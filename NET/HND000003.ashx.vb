@@ -1,38 +1,7 @@
 ﻿Imports System.Data.SqlClient
-Imports System.Drawing.Design
-Imports System.Drawing.Drawing2D
-Imports System.EnterpriseServices
 Imports System.IO
-Imports System.Net.Mail
-Imports System.Net.Mime
-Imports System.Net.PeerToPeer.Collaboration
-Imports System.Runtime.InteropServices
-Imports System.Runtime.Remoting.Contexts
-Imports System.Security.Cryptography
-Imports System.Security.Principal
-Imports System.Web
-Imports System.Web.DynamicData
 Imports System.Web.Script.Serialization
-Imports System.Web.Services
-Imports System.Web.WebSockets
-Imports System.Windows.Automation
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView
-Imports AjaxControlToolkit
-Imports AjaxControlToolkit.HtmlEditor.ToolbarButtons
-Imports CrystalDecisions.CrystalReports.Engine
-Imports CrystalDecisions.Shared
-Imports CrystalDecisions.[Shared].Json
-Imports Microsoft.Ajax.Utilities
-Imports Microsoft.Identity.Client.AuthScheme
-Imports Microsoft.Identity.Client.Cache
-Imports Microsoft.IdentityModel.Protocols.OpenIdConnect
-Imports Microsoft.Reporting.Map.WebForms.VirtualEarth
-Imports Microsoft.ReportingServices.RdlExpressions.ExpressionHostObjectModel
-Imports Microsoft.ReportingServices.Rendering.ExcelOpenXmlRenderer
-Imports Microsoft.SqlServer
-Imports Microsoft.VisualBasic.ApplicationServices
 Imports Newtonsoft.Json
-Imports OfficeOpenXml.ConditionalFormatting.Contracts
 
 Public Class HND000003
     Implements System.Web.IHttpHandler
@@ -44,9 +13,9 @@ Public Class HND000003
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.10"
+    Dim DataSource As String = "10.10.30.20"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
     'connection
 
@@ -1138,14 +1107,6 @@ Public Class HND000003
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
 
-            ElseIf FormCode = "FRM000010" And Type = "Sub-Department" Then
-
-                Dim pAcctCode = context.Request("pAcctCode")
-
-                Dim json As String = Me.FRM000010_Get_Sub_Department(pAcctCode)
-                context.Response.ContentType = "text/json"
-                context.Response.Write(json)
-
             ElseIf FormCode = "FRM000010" And Type = "Cost-Estimate-Construction" Then
 
                 Dim pCategory = context.Request("pCategory")
@@ -1172,6 +1133,16 @@ Public Class HND000003
                 Dim pProjectCat = context.Request("pProjectCat")
 
                 Dim json As String = Me.FRM000010_Get_PR_Tagging(pID, pWBSNo, pProjectCat)
+                context.Response.ContentType = "text/json"
+                context.Response.Write(json)
+
+            ElseIf FormCode = "FRM000010" And Type = "PR-Viewing" Then
+
+                Dim pID = context.Request("pID")
+                Dim pWBSNo = context.Request("pWBSNo")
+                Dim pProjectCat = context.Request("pProjectCat")
+
+                Dim json As String = Me.FRM000010_Get_PR_Viewing(pID, pWBSNo, pProjectCat)
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
 
@@ -10445,7 +10416,7 @@ Public Class HND000003
         'subd phase
 
         'subd phase block lot
-        Query.Append("else if @Category in ('Shell to Premium','Shell to Complete','classic to Premium','Shell to classic','Shell to Basic','Structural Consultant - House Unit','NWRB Application','Land Scape Unit','Interior Designer','House Repair', 'House Modification','Initial Inspection','House Construction', 'Take-Over Unit','Electrical Consultant','DOLE Application - Model House','Basic to Complete') ")
+        Query.Append("else if @Category in ('Shell to Premium','Shell to Complete','classic to Premium','Shell to classic','Shell to Basic','Structural Consultant - House Unit','NWRB Application','Land Scape Unit','Interior Designer','House Repair', 'House Modification','Initial Inspection','House Construction', 'Take-Over Unit','Electrical Consultant','DOLE Application - Model House','Basic to Complete', 'Others') ")
         Query.Append("begin  ")
         Query.Append("   select ")
         Query.Append("      [A].l_code [Code] ")
@@ -10563,7 +10534,7 @@ Public Class HND000003
         'subd phase
 
         'subd phase block lot
-        Query.Append("else if @Category in ('Shell to Premium','Shell to Complete','classic to Premium','Shell to classic','Shell to Basic','Structural Consultant - House Unit','NWRB Application','Land Scape Unit','Interior Designer','House Repair', 'House Modification','Initial Inspection','House Construction', 'Take-Over Unit','Electrical Consultant','DOLE Application - Model House','Basic to Complete') ")
+        Query.Append("else if @Category in ('Shell to Premium','Shell to Complete','classic to Premium','Shell to classic','Shell to Basic','Structural Consultant - House Unit','NWRB Application','Land Scape Unit','Interior Designer','House Repair', 'House Modification','Initial Inspection','House Construction', 'Take-Over Unit','Electrical Consultant','DOLE Application - Model House','Basic to Complete', 'Others') ")
         Query.Append("begin  ")
         Query.Append("   select ")
         Query.Append("      [D].abbr + ' ' + [C].description + ' B' + [B].block + ' L' + [A].lot [Project] ")
@@ -10815,6 +10786,7 @@ Public Class HND000003
         'display 
 
     End Function
+
     Private Function FRM000010_Get_Charge_To(pTblFrom, pCode1, pCode2, pCode3, pCode4, pCode5)
 
         'variable
@@ -11023,47 +10995,6 @@ Public Class HND000003
         'display 
 
     End Function
-    Function FRM000010_Get_Sub_Department(pAcctCode)
-
-        'get query
-        Dim Query As New StringBuilder
-        Query.Append("select ")
-        Query.Append("  acct_type ")
-        Query.Append("from ")
-        Query.Append("  fin_chart ")
-        Query.Append("where ")
-        Query.Append("  acct_code = '" & pAcctCode & "' ")
-        'get query
-
-        'variable
-        Dim RecordList As New List(Of Object)()
-        'variable
-
-        'read record
-        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
-            Using Cmd As New SqlCommand(Query.ToString)
-                Cmd.CommandType = CommandType.Text
-                Cmd.Connection = ConStr
-                ConStr.Open()
-                Dim DR As SqlDataReader = Cmd.ExecuteReader
-                While DR.Read()
-
-                    RecordList.Add(New With {
-                        .AcctType = DR("acct_type")
-                    })
-
-                End While
-                DR.Close()
-                ConStr.Close()
-            End Using
-        End Using
-        'read record
-
-        'set to max
-        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
-        'display 
-
-    End Function
     Private Function FRM000010_Get_Cost_Estimate_Cons(pCategory, pSubd)
 
         'get query
@@ -11072,8 +11003,6 @@ Public Class HND000003
         Query.Append("  (CASE WHEN [A].Batch IS NULL OR [A].Batch = '' OR [A].Batch = '-' THEN [A].CECode ELSE [A].Batch END) [Batch] ")
         Query.Append("  ,[A].Title [Project] ")
         Query.Append("  ,[A].CECode ")
-        Query.Append("  ,ISNULL([A].DivCode, '') [DivCode] ")
-        Query.Append("  ,ISNULL((select description from division where div_code = [A].DivCode), '') [DivName] ")
         Query.Append("from ")
         Query.Append("  Trxn_CEHdr [A] ")
         Query.Append("  left join eng_lot [B] on [A].Subdivision = [B].l_code ")
@@ -11101,14 +11030,12 @@ Public Class HND000003
                 While DR.Read()
 
                     Dim Action As New StringBuilder
-                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddEstimate('" & DR("CECode") & "', '" & DR("Project") & "', '" & DR("DivCode") & "', '" & DR("DivName") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddEstimate('" & DR("CECode") & "', '" & DR("Project") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
 
                     RecordList.Add(New With {
                         .Action = Action.ToString,
                         .Batch = DR("Batch"),
-                        .Project = DR("Project"),
-                        .DivCode = DR("DivCode"),
-                        .DivName = DR("DivName")
+                        .Project = DR("Project")
                     })
 
                 End While
@@ -11131,8 +11058,6 @@ Public Class HND000003
             Query.Append("select distinct ")
             Query.Append("  (CASE WHEN [A].BatchNo IS NULL OR [A].BatchNo = '' OR [A].BatchNo = '-' THEN [A].CECode ELSE [A].BatchNo END) [Batch] ")
             Query.Append("  ,(CASE WHEN [A].BatchNo IS NULL OR [A].BatchNo = '' OR [A].BatchNo = '-' THEN [A].BatchNo ELSE [A].BatchNo + ' - ' + (select top 1 subdivision.description from subdivision where subdivision.code = '" & pSubd & "') END) [Project]  ")
-            Query.Append("  ,isnull([B].division, '') [DivCode] ")
-            Query.Append("  ,ISNULL((select description from division where div_code = [B].division), '') [DivName] ")
             Query.Append("from ")
             Query.Append("  Trxn_CEDtl_PO [A] ")
             Query.Append("  left join subdivision [B] on [A].Project = [B].Code ")
@@ -11143,8 +11068,6 @@ Public Class HND000003
             Query.Append("select distinct ")
             Query.Append("  (CASE WHEN [A].Batch IS NULL OR [A].Batch = '' OR [A].Batch = '-' THEN [A].CECode ELSE [A].Batch END) [Batch] ")
             Query.Append("  ,(CASE WHEN [A].Batch IS NULL OR [A].Batch = '' OR [A].Batch = '-' THEN [A].Title ELSE [A].Batch + ' - ' + (select top 1 subdivision.description from subdivision where subdivision.code = '" & pSubd & "' or subdivision.code = '" & pSubd & "') END) [Project] ")
-            Query.Append("  ,isnull([A].DivCode, '') [DivCode] ")
-            Query.Append("  ,ISNULL((select description from division where div_code = [A].DivCode), '') [DivName] ")
             Query.Append("from ")
             Query.Append("  Trxn_CEHdr [A] ")
             Query.Append("  left join eng_lot [B] on [A].Subdivision = [B].l_code ")
@@ -11171,14 +11094,12 @@ Public Class HND000003
                 While DR.Read()
 
                     Dim Action As New StringBuilder
-                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddEstimate('" & DR("Batch") & "', '" & DR("Project") & "', '" & DR("DivCode") & "', '" & DR("DivName") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddEstimate('" & DR("Batch") & "', '" & DR("Project") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
 
                     RecordList.Add(New With {
                         .Action = Action.ToString,
                         .Batch = DR("Batch"),
-                        .Project = DR("Project"),
-                        .DivCode = DR("DivCode"),
-                        .DivName = DR("DivName")
+                        .Project = DR("Project")
                     })
 
                 End While
@@ -11245,11 +11166,12 @@ Public Class HND000003
         Query.Append("  left join sys_um [g] on [a].UMCode = [g].u_code ")
         Query.Append("where ")
         Query.Append("  [A].WBSNo = '" & pWBSNo & "' ")
+        Query.Append("  and [b].Post = 1 ")
+        Query.Append("  and [b].Rvrs = 0 ")
         Query.Append("  and ISNULL([a].IsOSM, 0) = 1 ")
-        Query.Append("  and ISNULL([b].Post, 0) = 1 ")
-        Query.Append("  and ISNULL([b].Rvrs, 0) = 0 ")
         Query.Append("  AND (@BatchNo = '' OR [b].Batch = @BatchNo) ")
         Query.Append("  and [B].SubdCode = @Subd ")
+        Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
         Query.Append("  and [a].Particular = @Particular) [a] ")
         'query
 
@@ -11298,6 +11220,85 @@ Public Class HND000003
 
     End Function
 
+    Private Function FRM000010_Get_PR_Viewing(pID, pWBSNo, pProjectCat)
+
+        'query
+        Dim Query As New StringBuilder
+        Query.Append("declare @Category nvarchar(60) = ISNULL((select Category from ogm_pr_hdr where form_no = '" & pID & "'), '') ")
+        Query.Append("declare @PRCode nvarchar(13) = ISNULL((select pr_code from ogm_pr_hdr where form_no = '" & pID & "'), '') ")
+        Query.Append("if @Category = 'House Construction' ")
+        Query.Append("begin ")
+        Query.Append("  select ")
+        Query.Append("      [G].abbr + ' ' + [F].description + ' B' + [E].block  + ' L' + [D].lot [Project] ")
+        Query.Append("      ,(select abbr from sys_um where u_code = [B].UMCode) [Unit] ")
+        Query.Append("      ,FORMAT([A].Qty, 'N2') [Qty] ")
+        Query.Append("  from ")
+        Query.Append("      Trxn_PRDtl_HouseCon [A] ")
+        Query.Append("      left join Trxn_CEDtl [B] on [A].WBSNo = [B].WBSNo and [A].ItemNo = [B].ItemNo and [A].CECode = [B].CECode ")
+        Query.Append("      left join Trxn_CEHdr [C] on [A].CECode = [C].CECode ")
+        Query.Append("      left join eng_lot [D] on [C].subdivision = [D].l_code ")
+        Query.Append("      left join eng_block [E] on [D].b_code = [E].b_code ")
+        Query.Append("      left join phase [F] on [E].p_code = [F].code ")
+        Query.Append("      left join subdivision [G] on [F].scode = [G].code ")
+        Query.Append("  where ")
+        Query.Append("      [A].PRCode = @PRCode ")
+        Query.Append("      and [A].WBSNo = '" & pWBSNo & "' ")
+        Query.Append("  order by ")
+        Query.Append("      [A].ItemNo ")
+        Query.Append("end ")
+        Query.Append("else if @Category = 'House Construction - CCI' ")
+        Query.Append("begin ")
+        Query.Append("  select ")
+        Query.Append("      [G].abbr + ' ' + [F].description + ' B' + [E].block  + ' L' + [D].lot [Project] ")
+        Query.Append("      ,(select abbr from sys_um where u_code = [B].UMCode) [Unit] ")
+        Query.Append("      ,FORMAT([A].Qty, 'N2') [Qty] ")
+        Query.Append("  from ")
+        Query.Append("      Trxn_PRDtl_HouseCon_CCI [A] ")
+        Query.Append("      left join Trxn_CEDtl [B] on [A].WBSNo = [B].WBSNo and [A].ItemNo = [B].ItemNo and [A].CECode = [B].CECode ")
+        Query.Append("      left join Trxn_CEHdr [C] on [A].CECode = [C].CECode ")
+        Query.Append("      left join eng_lot [D] on [C].subdivision = [D].l_code ")
+        Query.Append("      left join eng_block [E] on [D].b_code = [E].b_code ")
+        Query.Append("      left join phase [F] on [E].p_code = [F].code ")
+        Query.Append("      left join subdivision [G] on [F].scode = [G].code ")
+        Query.Append("  where ")
+        Query.Append("      [A].PRCode = @PRCode ")
+        Query.Append("      and [A].WBSNo = '" & pWBSNo & "' ")
+        Query.Append("  order by ")
+        Query.Append("      [A].ItemNo ")
+        Query.Append("end ")
+        'query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    RecordList.Add(New With {
+                        .Project = DR("Project"),
+                        .Unit = DR("Unit"),
+                        .Qty = DR("Qty")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'display 
+        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
+        'display
+
+    End Function
     Private Function FRM000010_Add_PR_Tagging(pID, pResultData)
 
         'variable

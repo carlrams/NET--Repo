@@ -38,14 +38,14 @@ Public Class FRM000010
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.10"
+    Dim DataSource As String = "10.10.30.20"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
 
-    Private Shared DataSource1 As String = "10.10.30.10"
+    Private Shared DataSource1 As String = "10.10.30.20"
     Private Shared catalog1 As String = "cldc_live_acc"
-    Private Shared UserID1 As String = "ciis"
+    Private Shared UserID1 As String = "ciisv2"
     Private Shared Password1 As String = "Cii5s"
     'connection
 
@@ -993,6 +993,12 @@ Public Class FRM000010
 
             'Project Type
             If lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI" Then pnl01Subdivision.Visible = True
+
+            If lbl01PurchaseType.Text = "Stock Request" And (lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI") Then
+                lbtn06PRDtlAdd.Visible = False
+            Else
+                lbtn06PRDtlAdd.Visible = True
+            End If
 
             'OSM Type - Non OSM
             If lbl01OSMType.Text = "Non OSM Project" Or lbl01OSMType.Text = "OSM Project" Or lbl01OSMType.Text.Contains("Advance PO") Then
@@ -2125,7 +2131,6 @@ Public Class FRM000010
             'display record
             bindTitle()
             bind01Overview()
-
             If lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI" Then
                 bind06PRDtl()
             Else
