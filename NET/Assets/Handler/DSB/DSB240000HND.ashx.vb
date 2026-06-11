@@ -16,6 +16,7 @@ Imports System.Windows.Forms.VisualStyles.VisualStyleElement.ListView
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView
 Imports AjaxControlToolkit.HtmlEditor.ToolbarButtons
 Imports NET.FINRTDatasetTableAdapters
+Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public Class DSB240000HND
@@ -28,9 +29,9 @@ Public Class DSB240000HND
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.10"
+    Dim DataSource As String = "10.10.30.20"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
     'connection
 
@@ -212,6 +213,24 @@ Public Class DSB240000HND
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
 
+            ElseIf pFormCode = "DSB240000" And pType = "Warehouse - Get Record : Item" Then
+
+                Dim pWarehouse = context.Request("pWarehouse")
+
+                Dim json As String = Me.Warehouse_Get_Record_Item(pWarehouse)
+                context.Response.ContentType = "text/json"
+                context.Response.Write(json)
+
+            ElseIf pFormCode = "DSB240000" And pType = "Warehouse - Get Record : Filter" Then
+
+                Dim pWarehouse = context.Request("pWarehouse")
+                Dim pItemCode = context.Request("pItemCode")
+                Dim pDate = context.Request("pDate")
+
+                Dim json As String = Me.Warehouse_Get_Record_Filter(pWarehouse, pItemCode, pDate)
+                context.Response.ContentType = "text/json"
+                context.Response.Write(json)
+
             ElseIf pFormCode = "DSB240000" And pType = "Get-Stock-Detail" Then
 
                 Dim pWarehouse = context.Request("pWarehouse")
@@ -378,6 +397,25 @@ Public Class DSB240000HND
             Query.Append("  and ISNULL([A].Batch, '') != '' ")
             Query.Append("  and ISNULL([A].Batch, '') != '-' ")
             Query.Append("  and [A].Category in ('House Construction', 'House Construction - CCI') ")
+            Query.Append("order by ")
+            Query.Append("   [Order1] ")
+            Query.Append("   ,[Order2] ")
+        ElseIf pTblName = "Get_Warehouse" Then
+            Query.Append("select ")
+            Query.Append("   '' [ID] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
+            Query.Append("   ,0 [Order1] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
+            Query.Append("union ")
+            Query.Append("select ")
+            Query.Append("   [A].w_code [ID] ")
+            Query.Append("   ,[A].warehouse [Name] ")
+            Query.Append("   ,2 [Order1] ")
+            Query.Append("   ,[A].warehouse [Order2] ")
+            Query.Append("from ")
+            Query.Append("   ogm_warehouse [A] ")
+            Query.Append("where ")
+            Query.Append("   [A].Lock = 1 ")
             Query.Append("order by ")
             Query.Append("   [Order1] ")
             Query.Append("   ,[Order2] ")
@@ -1898,28 +1936,52 @@ Public Class DSB240000HND
 
         'get query
         Dim Query As New StringBuilder
+        'Query.Append("select ")
+        'Query.Append("  [Warehouse] ")
+        'Query.Append("  ,[WhseCode] ")
+        'Query.Append("  ,[TotalStock] ")
+        'Query.Append("  ,[Division] ")
+        'Query.Append("  ,[Address] ")
+        'Query.Append("from ")
+        'Query.Append("(select ")
+        'Query.Append("  [A].warehouse [Warehouse] ")
+        'Query.Append("  ,[A].w_code [WhseCode] ")
+        'Query.Append("  ,ISNULL((select COUNT(1) from ItemBalance where ItemBalance.year = YEAR(GETDATE()) and ItemBalance.period = MONTH(GETDATE()) and ISNULL(ItemBalance.ClassCode, '') != '' and ItemBalance.WhseCode = [A].w_code), 0) [TotalStock] ")
+        'Query.Append("  ,[B].description [Division] ")
+        'Query.Append("  ,ISNULL([A].address, '') [Address] ")
+        'Query.Append("from ")
+        'Query.Append("  ogm_warehouse [A] ")
+        'Query.Append("  left join division [B] on [A].division = [B].div_code ")
+        'Query.Append("where ")
+        'Query.Append("  ISNULL([A].lock, 0) = 1) [Tbl] ")
+        'Query.Append("where ")
+        'Query.Append("  [TotalStock] > 0 ")
+        'Query.Append("order by ")
+        'Query.Append("  [TotalStock] DESC ")
         Query.Append("select ")
-        Query.Append("  [Warehouse] ")
-        Query.Append("  ,[WhseCode] ")
-        Query.Append("  ,[TotalStock] ")
-        Query.Append("  ,[Division] ")
-        Query.Append("  ,[Address] ")
+        Query.Append("  ItemBalance.Year ")
+        Query.Append("  ,ItemBalance.Period ")
+        Query.Append("  ,ItemBalance.WhseCode ")
+        Query.Append("  ,ItemBalance.WhseName ")
+        Query.Append("  ,ItemBalance.ClassCode ")
+        Query.Append("  ,ItemBalance.ClassName ")
+        Query.Append("  ,ItemBalance.ItemCode ")
+        Query.Append("  ,ItemBalance.ItemName ")
+        Query.Append("  ,ItemBalance.Qty + isnull((select sum(ItemLedger.Qty) * -1 from ItemLedger where ItemLedger.Year = ItemBalance.Year and ItemLedger.Period = ItemBalance.Period and ItemLedger.TrxDate > GETDATE() and ItemLedger.WhseCode = ItemBalance.WhseCode and ItemLedger.ItemCode = ItemBalance.ItemCode and ItemLedger.UMCode = ItemBalance.UMCode),0) [Qty] ")
+        Query.Append("  ,ItemBalance.UMCode ")
+        Query.Append("  ,ItemBalance.UMName ")
+        Query.Append("  ,ItemBalance.Cost ")
+        Query.Append("  ,ItemBalance.Total ")
+        Query.Append("  ,(select top 1 replace(replace(ItemLedger.TblFrom,'Trxn_',''),'Hdr','') from ItemLedger where ItemLedger.WhseCode = ItemBalance.WhseCode and ItemLedger.ItemCode = ItemBalance.ItemCode and ItemLedger.UMCode = ItemBalance.UMCode and ItemLedger.Qty > 0 order by ItemLedger.TrxDate desc) [TrxnType] ")
         Query.Append("from ")
-        Query.Append("(select ")
-        Query.Append("  [A].warehouse [Warehouse] ")
-        Query.Append("  ,[A].w_code [WhseCode] ")
-        Query.Append("  ,ISNULL((select COUNT(1) from ItemBalance where ItemBalance.year = YEAR(GETDATE()) and ItemBalance.period = MONTH(GETDATE()) and ISNULL(ItemBalance.ClassCode, '') != '' and ItemBalance.WhseCode = [A].w_code), 0) [TotalStock] ")
-        Query.Append("  ,[B].description [Division] ")
-        Query.Append("  ,ISNULL([A].address, '') [Address] ")
-        Query.Append("from ")
-        Query.Append("  ogm_warehouse [A] ")
-        Query.Append("  left join division [B] on [A].division = [B].div_code ")
+        Query.Append("  ItemBalance ")
         Query.Append("where ")
-        Query.Append("  ISNULL([A].lock, 0) = 1) [Tbl] ")
-        Query.Append("where ")
-        Query.Append("  [TotalStock] > 0 ")
+        Query.Append("  Year = YEAR(GETDATE()) ")
+        Query.Append("  and Period = MONTH(GETDATE()) ")
+        Query.Append("  and [Qty] > 0 ")
+        Query.Append("  and ISNULL(ItemCode, '') != '' ")
         Query.Append("order by ")
-        Query.Append("  [TotalStock] DESC ")
+        Query.Append("  ItemBalance.WhseName ")
         'get query
 
         'list
@@ -1935,12 +1997,186 @@ Public Class DSB240000HND
                 Dim DR As SqlDataReader = Cmd.ExecuteReader()
                 While DR.Read()
 
+                    '.Warehouse = DR("Warehouse"),
+                    '.WhseCode = DR("WhseCode"),
+                    '.TotalStock = DR("TotalStock"),
+                    '.Division = DR("Division"),
+                    '.Address = DR("Address")
+
                     RecordList.Add(New With {
-                        .Warehouse = DR("Warehouse"),
                         .WhseCode = DR("WhseCode"),
-                        .TotalStock = DR("TotalStock"),
-                        .Division = DR("Division"),
-                        .Address = DR("Address")
+                        .Warehouse = DR("WhseName"),
+                        .ClassCode = DR("ClassCode"),
+                        .ClassName = DR("ClassName"),
+                        .ItemCode = DR("ItemCode"),
+                        .ItemName = DR("ItemName"),
+                        .Qty = DR("Qty"),
+                        .UMCode = DR("UMCode"),
+                        .UMName = DR("UMName"),
+                        .Cost = DR("Cost"),
+                        .Total = DR("Total"),
+                        .Type = DR("TrxnType")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'connection
+
+        'Creates an instance of your JavaScriptSerializer And Setting the MaxJsonLength
+        Dim serializer As JavaScriptSerializer = New JavaScriptSerializer()
+        serializer.MaxJsonLength = 2146233079
+
+        'display 
+        Return (serializer.Serialize(RecordList))
+        'display
+
+    End Function
+    Function Warehouse_Get_Record_Item(pWarehouse)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("select ")
+        Query.Append("  [A].item [i_code] ")
+        Query.Append("  ,isnull([B].lock, 0) [Lock] ")
+        Query.Append("  ,[B].item ")
+        Query.Append("from ")
+        Query.Append("  ogm_item_bal [A] ")
+        Query.Append("  left join ogm_item [B] on [A].item = [B].i_code ")
+        Query.Append("where ")
+        Query.Append("  [A].year = YEAR(GETDATE()) ")
+        Query.Append("  and [A].period = MONTH(GETDATE()) ")
+        Query.Append("  and [A].qty > 0 ")
+        Query.Append("  and [A].warehouse = @pWarehouse ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pWarehouse", pWarehouse)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Action As New StringBuilder
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view mt-1' title='Select Item' onclick=""fn0301GetItem('" & DR("item") & "', '" & DR("i_code") & "', '" & DR("Lock") & "');return false;""><i class='las la-check fs-3'></i></button>")
+
+                    RecordList.Add(New With {
+                        .Action = Action.ToString(),
+                        .ItemCode = DR("i_code"),
+                        .Lock = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center mt-3'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Lock") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .ItemName = DR("item")
+                        })
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'display 
+        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
+        'display
+    End Function
+    Function Warehouse_Get_Record_Filter(pWarehouse, pItemCode, pDate)
+
+        Dim vDate As Date = IIf(pDate = "", Date.Now, pDate)
+
+        'get query
+        Dim Query As New StringBuilder
+        'Query.Append("select ")
+        'Query.Append("  [Warehouse] ")
+        'Query.Append("  ,[WhseCode] ")
+        'Query.Append("  ,[TotalStock] ")
+        'Query.Append("  ,[Division] ")
+        'Query.Append("  ,[Address] ")
+        'Query.Append("from ")
+        'Query.Append("(select ")
+        'Query.Append("  [A].warehouse [Warehouse] ")
+        'Query.Append("  ,[A].w_code [WhseCode] ")
+        'Query.Append("  ,ISNULL((select COUNT(1) from ItemBalance where ItemBalance.year = YEAR(GETDATE()) and ItemBalance.period = MONTH(GETDATE()) and ISNULL(ItemBalance.ClassCode, '') != '' and ItemBalance.WhseCode = [A].w_code), 0) [TotalStock] ")
+        'Query.Append("  ,[B].description [Division] ")
+        'Query.Append("  ,ISNULL([A].address, '') [Address] ")
+        'Query.Append("from ")
+        'Query.Append("  ogm_warehouse [A] ")
+        'Query.Append("  left join division [B] on [A].division = [B].div_code ")
+        'Query.Append("where ")
+        'Query.Append("  ISNULL([A].lock, 0) = 1) [Tbl] ")
+        'Query.Append("where ")
+        'Query.Append("  [TotalStock] > 0 ")
+        'Query.Append("order by ")
+        'Query.Append("  [TotalStock] DESC ")
+        Query.Append("select ")
+        Query.Append("  ItemBalance.Year ")
+        Query.Append("  ,ItemBalance.Period ")
+        Query.Append("  ,ItemBalance.WhseCode ")
+        Query.Append("  ,ItemBalance.WhseName ")
+        Query.Append("  ,ItemBalance.ClassCode ")
+        Query.Append("  ,ItemBalance.ClassName ")
+        Query.Append("  ,ItemBalance.ItemCode ")
+        Query.Append("  ,ItemBalance.ItemName ")
+        Query.Append("  ,ItemBalance.Qty + isnull((select sum(ItemLedger.Qty) * -1 from ItemLedger where ItemLedger.Year = ItemBalance.Year and ItemLedger.Period = ItemBalance.Period and ItemLedger.TrxDate > @Date and ItemLedger.WhseCode = ItemBalance.WhseCode and ItemLedger.ItemCode = ItemBalance.ItemCode and ItemLedger.UMCode = ItemBalance.UMCode),0) [Qty] ")
+        Query.Append("  ,ItemBalance.UMCode ")
+        Query.Append("  ,ItemBalance.UMName ")
+        Query.Append("  ,ItemBalance.Cost ")
+        Query.Append("  ,ItemBalance.Total ")
+        Query.Append("  ,(select top 1 replace(replace(ItemLedger.TblFrom,'Trxn_',''),'Hdr','') from ItemLedger where ItemLedger.WhseCode = ItemBalance.WhseCode and ItemLedger.ItemCode = ItemBalance.ItemCode and ItemLedger.UMCode = ItemBalance.UMCode and ItemLedger.Qty > 0 order by ItemLedger.TrxDate desc) [TrxnType] ")
+        Query.Append("from ")
+        Query.Append("  ItemBalance ")
+        Query.Append("where ")
+        Query.Append("  Year = @Year ")
+        Query.Append("  and Period = @Period ")
+        Query.Append("  and [Qty] > 0 ")
+        Query.Append("  and ISNULL(ItemCode, '') != '' ")
+        If pItemCode <> "" Then Query.Append("  and ItemCode = @pItemCode ")
+        If pWarehouse <> "" Then Query.Append("  and WhseCode = @pWhseCode ")
+        'get query
+
+        'list
+        Dim RecordList As New List(Of Object)()
+        'list
+
+        'connection
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString())
+                Cmd.Parameters.AddWithValue("@Date", vDate)
+                Cmd.Parameters.AddWithValue("@Year", Year(vDate))
+                Cmd.Parameters.AddWithValue("@Period", Month(vDate))
+                Cmd.Parameters.AddWithValue("@pItemCode", pItemCode)
+                Cmd.Parameters.AddWithValue("@pWhseCode", pWarehouse)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader()
+                While DR.Read()
+
+                    '.Warehouse = DR("Warehouse"),
+                    '.WhseCode = DR("WhseCode"),
+                    '.TotalStock = DR("TotalStock"),
+                    '.Division = DR("Division"),
+                    '.Address = DR("Address")
+
+                    RecordList.Add(New With {
+                        .WhseCode = DR("WhseCode"),
+                        .Warehouse = DR("WhseName"),
+                        .ClassCode = DR("ClassCode"),
+                        .ClassName = DR("ClassName"),
+                        .ItemCode = DR("ItemCode"),
+                        .ItemName = DR("ItemName"),
+                        .Qty = DR("Qty"),
+                        .UMCode = DR("UMCode"),
+                        .UMName = DR("UMName"),
+                        .Cost = DR("Cost"),
+                        .Total = DR("Total"),
+                        .Type = DR("TrxnType")
                     })
 
                 End While
@@ -2073,6 +2309,7 @@ Public Class DSB240000HND
         Query.Append("  [A].ItemName ")
         Query.Append("  ,[A].ItemName [Parent] ")
         Query.Append("  ,'' [WhseCode] ")
+        Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-6,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -6, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth7] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-5,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -5, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth6] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-4,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -4, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth5] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-3,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -3, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth4] ")
@@ -2080,8 +2317,8 @@ Public Class DSB240000HND
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-1,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -1, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth2] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(GETDATE()) and [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END)) [Mnth1] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(GETDATE()) and [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END)) [Total] ")
-        Query.Append("  ,SUM(CASE WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ( [A].year * 12 + [A].period ) ) BETWEEN 0 AND 5 THEN [A].qty ELSE 0 END) / 6.0 [AvgMnth] ")
-        Query.Append("  ,(CASE WHEN SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) = 0 THEN 0 ELSE SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) / (SUM(CASE  WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ( [A].year * 12 + [A].period ) ) BETWEEN 0 AND 5 THEN [A].qty ELSE 0 END) / 6.0) END) [Projection] ")
+        Query.Append("  ,SUM(CASE WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ( [A].year * 12 + [A].period ) ) BETWEEN 0 AND 6 THEN [A].qty ELSE 0 END) / 7.0 [AvgMnth] ")
+        Query.Append("  ,(CASE WHEN SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) = 0 THEN 0 ELSE SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) / (SUM(CASE  WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ( [A].year * 12 + [A].period ) ) BETWEEN 0 AND 6 THEN [A].qty ELSE 0 END) / 7.0) END) [Projection] ")
         Query.Append("  ,0 [No] ")
         Query.Append("from ")
         Query.Append("  ItemBalance [A] ")
@@ -2095,6 +2332,7 @@ Public Class DSB240000HND
         Query.Append("  [A].WhseName [ItemName] ")
         Query.Append("  ,[A].ItemName [Parent] ")
         Query.Append("  ,[A].WhseCode ")
+        Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-6,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -6, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth7] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-5,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -5, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth6] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-4,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -4, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth5] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-3,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -3, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth4] ")
@@ -2102,8 +2340,8 @@ Public Class DSB240000HND
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(DATEADD(MONTH,-1,GETDATE())) and [A].year = YEAR(DATEADD(MONTH, -1, GETDATE())) THEN [A].qty ELSE 0 END)) [Mnth2] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(GETDATE()) and [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END)) [Mnth1] ")
         Query.Append("  ,SUM((CASE WHEN [A].period = MONTH(GETDATE()) and [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END)) [Total] ")
-        Query.Append("  ,SUM(CASE WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ( [A].year * 12 + [A].period ) ) BETWEEN 0 AND 5 THEN [A].qty ELSE 0 END) / 6.0 [AvgMnth] ")
-        Query.Append("  ,(CASE WHEN SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) = 0 THEN 0 ELSE SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) / (SUM(CASE  WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ( [A].year * 12 + [A].period ) ) BETWEEN 0 AND 5 THEN [A].qty ELSE 0 END) / 6.0) END) [Projection] ")
+        Query.Append("  ,SUM(CASE WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ( [A].year * 12 + [A].period ) ) BETWEEN 0 AND 6 THEN [A].qty ELSE 0 END) / 7.0 [AvgMnth] ")
+        Query.Append("  ,(CASE WHEN SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) = 0 THEN 0 ELSE SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) / (SUM(CASE  WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ( [A].year * 12 + [A].period ) ) BETWEEN 0 AND 6 THEN [A].qty ELSE 0 END) / 7.0) END) [Projection] ")
         Query.Append("  ,1 [No] ")
         Query.Append("from ")
         Query.Append("  ItemBalance [A] ")
@@ -2137,6 +2375,7 @@ Public Class DSB240000HND
                         .SearchText = DR("SearchText"),
                         .ItemName = DR("ItemName"),
                         .WhseCode = DR("WhseCode"),
+                        .Month7 = DR("Mnth7"),
                         .Month6 = DR("Mnth6"),
                         .Month5 = DR("Mnth5"),
                         .Month4 = DR("Mnth4"),
@@ -2256,6 +2495,7 @@ Public Class DSB240000HND
         Query.Append("  ,ISNULL([A].WhseName, '-') [Warehouse] ")
         Query.Append("  ,ISNULL([A].status, 'Processing') [Status] ")
         Query.Append("  ,ISNULL((select SUM([Bal].qty) from ItemBalance [Bal] where [Bal].year = YEAR(GETDATE()) and [Bal].period = MONTH(GETDATE()) and [Bal].WhseCode = [A].WhseCode and [Bal].ItemCode = [A].ItemCode), 0) + [A].qty [NewBal] ")
+        Query.Append("  ,ISNULL((select SUM([Bal].qty) from ItemBalance [Bal] where [Bal].year = YEAR(GETDATE()) and [Bal].period = MONTH(GETDATE()) and [Bal].WhseCode = [A].WhseCode and [Bal].ItemCode = [A].ItemCode), 0) [CurrBal] ")
         Query.Append("  ,ISNULL((select top 1 [D].fullname from ogm_pr_dtl [B] left join ogm_pr_hdr [C] on [B].pr_code = [C].pr_code left join employee [D] on [B].Purchaser = [D].emp_no where [A].PRNo = [C].form_no and [A].PRSeqNo = [B].seq_no), '') [Purchaser] ")
         Query.Append("from ")
         Query.Append("  PODtl [A] ")
@@ -2290,6 +2530,7 @@ Public Class DSB240000HND
                         .Warehouse = DR("Warehouse"),
                         .Status = DR("Status"),
                         .NewBal = DR("NewBal"),
+                        .CurrBal = DR("CurrBal"),
                         .Purchaser = DR("Purchaser")
                     })
 
@@ -2323,6 +2564,7 @@ Public Class DSB240000HND
         Query.Append("  ,ISNULL([A].WhseName, '-') [Warehouse] ")
         Query.Append("  ,ISNULL([A].status, 'Processing') [Status] ")
         Query.Append("  ,ISNULL((select SUM([Bal].qty) from ItemBalance [Bal] where [Bal].year = YEAR(GETDATE()) and [Bal].period = MONTH(GETDATE()) and [Bal].WhseCode = [A].WhseCode and [Bal].ItemCode = [A].ItemCode), 0) + [A].qty [NewBal] ")
+        Query.Append("  ,ISNULL((select SUM([Bal].qty) from ItemBalance [Bal] where [Bal].year = YEAR(GETDATE()) and [Bal].period = MONTH(GETDATE()) and [Bal].WhseCode = [A].WhseCode and [Bal].ItemCode = [A].ItemCode), 0) [CurrBal] ")
         Query.Append("  ,ISNULL((select top 1 [D].fullname from ogm_pr_dtl [B] left join ogm_pr_hdr [C] on [B].pr_code = [C].pr_code left join employee [D] on [B].Purchaser = [D].emp_no where [A].PRNo = [C].form_no and [A].PRSeqNo = [B].seq_no), '') [Purchaser] ")
         Query.Append("from ")
         Query.Append("  PODtl [A] ")
@@ -2369,6 +2611,7 @@ Public Class DSB240000HND
                         .Warehouse = DR("Warehouse"),
                         .Status = DR("Status"),
                         .NewBal = DR("NewBal"),
+                        .CurrBal = DR("CurrBal"),
                         .Purchaser = DR("Purchaser")
                     })
 

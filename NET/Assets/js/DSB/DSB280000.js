@@ -541,6 +541,9 @@ function fn03Chart() {
                         yaxis: {
                             labels: {
                                 show: false
+                            },
+                            max: function (max) {
+                                return 100;
                             }
                         },
                         title: {

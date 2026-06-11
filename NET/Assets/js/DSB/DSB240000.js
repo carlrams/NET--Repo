@@ -5,6 +5,7 @@ let grid02Api;
 let grid0201Api;
 let grid03Api;
 let grid0301Api;
+let grid0302Api;
 let grid04Api;
 let grid05Api;
 let grid06Api;
@@ -2000,9 +2001,9 @@ function fn03Table() {
                 });
             }
         },
-        onRowClicked: params => {
-            fn0301Table(params.data.WhseCode);
-        },
+        //onRowClicked: params => {
+        //    fn0301Table(params.data.WhseCode);
+        //},
         columnDefs: [
             {
                 headerName: "Warehouse",
@@ -2015,25 +2016,62 @@ function fn03Table() {
                 cellStyle: { fontWeight: 'bold' }
             },
             {
-                headerName: "Division",
-                field: "Division",
+                headerName: "Classification",
+                field: "ClassName",
                 filter: 'agTextColumnFilter',
-                width: 120,
-                tooltipField: "Division"
+                width: 250,
+                tooltipField: "ClassName"
             },
             {
-                headerName: "Address",
-                field: "Address",
+                headerName: "Item",
+                field: "ItemName",
                 filter: 'agTextColumnFilter',
                 flex: 1,
                 minWidth: 350,
-                tooltipField: "Address"
+                tooltipField: "ItemName"
             },
             {
-                headerName: "Total Stock",
-                field: "TotalStock",
+                headerName: "Qty. Stock",
+                field: "Qty",
                 width: 150,
-                tooltipField: "TotalStock",
+                tooltipField: "Qty",
+                cellClass: "text-end",
+                valueFormatter: params => {
+                    if (params.value == null || params.value === "") return "";
+                    return Number(params.value).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                },
+                cellStyle: { fontWeight: 'bold' }
+            },
+            {
+                headerName: "Unit",
+                field: "UMName",
+                filter: 'agTextColumnFilter',
+                width: 75,
+                tooltipField: "UMName"
+            },
+            {
+                headerName: "Cost",
+                field: "Cost",
+                width: 150,
+                tooltipField: "Cost",
+                cellClass: "text-end",
+                valueFormatter: params => {
+                    if (params.value == null || params.value === "") return "";
+                    return Number(params.value).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                },
+                cellStyle: { fontWeight: 'bold' }
+            },
+            {
+                headerName: "Total",
+                field: "Total",
+                width: 150,
+                tooltipField: "Total",
                 cellClass: "text-end",
                 valueFormatter: params => {
                     if (params.value == null || params.value === "") return "";
@@ -2056,14 +2094,18 @@ function fn03Table() {
 
     grid03Api = agGrid.createGrid(gridDiv, gridOptions);
     function updFooter() {
+        let Qty = 0;
+        let Cost = 0;
         let Total = 0;
 
         grid03Api.forEachNodeAfterFilter(function (node) {
-            Total += Number(node.data.TotalStock) || 0;
+            Total += Number(node.data.Total) || 0;
+            Qty += Number(node.data.Qty) || 0;
+            Cost += Number(node.data.Cost) || 0;
         });
 
         grid03Api.setGridOption('pinnedBottomRowData', [
-            { Warehouse: 'TOTAL', TotalStock: Total }
+            { Warehouse: 'TOTAL', Qty: Qty, Cost: Cost, Total: Total }
         ]);
     }
 };
@@ -2452,7 +2494,7 @@ function fn04Table() {
     });
 
     const AbbrMonths = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 7; i++) {
         const d = new Date();
         d.setMonth(d.getMonth() - i);
         AbbrMonths.push(d.toLocaleString('default', { month: 'short' }));
@@ -2506,6 +2548,25 @@ function fn04Table() {
                 flex: 1,
                 minWidth: 450,
                 getQuickFilterText: params => params.data.SearchText || '',
+                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+            },
+            {
+                headerName: AbbrMonths[6],
+                field: "Month7",
+                tooltipField: "Month7",
+                width: 150,
+                cellStyle: { fontStyle: 'italic' },
+                valueFormatter: params => {
+                    let value = parseFloat(params.value);
+                    if (isNaN(value)) {
+                        value = parseFloat(params.data.Month6) || 0;
+                    }
+                    return value.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                },
+                getQuickFilterText: () => '',
                 cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
             },
             {
@@ -2764,7 +2825,8 @@ function fn05Table() {
                 params.api.applyColumnState({
                     state: [
                         { colId: 'RefNo', pinned: 'left' },
-                        { colId: 'Status', pinned: 'right' },
+                        { colId: 'Warehouse', pinned: 'right' },
+                        { colId: 'CurrBal', pinned: 'right' },
                         { colId: 'NewBal', pinned: 'right' }
                     ]
                 });
@@ -2824,13 +2886,6 @@ function fn05Table() {
                 width: 200,
             },
             {
-                headerName: "Warehouse",
-                field: "Warehouse",
-                filter: 'agTextColumnFilter',
-                tooltipField: "Warehouse",
-                width: 250,
-            },
-            {
                 headerName: "Purchaser",
                 field: "Purchaser",
                 filter: 'agTextColumnFilter',
@@ -2842,7 +2897,6 @@ function fn05Table() {
                 field: "Status",
                 filter: 'agTextColumnFilter',
                 width: 180,
-                pinned: "right",
                 cellRenderer: params => {
                     var span = "";
                     if (params.value != "") {
@@ -2892,6 +2946,28 @@ function fn05Table() {
                 onCellClicked: function (params) {
                     //redirect
                     window.open("SCM060100-DTL-" + params.data.Code, '_blank').focus();
+                }
+            },
+            {
+                headerName: "Warehouse",
+                field: "Warehouse",
+                filter: 'agTextColumnFilter',
+                tooltipField: "Warehouse",
+                pinned: "right",
+                width: 200,
+            },
+            {
+                headerName: "Current Balance",
+                field: "CurrBal",
+                width: 150,
+                cellClass: "text-end",
+                pinned: "right",
+                valueFormatter: params => {
+                    if (params.value == null || params.value === "") return "";
+                    return Number(params.value).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
                 }
             },
             {
@@ -4505,6 +4581,319 @@ function fn0301Filter_Ok(Btn) {
         };
     };
 };
+//warehouse dropdown
+function ddl0301Warehouse(ID) {
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/DSB/DSB240000HND.ashx",
+        data: {
+            'pFunction': 'Dropdown',
+            'pType': 'Get Record',
+            'pTblName': 'Get_Warehouse',
+            'pPlaceHolder': 'Warehouse',
+        },
+        success: function (response) {
+            var s = '';
+            for (var i = 0; i < response.length; i++) {
+                s += '<option value="' + response[i].ID + '">' + response[i].Name + '</option>';
+            }
+            $("#ddl0301Warehouse").html(s);
+            $('#ddl0301Warehouse').val(ID).trigger('change');
+        },
+    });
+};
+function fn0301Filter() {
+    ddl0301Warehouse('');
+    document.getElementById("tbx0301Item").value = "";
+    document.getElementById("hf0301ItemCode").value = "";
+    document.getElementById("tbx0301Date").value = "";
+
+    //modal
+    $("#mdl0301Filter").modal("show");
+};
+//get item
+function fn0301Item() {
+    if (document.getElementById("ddl0301Warehouse").options[document.getElementById("ddl0301Warehouse").selectedIndex].value == "") {
+        fnAlertOnly('Please select a warehouse!', 'error', 'btn btn-danger');
+    } else {
+        //item
+        $.ajax({
+            type: "POST",
+            url: "Assets/Handler/DSB/DSB240000HND.ashx",
+            data: {
+                'pFormCode': 'DSB240000',
+                'pType': 'Warehouse - Get Record : Item',
+                'pWarehouse': document.getElementById("ddl0301Warehouse").options[document.getElementById("ddl0301Warehouse").selectedIndex].value
+            },
+            success: function (response) {
+                grid0302Api.setGridOption("rowData", response);
+            },
+            complete: function (response) {
+                grid0302Api.setGridOption("loading", false);
+            }
+        });
+
+        //AG Grid
+        let gridDiv = document.querySelector('#table0302Record');
+        let gridOptions;
+
+        //Destroy old grid if exists
+        gridDiv.innerHTML = "";
+
+        const gridTheme = agGrid.themeQuartz.withParams({
+            wrapperBorder: true,
+            headerRowBorder: false,
+        });
+
+        gridOptions = {
+            theme: gridTheme,
+            suppressCellFocus: true,
+            suppressDragLeaveHidesColumns: true,
+            enableCellTextSelection: true,
+            rowSelection: 'single',
+            loading: true,
+            columnDefs: [
+                {
+                    headerName: "Action",
+                    field: "Action",
+                    sortable: false,
+                    resizable: false,
+                    lockPosition: true,
+                    width: 75,
+                    cellRenderer: params => params.value
+                },
+                {
+                    headerName: "Lock",
+                    field: "Lock",
+                    sortable: false,
+                    resizable: false,
+                    lockPosition: true,
+                    width: 65,
+                    cellRenderer: params => params.value
+                },
+                {
+                    headerName: "Item",
+                    field: "ItemName",
+                    filter: 'agTextColumnFilter',
+                    tooltipField: "ItemName",
+                    flex: 1,
+                    minWidth: 350
+                }
+            ],
+            rowData: [],
+            pagination: false
+        };
+
+        grid0302Api = agGrid.createGrid(gridDiv, gridOptions);
+
+        $("#mdl0302Item").modal("show");
+    };
+};
+function fn0301GetItem(pItemName, pItemCode, pLock) {
+    //validate
+    if (pLock == 1) {
+        Item(pItemName, pItemCode);
+    } else {
+        fnAlertOnly('Record is unlocked, it cannot be used!', 'error', 'btn btn-danger');
+    };
+    function Item(pItemName, pItemCode) {
+        document.getElementById("tbx0301Item").value = pItemName;
+        document.getElementById("hf0301ItemCode").value = pItemCode;
+        $("#mdl0302Item").modal("hide");
+    };
+};
+function fn0302Filter_Ok(Btn) {
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = true;
+    // Show loading indicator
+    Btn.setAttribute('data-kt-indicator', 'on');
+    // Simulate form submission
+    Filter_Ok();
+    //function
+    async function Filter_Ok() {
+        await Filter_Ok_Await(Btn);
+    };
+    async function Filter_Ok_Await(Btn) {
+        // validate
+        return new Promise(resolve => {
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/DSB/DSB240000HND.ashx",
+                data: {
+                    'pFormCode': 'DSB240000',
+                    'pType': 'Warehouse - Get Record : Filter',
+                    'pWarehouse': document.getElementById("ddl0301Warehouse").options[document.getElementById("ddl0301Warehouse").selectedIndex].value,
+                    'pItemCode': document.getElementById("hf0301ItemCode").value,
+                    'pDate': document.getElementById("tbx0301Date").value
+                },
+                success: function (response) {
+                    grid03Api.setGridOption("rowData", response);
+                    //alert
+                    fnAlertOnly('Record successfully loaded.', 'success', 'btn btn-success');
+
+                    ddl0301Warehouse('');
+                    document.getElementById("tbx0301Item").value = "";
+                    document.getElementById("hf0301ItemCode").value = "";
+                    document.getElementById("tbx0301Date").value = "";
+                    // Disable the clicked button to avoid multiple clicks
+                    Btn.disabled = false;
+                    // Hide loading indication
+                    Btn.removeAttribute('data-kt-indicator');
+                    //resolve
+                    resolve();
+                },
+                complete: function (response) {
+                    grid03Api.setGridOption("loading", false);
+                }
+            });
+
+            //AG Grid
+            let gridDiv = document.querySelector('#table03Record');
+            let gridOptions;
+
+            //Destroy old grid if exists
+            gridDiv.innerHTML = "";
+
+            const gridTheme = agGrid.themeQuartz.withParams({
+                wrapperBorder: true,
+                headerRowBorder: false,
+            });
+
+            gridOptions = {
+                theme: gridTheme,
+                suppressCellFocus: true,
+                suppressDragLeaveHidesColumns: true,
+                enableCellTextSelection: true,
+                rowSelection: 'single',
+                loading: true,
+                onFilterChanged: updFooter,
+                onFirstDataRendered: updFooter,
+                onGridSizeChanged: function (params) {
+                    const isMobile = params.clientWidth < 768;
+
+                    if (isMobile) {
+                        params.api.applyColumnState({
+                            defaultState: { pinned: null }
+                        });
+                    } else {
+                        params.api.applyColumnState({
+                            state: [
+                                { colId: 'Warehouse', pinned: 'left' }
+                            ]
+                        });
+                    }
+                },
+                //onRowClicked: params => {
+                //    fn0301Table(params.data.WhseCode);
+                //},
+                columnDefs: [
+                    {
+                        headerName: "Warehouse",
+                        field: "Warehouse",
+                        lockPosition: true,
+                        pinned: "left",
+                        filter: 'agTextColumnFilter',
+                        width: 250,
+                        tooltipField: "Warehouse",
+                        cellStyle: { fontWeight: 'bold' }
+                    },
+                    {
+                        headerName: "Classification",
+                        field: "ClassName",
+                        filter: 'agTextColumnFilter',
+                        width: 250,
+                        tooltipField: "ClassName"
+                    },
+                    {
+                        headerName: "Item",
+                        field: "ItemName",
+                        filter: 'agTextColumnFilter',
+                        flex: 1,
+                        minWidth: 350,
+                        tooltipField: "ItemName"
+                    },
+                    {
+                        headerName: "Qty. Stock",
+                        field: "Qty",
+                        width: 150,
+                        tooltipField: "Qty",
+                        cellClass: "text-end",
+                        valueFormatter: params => {
+                            if (params.value == null || params.value === "") return "";
+                            return Number(params.value).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                        cellStyle: { fontWeight: 'bold' }
+                    },
+                    {
+                        headerName: "Unit",
+                        field: "UMName",
+                        filter: 'agTextColumnFilter',
+                        width: 75,
+                        tooltipField: "UMName"
+                    },
+                    {
+                        headerName: "Cost",
+                        field: "Cost",
+                        width: 150,
+                        tooltipField: "Cost",
+                        cellClass: "text-end",
+                        valueFormatter: params => {
+                            if (params.value == null || params.value === "") return "";
+                            return Number(params.value).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                        cellStyle: { fontWeight: 'bold' }
+                    },
+                    {
+                        headerName: "Total",
+                        field: "Total",
+                        width: 150,
+                        tooltipField: "Total",
+                        cellClass: "text-end",
+                        valueFormatter: params => {
+                            if (params.value == null || params.value === "") return "";
+                            return Number(params.value).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                        cellStyle: { fontWeight: 'bold' }
+                    }
+                ],
+                rowData: [],
+                pagination: false,
+                getRowStyle: params => {
+                    if (params.node.rowPinned) {
+                        return { fontWeight: 'bold', background: '#f8f9fa' };
+                    }
+                }
+            };
+
+            grid03Api = agGrid.createGrid(gridDiv, gridOptions);
+            function updFooter() {
+                let Qty = 0;
+                let Cost = 0;
+                let Total = 0;
+
+                grid03Api.forEachNodeAfterFilter(function (node) {
+                    Total += Number(node.data.Total) || 0;
+                    Qty += Number(node.data.Qty) || 0;
+                    Cost += Number(node.data.Cost) || 0;
+                });
+
+                grid03Api.setGridOption('pinnedBottomRowData', [
+                    { Warehouse: 'TOTAL', Qty: Qty, Cost: Cost, Total: Total }
+                ]);
+            }
+        });
+    };
+};
 //for - 04
 function fn05Filter() {
     fn05Warehouse('');
@@ -4582,7 +4971,8 @@ function fn05Filter_Ok(Btn) {
                         params.api.applyColumnState({
                             state: [
                                 { colId: 'RefNo', pinned: 'left' },
-                                { colId: 'Status', pinned: 'right' },
+                                { colId: 'Warehouse', pinned: 'right' },
+                                { colId: 'CurrBal', pinned: 'right' },
                                 { colId: 'NewBal', pinned: 'right' }
                             ]
                         });
@@ -4642,18 +5032,10 @@ function fn05Filter_Ok(Btn) {
                         width: 200,
                     },
                     {
-                        headerName: "Warehouse",
-                        field: "Warehouse",
-                        filter: 'agTextColumnFilter',
-                        tooltipField: "Warehouse",
-                        width: 250,
-                    },
-                    {
                         headerName: "Status",
                         field: "Status",
                         filter: 'agTextColumnFilter',
                         width: 180,
-                        pinned: "right",
                         cellRenderer: params => {
                             var span = "";
                             if (params.value != "") {
@@ -4694,6 +5076,28 @@ function fn05Filter_Ok(Btn) {
                         onCellClicked: function (params) {
                             //redirect
                             window.open("SCM060100-DTL-" + params.data.Code, '_blank').focus();
+                        }
+                    },
+                    {
+                        headerName: "Warehouse",
+                        field: "Warehouse",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Warehouse",
+                        width: 200,
+                        pinned: "right",
+                    },
+                    {
+                        headerName: "Current Balance",
+                        field: "CurrBal",
+                        width: 150,
+                        cellClass: "text-end",
+                        pinned: "right",
+                        valueFormatter: params => {
+                            if (params.value == null || params.value === "") return "";
+                            return Number(params.value).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
                         }
                     },
                     {
@@ -5501,11 +5905,19 @@ function fn03Export() {
         });
     }
 };
+function fn0301Export() {
+    if (grid03Api) {
+        grid03Api.exportDataAsCsv({
+            fileName: 'Inventory Stock per Warehouse.csv',
+            columnKeys: ['Warehouse', 'ClassName', 'ItemName', 'Qty', 'UMName', 'Cost', 'Total']
+        });
+    }
+};
 function fn04Export() {
     if (grid04Api) {
         grid04Api.exportDataAsCsv({
             fileName: 'Actual Issuance Usage.csv',
-            columnKeys: ['ItemName', 'Month6', 'Month5', 'Month4', 'Month3', 'Month2', 'Month1', 'Total', 'AvgMonth', 'Projection']
+            columnKeys: ['ItemName', 'Month7', 'Month6', 'Month5', 'Month4', 'Month3', 'Month2', 'Month1', 'Total', 'AvgMonth', 'Projection']
         });
     }
 };
@@ -5513,7 +5925,7 @@ function fn05Export() {
     if (grid05Api) {
         grid05Api.exportDataAsCsv({
             fileName: 'Upcoming New Balances (Incoming Stock).csv',
-            columnKeys: ['RefNo', 'ItemName', 'Qty', 'Date', 'Supplier', 'Warehouse', 'Purchaser', 'Status']
+            columnKeys: ['RefNo', 'ItemName', 'Qty', 'Date', 'Supplier', 'Purchaser', 'Status', 'Warehouse', 'CurrBal', 'NewBal']
         });
     }
 };

@@ -1415,6 +1415,79 @@
 		</asp:UpdatePanel>
 		<!--begin::PR New Particular-->
 				
+		<!--begin::Modal PR Find-->
+		<div id="mdl06PRDtlTagView" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+	        <div class="modal-dialog modal-dialog-scrollable mw-1000px">
+	            <div class="modal-content shadow-none">
+					<div class="modal-header">
+                        <h5 class="modal-title">Project Tagged</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex flex-stack">
+                                <!--begin::Search-->
+                                <div class="position-relative me-1">
+                                    <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                                    <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+				                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+					                        <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+				                        </svg>
+                                    </span>
+                                    <!--end::Svg Icon-->
+                                    <input id="tbx06PRDtlViewFind" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" />
+                                </div>
+                            </div>
+                            <!--begin::Close-->
+                            <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+				                <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+				                <span class="svg-icon svg-icon-1">
+					                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+						                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+					                </svg>
+				                </span>
+				                <!--end::Svg Icon-->
+                            </div>
+                            <!--end::Close-->
+                        </div>
+					</div>
+					<div class="modal-body">
+                        <!--begin::Files-->
+                        <div class="table-loading">
+                            <div id="div06PRDtlViewLoader" class="table-loading-message">
+                                Loading...
+                            </div>
+                            <table id="table06PRDtlView" class="table table-row-bordered border rounded gy-2 gs-2 w-100 align-middle">
+				                <thead>
+					                <tr class="fw-bold fs-7 text-gray-800">
+                                        <th class="min-w-200px w-100 fw-bold border-end">Project</th>
+                                        <th class="min-w-100px mw-100px fw-bold border-end">Unit</th>
+                                        <th class="min-w-150px mw-150px fw-bold border-end">Qty</th>
+					                </tr>
+				                </thead>                                                                                             
+				                <tbody>
+						
+				                </tbody>
+								<tfoot>
+									<tr class="fw-bold fs-7 text-gray-800">
+										<th></th>
+										<th class="text-end text-dark">Total</th>
+										<th class="text-end text-dark"></th>
+									</tr>
+								</tfoot>
+                            </table>
+                            <!--end::Files-->
+                        </div>
+					</div>
+                    <div class="modal-footer">
+                         <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
+		<!--begin::Modal PR Find-->
+        
 		<!--begin::Modal PR New Particular SCM-->
 		<asp:UpdatePanel ID="mdl06PRDtlAddSCM" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
 		<ContentTemplate>
@@ -1875,7 +1948,7 @@
 				                        </svg>
                                     </span>
                                     <!--end::Svg Icon-->
-                                    <input id="tbx01FindCharge" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" />
+                                    <input id="tbx01FindCharge" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid01Api.setGridOption('quickFilterText', document.getElementById('tbx01FindCharge').value);" />
                                 </div>
                             </div>
                             <!--begin::Close-->
@@ -1895,22 +1968,7 @@
 					<div class="modal-body">
                         <!--begin::Files-->
                         <div class="table-loading">
-                            <div id="div01Loader" class="table-loading-message">
-                                Loading...
-                            </div>
-                            <table id="tbl01Record" class="table table-row-bordered border rounded gy-2 gs-2 w-100 align-middle">
-				                <thead>
-					                <tr class="fw-bold fs-7 text-gray-800">
-							            <th class="min-w-50px mw-50px fw-bold border-end" style="padding-left:15px"><span title="Action"><i class='las la-bars fs-3'></i></span></th>
-						                <th class="min-w-100px mw-100px fw-bold border-end">Code</th>
-                                        <th class="min-w-50px mw-50px fw-bold border-end">Lock</th>
-						                <th class="min-w-150px w-100 fw-bold border-end">Description</th>
-					                </tr>
-				                </thead>                                                                                             
-				                <tbody>
-						
-				                </tbody>
-                            </table>
+                            <div id="tbl01Record" style="height: 150vh;"></div>
                             <!--end::Files-->
                         </div>
 					</div>
@@ -2229,7 +2287,12 @@
 	<!--end::Content-->
 
 	<!-- scripts related to this page -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
     <script type="text/javascript">     
+
+		//public ag grid
+		let grid01Api;
+		//public ag grid
 
 		//format
         function fnFormatNumericQty(input, maxQty, Qty) {
@@ -2313,6 +2376,118 @@
             });
         }
 		//balance
+
+        //view tag
+        function fn02PRDtlTag(pID, pItemNo) {
+            $.ajax({
+                type: "POST",
+                url: "HND000003.ashx",
+                data: {
+                    'FormCode': 'FRM000010',
+                    'Type': 'PR-Viewing',
+                    'pID': pID,
+                    'pWBSNo': pItemNo,
+                    'pProjectCat': document.getElementById("ContentPlaceHolder1_lbl01ProjectCat").innerText
+                },
+                beforeSend: function () {
+                    // Show Swal loader
+                    Swal.fire({
+                        title: 'Loading...',
+                        text: 'Please wait while data is being processed.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                },
+                success: function (response) {
+                    //display loader
+                    document.getElementById("div06PRDtlViewLoader").style.display = "";
+                    //display loader
+
+                    $('#table06PRDtlView').DataTable().destroy();
+
+                    //disable column type detection
+                    DataTable.types().forEach(type => {
+                        DataTable.type(type, 'detect', () => false);
+                    });
+                    //disable column type detection
+
+                    //sort date by yyyy/mm/dd
+                    $.fn.dataTable.moment('MM/DD/YYYY');
+                    //sort date by yyyy/mm/dd
+
+                    //datatable
+                    var table06PRDtl = $("#table06PRDtlView").DataTable({
+                        processing: true,
+                        bFilter: true,
+                        bPaginate: true,
+                        bInfo: false,
+                        paging: false,
+                        lengthChange: true,
+                        pageLength: 25,
+                        select: true,
+                        data: response,
+                        columns: [
+                            { data: 'Project' },
+                            { data: 'Unit' },
+                            { data: 'Qty' },
+                        ],
+                        rowId: 'rowId',
+                        columnDefs: [
+                            {
+                                targets: [0], className: 'tbody-nowrap-auto'
+                            },
+                            {
+                                targets: [2],
+                                className: 'dt-body-right',
+                                render: $.fn.dataTable.render.number(',', '.', 2)
+                            }
+                        ],
+                        order: [[0, 'asc']],
+                        orderCellsTop: true,
+                        initComplete: function () {
+                            this.api().cells().every(function () {
+                                var cell = this.node();
+                                $(cell).attr('title', $(cell).text());
+                            });
+                        },
+                        footerCallback: function (row, data, start, end, display) {
+                            var api = this.api();
+
+                            function sumColumn(colIndex) {
+                                return api.column(colIndex, { search: 'applied' }).data().reduce(function (a, b) {
+                                    return (parseFloat(a) || 0) + (parseFloat(b) || 0);
+                                }, 0);
+                            }
+
+                            var qtyTotal = sumColumn(2);
+
+                            $(api.column(2).footer()).html(qtyTotal.toLocaleString("en-US", { minimumFractionDigits: 2 }));
+                        },
+                    });
+                    //datatable
+
+                    //search
+                    $('#tbx06PRDtlViewFind').on('keyup', function () {
+                        table06PRDtl.search(this.value).draw();
+                    });
+                    //search
+
+                    // close Swal loader if error
+                    Swal.close();
+
+                    //hide loader
+                    document.getElementById("div06PRDtlViewLoader").style.display = "none";
+                    //hide loader
+
+                    //modal
+                    $('#mdl06PRDtlTagView').modal('show');
+                }
+            });
+        };
+        //view tag
 
 		//tag
 		function fn01PRDtlTag(pID, pItemNo) {
@@ -2653,7 +2828,8 @@
 
 		//charge to
 		function fn01ChargeTo() {
-            if (document.getElementById("ContentPlaceHolder1_hf01AcctCode").value != "" && document.getElementById("ContentPlaceHolder1_hf01Subsidiary").value != "NO SUBSIDIARY") {
+			if (document.getElementById("ContentPlaceHolder1_hf01AcctCode").value != "" && document.getElementById("ContentPlaceHolder1_hf01Subsidiary").value != "NO SUBSIDIARY") {
+
                 $.ajax({
                     type: "POST",
                     url: "HND000003.ashx",
@@ -2667,76 +2843,71 @@
 						'pCode4': '',
 						'pCode5': ''
                     },
-					success: function (response) {
-                        //display loader
-						document.getElementById("div01Loader").style.display = "";
-						document.getElementById("h01Title").innerText = "";
-                        //display loader
+                    success: function (response) {
+                        grid01Api.setGridOption("rowData", response);
+					},
+                    complete: function (response) {
+                        grid01Api.setGridOption("loading", false);
+					}
+				});
 
-                        $('#tbl01Record').DataTable().destroy();
+				//Search Header
+                document.getElementById("h01Title").innerText = "";
 
-                        //disable column type detection
-                        DataTable.types().forEach(type => {
-                            DataTable.type(type, 'detect', () => false);
-                        });
-                        //disable column type detection
+                //AG Grid
+                let gridDiv = document.querySelector('#tbl01Record');
+                let gridOptions;
 
-                        //sort date by yyyy/mm/dd
-                        $.fn.dataTable.moment('MM/DD/YYYY');
-                        //sort date by yyyy/mm/dd
+                // Destroy old grid if exists
+                gridDiv.innerHTML = "";
 
-                        //datatable
-                        var tbl01Record = $("#tbl01Record").DataTable({
-                            processing: true,
-                            bFilter: true,
-                            bPaginate: true,
-                            bInfo: false,
-                            paging: true,
-                            lengthChange: true,
-                            pageLength: 25,
-                            select: true,
-                            data: response,
-                            columns: [
-                                { data: 'Action' },
-                                { data: 'Code' },
-                                { data: 'Lock' },
-                                { data: 'Description' }
-                            ],
-                            rowId: 'rowId',
-                            columnDefs: [
-                                {
-                                    targets: [0, 2], orderable: false
-                                },
-                                {
-                                    targets: 3, className: 'tbody-nowrap-auto'
-                                }
-                            ],
-                            order: false,
-                            orderCellsTop: true,
-                            initComplete: function () {
-                                this.api().cells().every(function () {
-                                    var cell = this.node();
-                                    $(cell).attr('title', $(cell).text());
-                                });
-                            }
-                        });
-                        //datatable
-
-                        //search
-                        $('#tbx01FindCharge').on('keyup', function () {
-                            tbl01Record.search(this.value).draw();
-                        });
-                        //search
-
-                        //hide loader
-                        document.getElementById("div01Loader").style.display = "none";
-                        document.getElementById("h01Title").innerText = document.getElementById("ContentPlaceHolder1_hf01Subsidiary").value + " - Search Record";
-                        //hide loader
-
-                        //modal
-                        $('#mdl01Charge').modal('show');
-                    }
+                const gridTheme = agGrid.themeQuartz.withParams({
+                    wrapperBorder: true,
+                    headerRowBorder: false,
                 });
+
+                gridOptions = {
+                    theme: gridTheme,
+                    suppressCellFocus: true,
+                    suppressDragLeaveHidesColumns: true,
+                    enableCellTextSelection: true,
+                    rowSelection: 'single',
+                    loading: true,
+                    columnDefs: [
+                        {
+                            headerName: "Action",
+                            field: "Action",
+                            lockPosition: true,
+                            pinned: "left",
+							width: 75,
+                            cellRenderer: params => params.value
+                        },
+                        {
+                            headerName: "Lock",
+                            field: "Lock",
+                            sortable: false,
+                            resizable: false,
+                            lockPosition: true,
+                            width: 65,
+                            cellRenderer: params => params.value
+                        },
+                        {
+                            headerName: "Description",
+                            field: "Description",
+                            filter: 'agTextColumnFilter',
+                            tooltipField: "Description",
+                            flex: 1,
+                            minWidth: 350
+                        }
+                    ],
+                    rowData: [],
+                    pagination: false,
+                };
+                grid01Api = agGrid.createGrid(gridDiv, gridOptions);
+
+				//Search Header
+                document.getElementById("h01Title").innerText = document.getElementById("ContentPlaceHolder1_hf01Subsidiary").value + " - Search Record";
+                $('#mdl01Charge').modal('show');
 			};
 		};
         function fn01AddChargeTo(pCode, pDescription, pLock) {
@@ -2850,7 +3021,7 @@
 						'pSubd': document.getElementById("ContentPlaceHolder1_ddl01Subdivision").options[document.getElementById("ContentPlaceHolder1_ddl01Subdivision").selectedIndex].value,
                         'pCategory': document.getElementById("ContentPlaceHolder1_ddl01ProjectCat").options[document.getElementById("ContentPlaceHolder1_ddl01ProjectCat").selectedIndex].value
                     },
-                    success: function (response) {
+					success: function (response) {
                         var end = new Date().getTime();
                         //display loader
                         document.getElementById("div04Loader").style.display = "";

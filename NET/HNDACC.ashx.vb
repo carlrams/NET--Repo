@@ -22,9 +22,9 @@ Public Class HNDACC
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.10"
+    Dim DataSource As String = "10.10.30.20"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
     'connection
 
@@ -1201,7 +1201,7 @@ Public Class HNDACC
                     RecordList.Add(New With {
                         .Action = "",
                         .WhseCode = DR("WhseCode"),
-                        .WhseName = DR("WhseName"),
+                        .Warehouse = DR("WhseName"),
                         .ClassCode = DR("ClassCode"),
                         .ClassName = DR("ClassName"),
                         .ItemCode = DR("ItemCode"),

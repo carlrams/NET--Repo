@@ -12,7 +12,7 @@ Public Class SLS040000
 
     Dim DataSource As String = "iis"
     Dim Catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
 
 #Region "Page"

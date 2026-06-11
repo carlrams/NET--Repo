@@ -10809,13 +10809,13 @@ Public Class HND000003
                 While DR.Read()
 
                     Dim Action As New StringBuilder
-                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddChargeTo('" & DR("Code") & "', '" & DR("Description") & "','" & DR("Lock") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view mt-1' title='Select' onclick=""fn01AddChargeTo('" & DR("Code") & "', '" & DR("Description") & "','" & DR("Lock") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
 
                     RecordList.Add(New With {
                         .rowId = "rowID01" & DR("code"),
                         .Action = Action.ToString,
                         .Code = DR("code"),
-                        .Lock = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Lock") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Lock = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center mt-3'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Lock") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
                         .Description = DR("description")
                     })
 
@@ -10999,14 +10999,21 @@ Public Class HND000003
 
         'get query
         Dim Query As New StringBuilder
+        Query.Append("declare @DeptCode nvarchar(13) = ISNULL((select dept_code from employee where emp_no = '" & CIIS_EmpCode & "'), '') ")
+        Query.Append("declare @BussCode nvarchar(13) = ISNULL((select buss_code from employee where emp_no = '" & CIIS_EmpCode & "'), '') ")
+        Query.Append("declare @DivCode nvarchar(13) = ISNULL((select div_code from business where buss_code = @BussCode), '') ")
+        Query.Append("declare @DivName nvarchar(60) = ISNULL((select description from division where div_code = @DivCode), '') ")
         Query.Append("select distinct ")
         Query.Append("  (CASE WHEN [A].Batch IS NULL OR [A].Batch = '' OR [A].Batch = '-' THEN [A].CECode ELSE [A].Batch END) [Batch] ")
         Query.Append("  ,[A].Title [Project] ")
         Query.Append("  ,[A].CECode ")
+        Query.Append("  ,ISNULL([D].div_code, @DivCode) [DivCode]  ")
+        Query.Append("  ,ISNULL([D].description, @DivName) [DivName]  ")
         Query.Append("from ")
         Query.Append("  Trxn_CEHdr [A] ")
         Query.Append("  left join eng_lot [B] on [A].Subdivision = [B].l_code ")
         Query.Append("  left join subdivision [C] on (CASE WHEN [B].s_code IS NULL THEN [A].SubdCode ELSE [B].s_code END) = [C].Code ")
+        Query.Append("  left join division [D] on [C].division = [D].div_code ")
         Query.Append("where ")
         Query.Append("  [A].Post = 1 ")
         Query.Append("  and [A].Rvrs = 0 ")
@@ -11030,7 +11037,7 @@ Public Class HND000003
                 While DR.Read()
 
                     Dim Action As New StringBuilder
-                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddEstimate('" & DR("CECode") & "', '" & DR("Project") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddEstimate('" & DR("CECode") & "', '" & DR("Project") & "', '" & DR("DivCode") & "', '" & DR("DivName") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
 
                     RecordList.Add(New With {
                         .Action = Action.ToString,
@@ -11054,13 +11061,20 @@ Public Class HND000003
 
         'get query
         Dim Query As New StringBuilder
+        Query.Append("declare @DeptCode nvarchar(13) = ISNULL((select dept_code from employee where emp_no = '" & CIIS_EmpCode & "'), '') ")
+        Query.Append("declare @BussCode nvarchar(13) = ISNULL((select buss_code from employee where emp_no = '" & CIIS_EmpCode & "'), '') ")
+        Query.Append("declare @DivCode nvarchar(13) = ISNULL((select div_code from business where buss_code = @BussCode), '') ")
+        Query.Append("declare @DivName nvarchar(60) = ISNULL((select description from division where div_code = @DivCode), '') ")
         If pProjectType = "OSM Project (Advance PO)" Or pProjectType = "CCI Project (Advance PO)" Then
             Query.Append("select distinct ")
             Query.Append("  (CASE WHEN [A].BatchNo IS NULL OR [A].BatchNo = '' OR [A].BatchNo = '-' THEN [A].CECode ELSE [A].BatchNo END) [Batch] ")
             Query.Append("  ,(CASE WHEN [A].BatchNo IS NULL OR [A].BatchNo = '' OR [A].BatchNo = '-' THEN [A].BatchNo ELSE [A].BatchNo + ' - ' + (select top 1 subdivision.description from subdivision where subdivision.code = '" & pSubd & "') END) [Project]  ")
+            Query.Append("  ,ISNULL([C].div_code, @DivCode) [DivCode] ")
+            Query.Append("  ,ISNULL([C].description, @DivName) [DivName] ")
             Query.Append("from ")
             Query.Append("  Trxn_CEDtl_PO [A] ")
             Query.Append("  left join subdivision [B] on [A].Project = [B].Code ")
+            Query.Append("  left join division [C] on [B].division = [C].div_code ")
             Query.Append("where ")
             Query.Append("  [A].Project = '" & pSubd & "' ")
             Query.Append("  and [A].Category = 'House Construction' ")
@@ -11068,10 +11082,13 @@ Public Class HND000003
             Query.Append("select distinct ")
             Query.Append("  (CASE WHEN [A].Batch IS NULL OR [A].Batch = '' OR [A].Batch = '-' THEN [A].CECode ELSE [A].Batch END) [Batch] ")
             Query.Append("  ,(CASE WHEN [A].Batch IS NULL OR [A].Batch = '' OR [A].Batch = '-' THEN [A].Title ELSE [A].Batch + ' - ' + (select top 1 subdivision.description from subdivision where subdivision.code = '" & pSubd & "' or subdivision.code = '" & pSubd & "') END) [Project] ")
+            Query.Append("  ,ISNULL([D].div_code, @DivCode) [DivCode] ")
+            Query.Append("  ,ISNULL([D].description, @DivName) [DivName] ")
             Query.Append("from ")
             Query.Append("  Trxn_CEHdr [A] ")
             Query.Append("  left join eng_lot [B] on [A].Subdivision = [B].l_code ")
             Query.Append("  left join subdivision [C] on (CASE WHEN [B].s_code IS NULL THEN [A].SubdCode ELSE [B].s_code END) = [C].Code ")
+            Query.Append("  left join division [D] on [C].division = [D].div_code ")
             Query.Append("where ")
             Query.Append("  [A].Post = 1 ")
             Query.Append("  and [A].Rvrs = 0 ")
@@ -11094,7 +11111,7 @@ Public Class HND000003
                 While DR.Read()
 
                     Dim Action As New StringBuilder
-                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddEstimate('" & DR("Batch") & "', '" & DR("Project") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select' onclick=""fn01AddEstimate('" & DR("Batch") & "', '" & DR("Project") & "', '" & DR("DivCode") & "', '" & DR("DivName") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
 
                     RecordList.Add(New With {
                         .Action = Action.ToString,

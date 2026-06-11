@@ -994,7 +994,7 @@ Public Class FRM000010
             'Project Type
             If lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI" Then pnl01Subdivision.Visible = True
 
-            If lbl01PurchaseType.Text = "Stock Request" And (lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI") Then
+            If lbl01PurchaseType.Text = "Stock Request" And (lbl01OSMType.Text = "OSM Project (Stock Request)" Or lbl01OSMType.Text = "CCI Project (Stock Request)") Then
                 lbtn06PRDtlAdd.Visible = False
             Else
                 lbtn06PRDtlAdd.Visible = True
@@ -1606,6 +1606,8 @@ Public Class FRM000010
         Query.Append("	    ,1 [Order] ")
         Query.Append("   from ")
         Query.Append("      Mstr_PurposeType ")
+        Query.Append("   where  ")
+        Query.Append("      isnull(AcctCode, '') <> '' ")
         Query.Append("   order by ")
         Query.Append("     [Order], [Value] ")
         Query.Append("end ")
@@ -2253,7 +2255,7 @@ Public Class FRM000010
                 Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Purpose.SelectedValue = "SALES EVENTS AND ACTIVITIES - Sales Events" And (tbx01ActName.Value = "" Or tbx01ActLocation.Value = "" Or tbx01ActDate.Value = "") Then
                 Alert("error", "Some field(s) are missing!")
-            ElseIf (ddl01OSMAType.SelectedValue = "Non OSM Project" Or ddl01OSMAType.SelectedValue = "OSM Project" Or ddl01OSMAType.SelectedValue.Contains("Advance PO")) And (tbx01ChargeTo.Value = "") Then
+            ElseIf (ddl01OSMAType.SelectedValue = "Non OSM Project" OrElse ddl01OSMAType.SelectedValue = "OSM Project" OrElse ddl01OSMAType.SelectedValue.Contains("Advance PO")) And (tbx01ChargeTo.Value = "") Then
                 Alert("error", "Some field(s) are missing!")
             Else
 
@@ -2675,9 +2677,9 @@ Public Class FRM000010
             bind01Estimate(ddl01OSMAType.SelectedValue)
         End If
 
-        If ddl01PurchaseType.SelectedValue <> "Return" And (ddl01OSMAType.SelectedValue = "OSM Project (Stock Request)" Or ddl01OSMAType.SelectedValue = "CCI Project (Stock Request)") Then
-            ddl01Purpose.SelectedValue = "Others - CONSTRUCTION MATERIALS"
-        End If
+        'If ddl01PurchaseType.SelectedValue <> "Return" And (ddl01OSMAType.SelectedValue = "OSM Project (Stock Request)" Or ddl01OSMAType.SelectedValue = "CCI Project (Stock Request)") Then
+        '    ddl01Purpose.SelectedValue = "Others - CONSTRUCTION MATERIALS"
+        'End If
 
         'set value
         'tbx01WorkCode.Value = ""
@@ -2989,7 +2991,7 @@ Public Class FRM000010
         Query.Append("   select ")
         Query.Append("      '' [Code] ")
         Query.Append("      ,'Select a status' [Name] ")
-        Query.Append("   union")
+        Query.Append("   union ")
         Query.Append("   select")
         Query.Append("      'Reply' [Code] ")
         Query.Append("      ,'Reply' [Name] ")

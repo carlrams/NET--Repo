@@ -19,7 +19,7 @@ Public Class HND000006
     'connection
     Dim DataSource As String = "iis"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
     'connection
 

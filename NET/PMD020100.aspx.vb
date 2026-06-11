@@ -45,7 +45,7 @@ Public Class PMD020100
     'connection
     Dim DataSource As String = "IISV2"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
     Dim FormCode As String = "PMD020100"
     'connection

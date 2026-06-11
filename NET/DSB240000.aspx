@@ -365,6 +365,18 @@
 							</h3>
 							<div class="card-toolbar">
 								<div class="d-flex flex-stack">
+									<div id="div03ExportButton" class="d-none"></div>
+									<button type="button" class="btn btn-sm btn-icon btn-info btn-active-info m-1" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" title="Options">
+										<!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
+										<i class="las la-filter fs-3"></i>
+										<!--end::Svg Icon-->
+									</button>
+									<div id="div03ExportMenu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-150px py-2" data-kt-menu="true">
+										<div class="menu-item px-3">
+											<a href="#" class="menu-link px-3" data-kt-export="filter" onclick="fn0301Filter();return false;">Filter</a>
+											<a href="#" class="menu-link px-3" data-kt-export="excel" onclick="fn0301Export(); return false;">Export as Excel</a>
+										</div>
+									</div>
 									<div class="position-relative me-5">
 										<span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
 											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -995,6 +1007,98 @@
                              <span class="indicator-label">Close</span>
                          </a>
                     </div>
+				</div>
+			</div>
+		</div>
+
+		<div id="mdl0301Filter" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered mw-650px">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Warehouse - Filter record</h5>
+						<!--begin::Close-->
+						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-warning" data-bs-dismiss="modal" aria-label="Close" title="Close">
+							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+							<span class="svg-icon svg-icon-1">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+								</svg>
+							</span>
+							<!--end::Svg Icon-->
+						</div>
+						<!--end::Close-->
+					</div>
+					<div class="modal-body">
+						<div class="input-group input-group-sm danger p-1 mb-2">
+							<select id="ddl0301Warehouse" data-kt-repeater="select2" data-dropdown-parent="#mdl0301Filter" class="form-select form-select-sm form-select-border ">
+								<option value="">Warehouse</option>
+							</select>
+						</div>
+						<div class="input-group input-group-sm mb-2">
+							<div class="d-flex align-items-center position-relative w-100" style="margin-left:1px">
+								<input id="tbx0301Item" type="text" class="form-control form-control-sm border-0 m-0" readonly placeholder="Item" />
+								<input id="hf0301ItemCode" type="hidden" value="" />
+								<span class="svg-icon svg-icon-2 position-absolute pointer end-5px" onclick="fn0301Item(); return false;">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+										<rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+										<path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+									</svg>
+								</span>
+								<!--end::Svg Icon-->
+							</div>
+						</div>
+						<div class="input-group input-group-sm mb-2">
+							<input id="tbx0301Date" type="text" data-kt-repeater="datepicker" class="form-control" readonly Placeholder="Date" />
+						</div>
+					</div>
+                    <!--begin::Actions-->
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0302Filter_Ok(this);return false;">
+                            <span class="indicator-label">
+				                Filter
+                            </span>
+                            <span class="indicator-progress">
+				                Loading
+                            </span>
+                        </button>
+                         <a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+                    <!--end::Actions-->
+				</div>
+			</div>
+		</div>
+		
+		<div id="mdl0302Item" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered mw-650px">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Warehouse - Get record</h5>
+						<!--begin::Close-->
+						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-warning" data-bs-dismiss="modal" aria-label="Close" title="Close">
+							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+							<span class="svg-icon svg-icon-1">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+								</svg>
+							</span>
+							<!--end::Svg Icon-->
+						</div>
+						<!--end::Close-->
+					</div>
+					<div class="modal-body">
+						<div id="table0302Record" class="ag-theme-quartz" style="height: 500px; border: none;"></div>
+					</div>
+                    <!--begin::Actions-->
+                    <div class="modal-footer">
+                         <a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+                    <!--end::Actions-->
 				</div>
 			</div>
 		</div>
