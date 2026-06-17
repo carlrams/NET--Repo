@@ -994,7 +994,7 @@ Public Class FRM000010
             'Project Type
             If lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI" Then pnl01Subdivision.Visible = True
 
-            If lbl01PurchaseType.Text = "Stock Request" And (lbl01OSMType.Text = "OSM Project (Stock Request)" Or lbl01OSMType.Text = "CCI Project (Stock Request)") Then
+            If lbl01PurchaseType.Text = "Stock Request" And (lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI") Then
                 lbtn06PRDtlAdd.Visible = False
             Else
                 lbtn06PRDtlAdd.Visible = True
@@ -1214,6 +1214,7 @@ Public Class FRM000010
             Query.Append("                 WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode), '') ")
             Query.Append("                 WHEN [B].Misc = 'SUBDIVISION' THEN (select description from sub_subdivision where code = [B].ChargeCode) ")
             Query.Append("                 WHEN [B].Misc = 'PHASE' THEN (select description from sub_phase where code = [B].ChargeCode) ")
+            Query.Append("                 WHEN [B].Misc = 'VENDOR' THEN (select description from sub_vendor where code = [B].ChargeCode) ")
             Query.Append("      ELSE '' END), '') [ChargeTo] ")
             Query.Append("   ,ISNULL([B].Misc, '') [Misc] ")
             Query.Append("   ,ISNULL([B].Division, '') [Division] ")
@@ -1406,6 +1407,7 @@ Public Class FRM000010
             Query.Append("                 WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode), '') ")
             Query.Append("                 WHEN [B].Misc = 'SUBDIVISION' THEN (select description from sub_subdivision where code = [B].ChargeCode) ")
             Query.Append("                 WHEN [B].Misc = 'PHASE' THEN (select description from sub_phase where code = [B].ChargeCode) ")
+            Query.Append("                 WHEN [B].Misc = 'VENDOR' THEN (select description from sub_vendor where code = [B].ChargeCode) ")
             Query.Append("      ELSE '' END), '') [ChargeTo] ")
             Query.Append("   ,ISNULL([B].Misc, '') [Misc] ")
             Query.Append("   ,ISNULL([B].Division, '') [Division] ")

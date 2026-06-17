@@ -250,6 +250,7 @@ Public Class Global_asax
         routes.MapPageRoute("Apps - Form - Audit Document Request", "FRM000047-{Mode}-{ID}", "~/FRM000047.aspx")
         routes.MapPageRoute("Apps - Form - Supplier Performance Evaluation", "FRM000053-{Mode}-{ID}", "~/FRM000053.aspx")
         routes.MapPageRoute("Apps - Form - Price Inquiry", "FRM000054-{Mode}-{ID}", "~/FRM000054.aspx")
+        routes.MapPageRoute("Apps - Form - Purchase Request (Updated)", "FRM0000100-{Mode}-{ID}", "~/FRM0000100.aspx")
         'Form Detail
 
         'Purchase Order
