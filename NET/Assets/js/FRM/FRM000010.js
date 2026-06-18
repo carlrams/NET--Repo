@@ -649,13 +649,37 @@ function fn0101Edit() {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("tbx0101FormType").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
-        } else if (document.getElementById("ddl0101Department").options[document.getElementById("ddl0101Department").selectedIndex].value == "") {
+        } else if (document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
-        } else if (document.getElementById("tbx0101RefNo").value == "") {
+        } else if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
-        } else if (document.getElementById("tbx0101Remarks").value == "") {
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
-        } else if (document.getElementById("tbx0101Remarks").value == "") {
+        } else if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO") && document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Stock Request") && document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "" && document.getElementById("tbx0101Estimate").value == "" && document.getElementById("hf0101Estimate").value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value.includes("House Construction") && document.getElementById("ddl0101Subdivision").options[document.getElementById("ddl0101Subdivision").selectedIndex].value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "" && document.getElementById("tbx0101Estimate").value == "" && document.getElementById("hf0101Estimate").value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "Others - FUEL" && document.getElementById("ddl0101Vehicle").options[document.getElementById("ddl0101Vehicle").selectedIndex].value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "Others - GRASS CUTTER MAINTENANCE" && document.getElementById("ddl0101Subdivision").options[document.getElementById("ddl0101Subdivision").selectedIndex].value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "Others - HOUSE REPAIR" && (document.getElementById("tbx0101Project").value == "" || document.getElementById("hf0101Subdivision").value == "" || document.getElementById("hf0101Phase").value == "" || document.getElementById("hf0101Block").value == "" || document.getElementById("hf0101Lot").value == "")) {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "REPAIR AND MAINTENANCE - Aircon" && document.getElementById("tbx0202Category").value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "REPAIR AND MAINTENANCE - Grass Cutter" && document.getElementById("tbx0202Category").value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "REPAIR AND MAINTENANCE - Tools and Equipment" && document.getElementById("tbx0202Category").value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "REPAIR AND MAINTENANCE - Vehicle" && document.getElementById("tbx0202Category").value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "SALES EVENTS AND ACTIVITIES - Sales Events" && (document.getElementById("tbx0101ActName").value == "" || document.getElementById("tbx0101ActLocation").value == "" || document.getElementById("tbx0101ActDate").value == "")) {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if ((document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) && document.getElementById("tbx0101ChargeTo").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else {
             Edit_Question(ID);
