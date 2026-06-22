@@ -1569,6 +1569,7 @@ Public Class FRM000010
 
         Dim Query As New StringBuilder
         Query.Append("declare @Purchase nvarchar(60) = '" & Purchase & "' ")
+        Query.Append("declare @Purpose nvarchar(60) = '" & ddl01OSMAType.SelectedValue & "' ")
         'Query.Append("if @Purchase = 'Return' ")
         'Query.Append("begin ")
         'Query.Append("   select ")
@@ -1610,6 +1611,7 @@ Public Class FRM000010
         Query.Append("      Mstr_PurposeType ")
         Query.Append("   where  ")
         Query.Append("      isnull(AcctCode, '') <> '' ")
+        Query.Append("      and ProjectType = @Purpose ")
         Query.Append("   order by ")
         Query.Append("     [Order], [Value] ")
         Query.Append("end ")

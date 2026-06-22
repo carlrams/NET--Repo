@@ -265,22 +265,22 @@
                                 
 								<div id="div0202Category" class="input-group input-group-sm mb-2" style="display: none;">
 									<span id="spn0202Category" class="input-group-text min-w-150px required">-</span>
-							        <input id="tbx0202Category" type="text" class="form-control" />
+							        <input id="tbx0202Category" type="text" class="form-control" value="" />
 								</div>
                                 
 								<div id="div0102ActName" class="input-group input-group-sm mb-2" style="display: none;">
 									<span class="input-group-text min-w-150px required">Activity</span>
-							        <input id="tbx0101ActName" type="text" class="form-control" Placeholder="Add category" />
+							        <input id="tbx0101ActName" type="text" class="form-control" Placeholder="Add category" value="" />
 								</div>
                                 
 								<div id="div0102ActLocation" class="input-group input-group-sm mb-2" style="display: none;">
 									<span class="input-group-text min-w-150px required">Activity</span>
-							        <input id="tbx0101ActLocation" type="text" class="form-control" Placeholder="Add location" />
+							        <input id="tbx0101ActLocation" type="text" class="form-control" Placeholder="Add location" value="" />
 								</div>
                                 
 								<div id="div0102ActDate" class="input-group input-group-sm mb-2" style="display: none;">
 									<span class="input-group-text min-w-150px required">Activity</span>
-							        <input id="tbx0101ActDate" type="text" data-kt-repeater="datepicker" class="form-control" readonly="readonly" placeholder="Pick a date" />
+							        <input id="tbx0101ActDate" type="text" data-kt-repeater="datepicker" class="form-control" readonly="readonly" placeholder="Pick a date" value="" />
 								</div>
                                 
 								<div id="div0102Subdivision" class="input-group input-group-sm mb-2" style="display: none;">
@@ -307,7 +307,7 @@
 								<div id="div0102Project" class="input-group input-group-sm mb-2" style="display: none;">
 									<span class="input-group-text min-w-150px required">Project</span>
 									<div class="d-flex align-items-center position-relative w-100" style="margin-left:1px">
-										<input id="tbx0101Project" type="text" class="form-control form-control-sm border-0 m-0" readonly="readonly" />
+										<input id="tbx0101Project" type="text" class="form-control form-control-sm border-0 m-0" readonly="readonly" value="" />
 										<input id="hf0101Subdivision" type="hidden" value="" />
 										<input id="hf0101Phase" type="hidden" value="" />
 										<input id="hf0101Block" type="hidden" value="" />
@@ -323,7 +323,7 @@
                                 
 								<div id="div0102ChargeTo" class="input-group input-group-sm mb-2" style="display: none;">
 									<span class="input-group-text min-w-150px required">Charge To</span>
-									<input id="tbx0101ChargeTo" type="text" class="form-control" placeholder="Charge To" readonly="readonly" />
+									<input id="tbx0101ChargeTo" type="text" class="form-control" placeholder="Charge To" readonly="readonly" value="" />
                                     <input id="hf0101ChargeCode" type="hidden" value="" />
                                     <input id="hf0101AcctCode" type="hidden" value="" />
                                     <input id="hf0101Subsidiary" type="hidden" value="" />
@@ -339,13 +339,13 @@
                                 
                                 <div class="input-group input-group-sm mb-2">
                                     <span class="input-group-text min-w-150px">Division</span>
-                                    <input id="tbx0101Division" type="text" class="form-control" readonly="readonly" placeholder="Add division" />
+                                    <input id="tbx0101Division" type="text" class="form-control" readonly="readonly" placeholder="Add division" value="" />
                                     <input id="hf0101DivCode" type="hidden" value="" />
                                 </div>
                                 
                                 <div class="input-group input-group-sm mb-2">
                                     <span class="input-group-text min-w-150px">Department</span>
-                                    <input id="tbx0101Department" type="text" class="form-control" readonly="readonly" placeholder="Add department" />
+                                    <input id="tbx0101Department" type="text" class="form-control" readonly="readonly" placeholder="Add department" value="" />
                                     <input id="hf0101DeptCode" type="hidden" value="" />
                                 </div>
 
@@ -353,6 +353,7 @@
                                     <span class="input-group-text min-w-150px">Remarks</span>
                                     <textarea id="tbx0101Remarks" class="form-control" placeholder="Add remarks" maxlength="1000" rows="3" cols=""></textarea>
                                 </div>
+
                             </div>
 
                         <!--begin:: Attatchment -->

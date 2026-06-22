@@ -6,6 +6,7 @@ Imports System.IO
 Imports System.IO.Pipes
 Imports System.Net
 Imports System.Net.Mail
+Imports System.Net.Mime
 Imports System.Net.PeerToPeer.Collaboration
 Imports System.Reflection.Emit
 Imports System.Runtime.ConstrainedExecution
@@ -35,6 +36,7 @@ Imports Microsoft.Identity.Client
 Imports Microsoft.SqlServer
 Imports Microsoft.VisualBasic.ApplicationServices
 Imports Newtonsoft.Json
+Imports OfficeOpenXml.ConditionalFormatting.Contracts
 
 
 Public Class FRM000010HND
@@ -47,9 +49,9 @@ Public Class FRM000010HND
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.20"
+    Dim DataSource As String = "10.10.30.10"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciisv2"
+    Dim UserID As String = "ciis"
     Dim Password As String = "Cii5s"
     Dim calmardblive As String = "calmardblive"
     'connection
@@ -75,6 +77,13 @@ Public Class FRM000010HND
                 Dim pTblName = context.Request("pTblName")
                 Dim pPlaceHolder = context.Request("pPlaceHolder")
                 json = Me.Get_Dropdown(pTblName, pPlaceHolder)
+
+            ElseIf pFunction = "Dropdown" And pType = "Get - Dropdown - Filter" Then
+
+                Dim pFilter = context.Request("pFilter")
+                Dim pTblName = context.Request("pTblName")
+                Dim pPlaceHolder = context.Request("pPlaceHolder")
+                json = Me.Get_Dropdown_Filter(pFilter, pTblName, pPlaceHolder)
 
             End If
 
@@ -145,11 +154,27 @@ Public Class FRM000010HND
             ElseIf pFormCode = "FRM000010" And pType = "Add - Record" Then
 
                 Dim pDateRequired = context.Request("pDateRequired")
+                Dim pPurchaseType = context.Request("pPurchaseType")
                 Dim pDeptCode = context.Request("pDeptCode")
-                Dim pRefNo = context.Request("pRefNo")
+                Dim pProjType = context.Request("pProjType")
+                Dim pPurpose = context.Request("pPurpose")
+                Dim pSubdCode = context.Request("pSubdCode")
+                Dim pPhase = context.Request("pPhase")
+                Dim pBlock = context.Request("pBlock")
+                Dim pLot = context.Request("pLot")
+                Dim pCarCode = context.Request("pCarCode")
+                Dim pCategory = context.Request("pCategory")
+                Dim pActName = context.Request("pActName")
+                Dim pActLocation = context.Request("pActLocation")
+                Dim pActDate = context.Request("pActDate")
+                Dim pChargeCode = context.Request("pChargeCode")
+                Dim pAcctCode = context.Request("pAcctCode")
+                Dim pDivision = context.Request("pDivision")
+                Dim pCECode = context.Request("pCECode")
+                Dim pMisc = context.Request("pMisc")
                 Dim pRemarks = context.Request("pRemarks")
                 Dim pCreatedBy = CIIS_EmpCode
-                json = Me.Add_Record(pDateRequired, pDeptCode, pRefNo, pRemarks, pCreatedBy)
+                json = Me.Add_Record(pDateRequired, pPurchaseType, pDeptCode, pProjType, pPurpose, pSubdCode, pPhase, pBlock, pLot, pCarCode, pCategory, pActName, pActLocation, pActDate, pChargeCode, pAcctCode, pDivision, pCECode, pMisc, pRemarks, pCreatedBy)
 
             End If
 
@@ -530,6 +555,64 @@ Public Class FRM000010HND
         'display
 
     End Function
+    Function Get_Dropdown_Filter(pFilter, pTblName, pPlaceHolder)
+
+        'query
+        Dim Query As New StringBuilder
+        If pTblName = "Get_Purpose" Then
+            Query.Append("select ")
+            Query.Append("   '' [ID] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
+            Query.Append("   ,0 [Order1] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
+            Query.Append("union ")
+            Query.Append("select distinct ")
+            Query.Append("   [A].Type + ' - ' + [A].Purpose [ID] ")
+            Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Name] ")
+            Query.Append("   ,2 [Order1] ")
+            Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Order2] ")
+            Query.Append("from ")
+            Query.Append("   Mstr_PurposeType [A] ")
+            Query.Append("where ")
+            Query.Append("   ISNULL([A].AcctCode, '') <> '' ")
+            Query.Append("   and [A].ProjectType = @pFilter ")
+            Query.Append("order by ")
+            Query.Append("   [Order1] ")
+            Query.Append("   ,[Order2] ")
+        End If
+        'query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pFilter", pFilter)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    RecordList.Add(New With {
+                        .ID = DR("ID"),
+                        .Name = DR("Name")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display
+
+    End Function
 #End Region
 
 #Region "Record"
@@ -546,17 +629,59 @@ Public Class FRM000010HND
         Query.Append("  ,(case when isnull(dbo.ProperCase([E].first_name) + ' ' + dbo.ProperCase([E].last_name),'') = '' then '-' else isnull(dbo.ProperCase([E].first_name) + ' ' + dbo.ProperCase([E].last_name),'') end) [EndorsedTo] ")
         Query.Append("  ,isnull([A].status, 'New') [Status] ")
         Query.Append("  ,isnull([A].FormTitle, '') [FormTitle] ")
-        Query.Append("  ,[B].DeptCode ")
-        Query.Append("  ,[F].description [DeptName] ")
-        Query.Append("  ,[B].RefNo ")
-        Query.Append("  ,[B].Remarks ")
+        Query.Append("  ,[B].PurchaseType ")
+        Query.Append("  ,[B].justification [ProjType] ")
+        Query.Append("  ,[B].Purpose ")
+        Query.Append("  ,ISNULL(FORMAT([B].DateReturn, 'MM/dd/yyyy'),'') [DateReturn] ")
+        Query.Append("  ,ISNULL(FORMAT([B].DateIssue, 'MM/dd/yyyy'),'') [DateIssue] ")
+        Query.Append("  ,isnull([F].abbr + ' ' + [G].description + ' B' + [H].block + ' L' + [I].lot,'') [Project] ")
+        Query.Append("  ,isnull([F].description, '') [SubdName] ")
+        Query.Append("  ,isnull([F].abbr, '') [SubdAbbr] ")
+        Query.Append("  ,[B].Subdivision [SubdCode] ")
+        Query.Append("  ,[G].description [PhaseName] ")
+        Query.Append("  ,[B].Phase [PhaseCode] ")
+        Query.Append("  ,[H].block [BlockName] ")
+        Query.Append("  ,[B].Block [BlockCode] ")
+        Query.Append("  ,[I].lot [LotName] ")
+        Query.Append("  ,[B].Lot [LotCode] ")
+        Query.Append("  ,[M].CarCode + ' - ' + [M].PlateNo [VehicleName] ")
+        Query.Append("  ,[B].PlateNo [VehiclePlate] ")
+        Query.Append("  ,[B].Type ")
+        Query.Append("  ,[B].Category ")
+        Query.Append("  ,[B].ActName ")
+        Query.Append("  ,[B].ActLocation ")
+        Query.Append("  ,isnull(format([B].ActDate, 'MM/dd/yyyy'), '') [ActDate] ")
+        Query.Append("  ,[B].remarks [Remarks] ")
+        Query.Append("  ,isnull([B].CECode, '') [CECode] ")
+        Query.Append("  ,isnull([J].Title, '') [EstTitle] ")
+        Query.Append("  ,isnull([B].AcctCode, '') [AcctCode] ")
+        Query.Append("  ,ISNULL([K].description, '') [DivName] ")
+        Query.Append("  ,[B].Division [DivCode] ")
+        Query.Append("  ,ISNULL([L].description, '') [DeptName] ")
+        Query.Append("  ,[B].department [DeptCode] ")
+        Query.Append("  ,ISNULL((CASE WHEN [B].Misc = 'MISCELLANEOUS' THEN (select description from sub_misc where account = [B].AcctCode and code = [B].ChargeCode) ")
+        Query.Append("                WHEN [B].Misc = 'MODEL HOUSE' THEN (select description from sub_house where code = [B].ChargeCode) ")
+        Query.Append("                WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode), '') ")
+        Query.Append("                WHEN [B].Misc = 'SUBDIVISION' THEN (select description from sub_subdivision where code = [B].ChargeCode) ")
+        Query.Append("                WHEN [B].Misc = 'PHASE' THEN (select description from sub_phase where code = [B].ChargeCode) ")
+        Query.Append("                WHEN [B].Misc = 'VENDOR' THEN (select description from sub_vendor where code = [B].ChargeCode) ")
+        Query.Append("  ELSE '' END), '') [ChargeName] ")
+        Query.Append("  ,isnull([B].ChargeCode, '') [ChargeCode] ")
+        Query.Append("  ,isnull([B].Misc, '') [Misc] ")
         Query.Append("from ")
         Query.Append("  oop_form_hdr [A] ")
-        Query.Append("  left join Form_PIHdr [B] on [A].tbl_code = [B].PICode and [A].tbl_from = 'Form_PIHdr' ")
+        Query.Append("  left join ogm_pr_hdr [B] on [A].tbl_code = [B].pr_code and [A].tbl_from = 'ogm_pr_hdr' ")
         Query.Append("  left join employee [C] on [A].created_by = [C].emp_no ")
         Query.Append("  left join employee [D] on [A].approver = [D].emp_no ")
         Query.Append("  left join employee [E] on [A].EndorsedTo = [E].emp_no ")
-        Query.Append("  left join department [F] on [B].DeptCode = [F].dept_code ")
+        Query.Append("  left join subdivision [F] on [B].Subdivision = [F].code ")
+        Query.Append("  left join phase [G] on [B].Phase = [G].code ")
+        Query.Append("  left join eng_block [H] on [B].Block = [H].b_code ")
+        Query.Append("  left join eng_lot [I] on [B].lot = [I].l_code ")
+        Query.Append("  left join Trxn_CEHdr [J] on [B].CECode = [J].CECode ")
+        Query.Append("  left join division [K] on [B].Division = [K].div_code ")
+        Query.Append("  left join department [L] on [B].department = [L].dept_code ")
+        Query.Append("  left join Mstr_Vehicle [M] on [B].Vehicle + ' - ' + [B].PlateNo = [M].CarModel + ' - ' + [M].PlateNo ")
         Query.Append("where ")
         Query.Append("  [A].f_code = @pID ")
         'get query
@@ -585,10 +710,39 @@ Public Class FRM000010HND
                         .EndorsedTo = DR("EndorsedTo"),
                         .Status = DR("Status"),
                         .FormTitle = DR("FormTitle"),
-                        .DeptCode = DR("DeptCode"),
+                        .PurchaseType = DR("PurchaseType"),
+                        .ProjType = DR("ProjType"),
+                        .Purpose = DR("Purpose"),
+                        .DateReturn = DR("DateReturn"),
+                        .DateIssue = DR("DateIssue"),
+                        .Project = DR("Project"),
+                        .SubdName = DR("SubdName"),
+                        .SubdAbbr = DR("SubdAbbr"),
+                        .SubdCode = DR("SubdCode"),
+                        .PhaseName = DR("PhaseName"),
+                        .PhaseCode = DR("PhaseCode"),
+                        .BlockName = DR("BlockName"),
+                        .BlockCode = DR("BlockCode"),
+                        .LotName = DR("LotName"),
+                        .LotCode = DR("LotCode"),
+                        .VehicleName = DR("VehicleName"),
+                        .VehiclePlate = DR("VehiclePlate"),
+                        .Type = DR("Type"),
+                        .Category = DR("Category"),
+                        .ActName = DR("ActName"),
+                        .ActLocation = DR("ActLocation"),
+                        .ActDate = DR("ActDate"),
+                        .Remarks = DR("Remarks"),
+                        .CECode = DR("CECode"),
+                        .EstTitle = DR("EstTitle"),
+                        .AcctCode = DR("AcctCode"),
+                        .DivName = DR("DivName"),
+                        .DivCode = DR("DivCode"),
                         .DeptName = DR("DeptName"),
-                        .RefNo = DR("RefNo"),
-                        .Remarks = DR("Remarks")
+                        .DeptCode = DR("DeptCode"),
+                        .ChargeName = DR("ChargeName"),
+                        .ChargeCode = DR("ChargeCode"),
+                        .Misc = DR("Misc")
                     })
 
                 End While
@@ -1118,7 +1272,7 @@ Public Class FRM000010HND
 #End Region
 
 #Region "CRUD - Record"
-    Function Add_Record(pDateRequired, pDeptCode, pRefNo, pRemarks, pCreatedBy)
+    Function Add_Record(pDateRequired, pPurchaseType, pDeptCode, pProjType, pPurpose, pSubdCode, pPhase, pBlock, pLot, pCarCode, pCategory, pActName, pActLocation, pActDate, pChargeCode, pAcctCode, pDivision, pCECode, pMisc, pRemarks, pCreatedBy)
 
         'variable
         Dim RecordList As New List(Of Object)()
@@ -1133,9 +1287,25 @@ Public Class FRM000010HND
         SqlCmd.CommandType = CommandType.StoredProcedure
         SqlCmd.CommandText = "New_FRM_FRM000010"
         SqlCmd.Parameters.AddWithValue("@pDateRequired", pDateRequired)
+        SqlCmd.Parameters.AddWithValue("@pPurchaseType", pPurchaseType)
         SqlCmd.Parameters.AddWithValue("@pDeptCode", pDeptCode)
-        SqlCmd.Parameters.AddWithValue("@pRefNo", pRefNo)
+        SqlCmd.Parameters.AddWithValue("@pProjType", pProjType)
+        SqlCmd.Parameters.AddWithValue("@pPurpose", pPurpose)
+        SqlCmd.Parameters.AddWithValue("@pSubdCode", pSubdCode)
+        SqlCmd.Parameters.AddWithValue("@pPhase", pPhase)
+        SqlCmd.Parameters.AddWithValue("@pBlock", pBlock)
+        SqlCmd.Parameters.AddWithValue("@pLot", pLot)
+        SqlCmd.Parameters.AddWithValue("@pCarCode", pCarCode)
+        SqlCmd.Parameters.AddWithValue("@pCategory", pCategory)
+        SqlCmd.Parameters.AddWithValue("@pActName", pActName)
+        SqlCmd.Parameters.AddWithValue("@pActLocation", pActLocation)
+        SqlCmd.Parameters.AddWithValue("@pActDate", pActDate)
+        SqlCmd.Parameters.AddWithValue("@pCECode", pCECode)
         SqlCmd.Parameters.AddWithValue("@pRemarks", pRemarks)
+        SqlCmd.Parameters.AddWithValue("@pChargeCode", pChargeCode)
+        SqlCmd.Parameters.AddWithValue("@pAcctCode", pAcctCode)
+        SqlCmd.Parameters.AddWithValue("@pMisc", pMisc)
+        SqlCmd.Parameters.AddWithValue("@pDivCode", pDivision)
         SqlCmd.Parameters.AddWithValue("@pCreatedBy", pCreatedBy)
         Dim oFCode As New SqlClient.SqlParameter("@oFCode", SqlDbType.NVarChar, 1000)
         oFCode.Direction = ParameterDirection.Output

@@ -230,7 +230,7 @@ function fn0101LoadOverview(pMode, pID) {
                 $('#ddl0101PurchaseType').val('').trigger('change');
                 $('#ddl0101ProjectType').val('').trigger('change');
                 document.getElementById("hf0101ProjectType").value = "";
-                fn0101Purpose('');
+                fn0101Purpose('', '');
                 fn0101Vehicle('');
                 fn0101Category('');
                 document.getElementById("tbx0202Category").value = "";
@@ -360,7 +360,7 @@ function fn0101LoadOverview(pMode, pID) {
                 //content
                 document.getElementById("div0101Detail").style.display = "";
                 document.getElementById("div0101Update").style.display = "none";
-
+                fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
                 document.getElementById("lbl0101ID").innerText = response[0].FormNo;
                 document.getElementById("lbl0101FormType").innerText = response[0].FormType;
                 document.getElementById("lbl0101DateRequested").innerText = response[0].DateCreated;
@@ -369,9 +369,12 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("lbl0101AssignedTo").innerText = response[0].Approver;
                 document.getElementById("lbl0101EndorsedTo").innerText = response[0].EndorsedTo;
                 document.getElementById("lbl0101Status").innerText = response[0].Status;
-                document.getElementById("lbl0101Department").innerText = response[0].DeptName;
-                document.getElementById("lbl0101RefNo").innerText = response[0].RefNo;
-                document.getElementById("lbl0101Remarks").value = response[0].Remarks;
+                document.getElementById("lbl0101PurchaseType").innerText = response[0].PurchaseType;
+                document.getElementById("lbl0101ProjectType").innerText = response[0].ProjType;
+                document.getElementById("lbl0101Purpose").innerText = response[0].Purpose;
+                document.getElementById("lbl0101Vehicle").innerText = response[0].VehicleName;
+                document.getElementById("lbl0101Category").innerText = response[0].Category;
+                document.getElementById("lbl0102Category").innerText = response[0].Category;
                 //content
 
             },
@@ -726,9 +729,25 @@ function fn0101Edit() {
                 'pFormCode': 'FRM000010',
                 'pType': 'Add - Record',
                 'pDateRequired': document.getElementById("tbx0101DateRequired").value,
-                'pDeptCode': document.getElementById("ddl0101Department").options[document.getElementById("ddl0101Department").selectedIndex].value,
-                'pRefNo': document.getElementById("tbx0101RefNo").value,
-                'pRemarks': document.getElementById("tbx0101Remarks").value
+                'pPurchaseType': document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value,
+                'pDeptCode': document.getElementById("hf0101DeptCode").value,
+                'pProjType': document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value,
+                'pPurpose': document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value,
+                'pSubdCode': document.getElementById("ddl0101Subdivision").options[document.getElementById("ddl0101Subdivision").selectedIndex].value,
+                'pPhase': document.getElementById("hf0101Phase").value,
+                'pBlock': document.getElementById("hf0101Block").value,
+                'pLot': document.getElementById("hf0101Lot").value,
+                'pCarCode': document.getElementById("ddl0101Vehicle").options[document.getElementById("ddl0101Vehicle").selectedIndex].value,
+                'pCategory': document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value,
+                'pActName': document.getElementById("tbx0101ActName").value,
+                'pActLocation': document.getElementById("tbx0101ActLocation").value,
+                'pActDate': document.getElementById("tbx0101ActDate").value,
+                'pCECode': document.getElementById("hf0101Estimate").value,
+                'pRemarks': document.getElementById("tbx0101Remarks").value,
+                'pChargeCode': document.getElementById("hf0101ChargeCode").value,
+                'pAcctCode': document.getElementById("hf0101AcctCode").value,
+                'pMisc': document.getElementById("hf0101Subsidiary").value,
+                'pDivision': document.getElementById("hf0101DivCode").value,
             },
 
             success: function (response) {
@@ -954,13 +973,14 @@ function fn0101SaveChangeStatus() {
 
 }
 //dropdown
-function fn0101Purpose(ID) {
+function fn0101Purpose(ID, ProjectType) {
     $.ajax({
         type: "POST",
         url: "Assets/Handler/FRM/FRM000010HND.ashx",
         data: {
             'pFunction': 'Dropdown',
-            'pType': 'Get - Dropdown',
+            'pType': 'Get - Dropdown - Filter',
+            'pFilter': ProjectType,
             'pTblName': 'Get_Purpose',
             'pPlaceHolder': 'Select Purpose'
         },
@@ -1299,6 +1319,7 @@ function dd0101ProjectType_onchange(ddl0101ProjectType) {
     document.getElementById("ddl0101Purpose").disabled = true;
     if (ddl0101ProjectType.value != "") {
         document.getElementById("ddl0101Purpose").disabled = false;
+        fn0101Purpose('', ddl0101ProjectType.value);
         $('#ddl0101Category').val('').trigger('change');
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
