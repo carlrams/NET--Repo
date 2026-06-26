@@ -574,6 +574,44 @@ function fn0301Filter_Ok(Btn) {
     };
     // Simulate form submission
     Filter_Ok();
+    function initComposeTo() {
+
+        // Compose - TO
+        const composeTo01 = document.getElementById("txt0301ComposeTO");
+
+        if (composeTo01.tomselect) {
+            composeTo01.tomselect.destroy();
+        };
+
+        const composeTo02 = new TomSelect("#txt0301ComposeTO", {
+                persist: false,
+                createOnBlur: true,
+                maxItems: 10,
+                // Manual
+                create: function (input) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(input)) return false;
+                    return { value: input, text: input };
+                },
+                load: function (query, callback) {
+                    const results = [];
+                    callback(results);
+                },
+                onItemAdd: function () {
+                    this.setTextboxValue('');
+                }
+            });
+        const hdnEmailSrs = document.getElementById("ContentPlaceHolder1_hdnEmailSrs").value;
+        if (hdnEmailSrs) {
+            const emailSrs = hdnEmailSrs.split(',').map(email => email.trim()).filter(Boolean);
+            emailSrs.forEach(email => {
+                composeTo02.addOption({ value: email, text: email });
+                composeTo02.addItem(email);
+            });
+        };
+        // Compose - TO
+
+    };
     async function Filter_Ok_Await(Btn) {
         const dateFrom = new Date(document.getElementById("tbx0301DateFrom").value);
         const dateTo = new Date(document.getElementById("tbx0301DateTo").value);
@@ -595,9 +633,13 @@ function fn0301Filter_Ok(Btn) {
         } else {
             // process
             return new Promise(resolve => {
+
                 //modal
                 $("#mdl0301Filter").modal("hide");
                 $("#mdl0301Mail").modal("show");
+
+                //tomSelect
+                initComposeTo();
 
                 //reset using tinyMCe
                 tinymce.get('txt0301MailContent').setContent(`
@@ -664,6 +706,7 @@ function fn0301Filter_Ok(Btn) {
 function fn0301TinyMCE() {
 
     //tom select
+    // Compose - CC
     new TomSelect("#txt0301ComposeCC", {
         persist: false,
         createOnBlur: true,
@@ -705,7 +748,7 @@ function fn0301TinyMCE() {
         }
     });
     //tom select
-
+    
     //tinyMCE
     tinymce.init({
         selector: 'textarea#txt0301MailContent',
@@ -740,6 +783,13 @@ function fn0301Send_Ok(Btn) {
             Btn.disabled = false;
             // Hide loading indication
             Btn.removeAttribute('data-kt-indicator');
+        } else if (document.getElementById("txt0301ComposeTO").value == "") {
+            // Alert
+            fnAlertOnly('Error capturing email!', 'error', 'btn btn-danger');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
         } else {
             $.ajax({
                 type: "POST",
@@ -749,7 +799,7 @@ function fn0301Send_Ok(Btn) {
                     'pType': 'For Award - Email (COF)',
                     'pID': document.getElementById("ContentPlaceHolder1_hdnID").value,
                     'pCodeSrs': document.getElementById("ContentPlaceHolder1_hdnCodeSrs").value,
-                    'pEmailSrs': document.getElementById("ContentPlaceHolder1_hdnEmailSrs").value,
+                    'pEmailSrs': document.getElementById("txt0301ComposeTO").value,
                     'pContent': encodeURIComponent(tinymce.get("txt0301MailContent").getContent()),
                     'pDateFrom': document.getElementById("tbx0301DateFrom").value,
                     'pDateTo': document.getElementById("tbx0301DateTo").value,

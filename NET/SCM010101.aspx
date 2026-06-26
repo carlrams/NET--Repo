@@ -467,6 +467,10 @@
 					<div class="modal-body">
                         <div class="d-block">
 							<div class="d-flex align-items-center border-bottom ps-8 pe-5 min-h-50px mb-2">
+								<div class="text-dark fw-bolder w-75px">To:</div>
+								<input id="txt0301ComposeTO" type="text" value="" class="form-control form-control-transparent border-0" />
+							</div>
+							<div class="d-flex align-items-center border-bottom ps-8 pe-5 min-h-50px mb-2">
 								<div class="text-dark fw-bolder w-75px">Cc:</div>
 								<input id="txt0301ComposeCC" type="text" value="lorettaelsa_fabie@calmarland.com,evangeline.pasinio@calmarland.com,haryete.alperez@calmarland.com,arvin.rey@calmarland.com,ira.satur@calmarland.com,joseph.valenzuela@calmarland.com,lloyd.hernandez@calmarland.com,anthony.borgueta@calmarland.com" class="form-control form-control-transparent border-0" />
 							</div>

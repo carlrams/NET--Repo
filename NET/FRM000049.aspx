@@ -128,6 +128,14 @@
 										<span class="input-group-text min-w-150px">Location</span>
 										<span id="lbl01Location" class="form-control"></span>
 									</div>
+									<div class="input-group input-group-sm mb-2">
+										<span class="input-group-text min-w-150px">Purpose</span>
+										<span id="lbl01Purpose" class="form-control"></span>
+									</div>
+									<div class="input-group input-group-sm mb-2">
+										<span class="input-group-text min-w-150px">Notes</span>
+										<span id="lbl01Note" class="form-control"></span>
+									</div>
                             </div>
                              <!--End:: Details -->
                             
@@ -194,6 +202,14 @@
                                 <div class="input-group input-group-sm mb-2">
                                     <span class="input-group-text min-w-150px required">Location</span>
                                     <input id="tbx01Location" type="text" class="form-control"  placeholder="Add Location" maxlength="180"/>
+                                </div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text min-w-150px">Purpose</span>
+                                    <input id="tbx01Purpose" type="text" class="form-control"  placeholder="Add Purpose" maxlength="180"/>
+                                </div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text min-w-150px">Notes</span>
+                                    <input id="tbx01Notes" type="text" class="form-control"  placeholder="Add Note" maxlength="180"/>
                                 </div>
                             </div>
                             <!--End:: Update/Edit/Add -->
@@ -681,7 +697,7 @@
                             <div class="col-sm-12 col-md-12 col-lg-12">
                                 <div class="input-group input-group-sm">
                                     <span id="spn03IsReturn" class="input-group-text min-w-150px required">Returnable</span>
-                                    <select id="ddl03IsReturn" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                    <select id="ddl03IsReturn" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px" onchange="onIsReturnChange(this)">
                                         <option value="">Select option</option>
                                         <option value="1">Yes</option>
                                         <option value="0">No</option>
@@ -908,7 +924,7 @@
                     <div class="modal-body">
 						<div class="input-group input-group-sm mb-2">
 							<span class="input-group-text min-w-150px required">User</span>
-							<select id="ddl03User" data-kt-repeater="select2" data-dropdown-parent="#mdl01User" class="form-select form-select-sm form-select-border min-h-38px" onchange="ddl04AddFrom_onchange(this.value)">
+							<select id="ddl03User" data-kt-repeater="select2" data-dropdown-parent="#mdl01User" class="form-select form-select-sm form-select-border min-h-38px">
                             </select>
 						</div>
 					</div>
@@ -933,7 +949,7 @@
             <div class="modal-dialog modal-dialog-centered mw-650px" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Approval Path - Add User</h5>
+                        <h5 class="modal-title">Approval Path - Template</h5>
                         <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
                             <span class="svg-icon svg-icon-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">

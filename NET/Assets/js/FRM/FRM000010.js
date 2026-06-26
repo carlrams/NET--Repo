@@ -2,6 +2,10 @@
 var FormCode = "FRM000010";
 let grid01Api;
 let grid02Api;
+let grid03Api;
+
+let grid04Api;
+let grid05Api;
 //form
 
 //attachment
@@ -71,6 +75,7 @@ function isNumberKey(e, input) {
 //general
 function fn01Load() {
     fn0101LoadOverview(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
+    fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
     fn0201LoadAttachment(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
     fn0301LoadNotes(document.getElementById('ContentPlaceHolder1_hdnID').value);
     fn0401LoadApprover(document.getElementById('ContentPlaceHolder1_hdnID').value);
@@ -87,9 +92,13 @@ function fn01DisableButtons(pValue) {
         document.getElementById("btn0101Edit").classList.remove("btn-edit");
         document.getElementById("btn98Add").classList.remove("btn-add");
         document.getElementById("btn99Add").classList.remove("btn-add");
+        document.getElementById("btn0101Print").classList.remove("btn-tools");
         document.getElementById("btn0101ChangeStatus").classList.remove("btn-secondary");
         document.getElementById("btn03010101Add").classList.remove("btn-add");
         document.getElementById("btn989Add").classList.remove("btn-add");
+        document.getElementById("btn11Add").classList.remove("btn-add");
+        document.getElementById("div11SCM").classList.remove("btn-add");
+        document.getElementById("div11OSM").classList.remove("btn-add");
         const button = document.querySelectorAll('.action-button');
         for (const btn of button) {
             btn.classList.remove("btn-active-light");
@@ -103,9 +112,13 @@ function fn01DisableButtons(pValue) {
         document.getElementById("btn0101Edit").classList.add("btn-edit");
         document.getElementById("btn98Add").classList.add("btn-add");
         document.getElementById("btn99Add").classList.add("btn-add");
+        document.getElementById("btn0101Print").classList.add("btn-tools");
         document.getElementById("btn0101ChangeStatus").classList.add("btn-secondary");
         document.getElementById("btn03010101Add").classList.add("btn-add");
         document.getElementById("btn989Add").classList.add("btn-add");
+        document.getElementById("btn11Add").classList.add("btn-add");
+        document.getElementById("div11SCM").classList.add("btn-add");
+        document.getElementById("div11OSM").classList.add("btn-add");
         const button = document.querySelectorAll('.action-button');
         for (const btn of button) {
             btn.classList.add("btn-active-light");
@@ -119,9 +132,13 @@ function fn01DisableButtons(pValue) {
     document.getElementById("btn0101Edit").disabled = pValue;
     document.getElementById("btn98Add").disabled = pValue;
     document.getElementById("btn99Add").disabled = pValue;
+    document.getElementById("btn0101Print").disabled = pValue;
     document.getElementById("btn0101ChangeStatus").disabled = pValue;
     document.getElementById("btn03010101Add").disabled = pValue;
     document.getElementById("btn989Add").disabled = pValue;
+    document.getElementById("btn11Add").disabled = pValue;
+    document.getElementById("div11SCM").disabled = pValue;
+    document.getElementById("div11OSM").disabled = pValue;
 };
 function fn01Toggle(button) {
     const wrapper = button.closest('.action-toggle-wrapper');
@@ -360,7 +377,7 @@ function fn0101LoadOverview(pMode, pID) {
                 //content
                 document.getElementById("div0101Detail").style.display = "";
                 document.getElementById("div0101Update").style.display = "none";
-                fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
+
                 document.getElementById("lbl0101ID").innerText = response[0].FormNo;
                 document.getElementById("lbl0101FormType").innerText = response[0].FormType;
                 document.getElementById("lbl0101DateRequested").innerText = response[0].DateCreated;
@@ -373,9 +390,23 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("lbl0101ProjectType").innerText = response[0].ProjType;
                 document.getElementById("lbl0101Purpose").innerText = response[0].Purpose;
                 document.getElementById("lbl0101Vehicle").innerText = response[0].VehicleName;
-                document.getElementById("lbl0101Category").innerText = response[0].Category;
-                document.getElementById("lbl0102Category").innerText = response[0].Category;
+                document.getElementById("lbl0101Category").innerText = response[0].ProjType.includes("(Stock Request)") || response[0].ProjType.includes("Advance PO") ? response[0].Category : "";
+                document.getElementById("lbl0102Category").innerText = response[0].Purpose.includes("REPAIR AND MAINTENANCE") ? response[0].Category : "";
+                document.getElementById("lbl0101ActName").innerText = response[0].ActName;
+                document.getElementById("lbl0101ActLocation").innerText = response[0].ActLocation;
+                document.getElementById("lbl0101ActDate").innerText = response[0].ActDate;
+                document.getElementById("lbl0101Subdivision").innerText = response[0].SubdName;
+                document.getElementById("lbl0101Estimate").innerText = response[0].Category.includes("House Construction") ? response[0].CECode + ' - ' + response[0].SubdName : response[0].EstTitle;
+                document.getElementById("lbl0101Project").innerText = response[0].Project;
+                document.getElementById("lbl0101ChargeTo").innerText = response[0].ChargeName;
+                document.getElementById("lbl0101Division").innerText = response[0].DivName;
+                document.getElementById("lbl0101Department").innerText = response[0].DeptName;
+                document.getElementById("lbl0101Remarks").innerText = response[0].Remarks;
                 //content
+
+                //show fields
+                fn0101ShowFields(pMode);
+                //show fields
 
             },
         });
@@ -389,6 +420,7 @@ function fn0101LoadOverview(pMode, pID) {
                 'pID': pID
             },
             success: function (response) {
+
                 //title
                 document.getElementById("spn0101Title").innerText = response[0].FormTitle;
                 document.getElementById("spn0101ID").innerText = response[0].FormNo;
@@ -439,10 +471,37 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("tbx0101AssignedTo").value = response[0].Approver;
                 document.getElementById("tbx0101EndorsedTo").value = response[0].EndorsedTo;
                 document.getElementById("tbx0101Status").value = response[0].Status;
-
-
+                $('#ddl0101PurchaseType').val(response[0].PurchaseType).trigger('change');
+                $('#ddl0101ProjectType').val(response[0].ProjType).trigger('change');
+                fn0101Purpose(response[0].Purpose, response[0].ProjType);
+                fn0101Vehicle(response[0].VehicleCode);
+                fn0101Category(response[0].ProjType.includes("(Stock Request)") || response[0].ProjType.includes("Advance PO") ? response[0].Category : "");
+                document.getElementById("tbx0202Category").value = response[0].Purpose.includes("REPAIR AND MAINTENANCE") ? response[0].Category : "";
+                document.getElementById("tbx0101ActName").value = response[0].ActName;
+                document.getElementById("tbx0101ActLocation").value = response[0].ActLocation;
+                document.getElementById("tbx0101ActDate").value = response[0].ActDate;
+                fn0101Subdivision(response[0].SubdCode);
+                document.getElementById("tbx0101Estimate").value = response[0].Category.includes("House Construction") ? response[0].CECode + ' - ' + response[0].SubdName : response[0].EstTitle;
+                document.getElementById("hf0101Estimate").value = response[0].CECode;
+                document.getElementById("tbx0101Project").value = response[0].Project;
+                document.getElementById("hf0101Subdivision").value = response[0].SubdCode;
+                document.getElementById("hf0101Phase").value = response[0].PhaseCode;
+                document.getElementById("hf0101Block").value = response[0].BlockCode;
+                document.getElementById("hf0101Lot").value = response[0].LotCode;
+                document.getElementById("tbx0101ChargeTo").value = response[0].ChargeName;
+                document.getElementById("hf0101ChargeCode").value = response[0].ChargeCode;
+                document.getElementById("hf0101AcctCode").value = response[0].AcctCode;
+                document.getElementById("hf0101Subsidiary").value = response[0].Misc;
+                document.getElementById("tbx0101Division").value = response[0].DivName;
+                document.getElementById("hf0101DivCode").value = response[0].DivCode;
+                document.getElementById("tbx0101Department").value = response[0].DeptName;
+                document.getElementById("hf0101DeptCode").value = response[0].DeptCode;
                 document.getElementById("tbx0101Remarks").value = response[0].Remarks;
                 //content
+
+                //show fields
+                fn0101ShowFields(pMode);
+                //show fields
 
 
             },
@@ -684,6 +743,8 @@ function fn0101Edit() {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if ((document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) && document.getElementById("tbx0101ChargeTo").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("tbx0101Remarks").value == "") { 
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else {
             Edit_Question(ID);
         }
@@ -732,13 +793,14 @@ function fn0101Edit() {
                 'pPurchaseType': document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value,
                 'pDeptCode': document.getElementById("hf0101DeptCode").value,
                 'pProjType': document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value,
-                'pPurpose': document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value,
+                'pPurpose': document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value,
                 'pSubdCode': document.getElementById("ddl0101Subdivision").options[document.getElementById("ddl0101Subdivision").selectedIndex].value,
                 'pPhase': document.getElementById("hf0101Phase").value,
                 'pBlock': document.getElementById("hf0101Block").value,
                 'pLot': document.getElementById("hf0101Lot").value,
                 'pCarCode': document.getElementById("ddl0101Vehicle").options[document.getElementById("ddl0101Vehicle").selectedIndex].value,
-                'pCategory': document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value,
+                'pCategory01': document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value,
+                'pCategory02': document.getElementById("tbx0202Category").value,
                 'pActName': document.getElementById("tbx0101ActName").value,
                 'pActLocation': document.getElementById("tbx0101ActLocation").value,
                 'pActDate': document.getElementById("tbx0101ActDate").value,
@@ -775,21 +837,26 @@ function fn0101Edit() {
                 'pType': 'Update - Record',
                 'pID': ID,
                 'pDateRequired': document.getElementById("tbx0101DateRequired").value,
-                'pSupplier': document.getElementById("ddl0101Supplier").options[document.getElementById("ddl0101Supplier").selectedIndex].value,
-                'pPrompt': document.getElementById("cbx0101_id").checked == true ? 1 : document.getElementById("cbx0102_id").checked == true ? 2 : document.getElementById("cbx0103_id").checked == true ? 3 : 0,
-                'pAttitude': document.getElementById("cbx0201_id").checked == true ? 1 : document.getElementById("cbx0202_id").checked == true ? 2 : document.getElementById("cbx0203_id").checked == true ? 3 : 0,
-                'pCompetitive': document.getElementById("cbx0301_id").checked == true ? 1 : document.getElementById("cbx0302_id").checked == true ? 2 : document.getElementById("cbx0303_id").checked == true ? 3 : 0,
-                'pProduct': document.getElementById("cbx0401_id").checked == true ? 1 : document.getElementById("cbx0402_id").checked == true ? 2 : document.getElementById("cbx0403_id").checked == true ? 3 : 0,
-                'pOnTime': document.getElementById("cbx0501_id").checked == true ? 1 : document.getElementById("cbx0502_id").checked == true ? 2 : document.getElementById("cbx0503_id").checked == true ? 3 : 0,
-                'pConsistency': document.getElementById("cbx0601_id").checked == true ? 1 : document.getElementById("cbx0602_id").checked == true ? 2 : document.getElementById("cbx0603_id").checked == true ? 3 : 0,
-                'pAfterSales': document.getElementById("cbx0701_id").checked == true ? 1 : document.getElementById("cbx0702_id").checked == true ? 2 : document.getElementById("cbx0703_id").checked == true ? 3 : 0,
-                'pTimeliness': document.getElementById("cbx0801_id").checked == true ? 1 : document.getElementById("cbx0802_id").checked == true ? 2 : document.getElementById("cbx0803_id").checked == true ? 3 : 0,
-                'pStability': document.getElementById("cbx0901_id").checked == true ? 1 : document.getElementById("cbx0902_id").checked == true ? 2 : document.getElementById("cbx0903_id").checked == true ? 3 : 0,
-                'pQuality': document.getElementById("cbx1001_id").checked == true ? 1 : document.getElementById("cbx1002_id").checked == true ? 2 : document.getElementById("cbx1003_id").checked == true ? 3 : 0,
-                'pOverallA': document.getElementById("spn01Total").innerText,
-                'pOverallB': document.getElementById("spn02Total").innerText,
-                'pOverallC': document.getElementById("spn03Total").innerText,
-                'pRemarks': document.getElementById("tbx0101Remarks").value
+                'pPurchaseType': document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value,
+                'pDeptCode': document.getElementById("hf0101DeptCode").value,
+                'pProjType': document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value,
+                'pPurpose': document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value,
+                'pSubdCode': document.getElementById("ddl0101Subdivision").options[document.getElementById("ddl0101Subdivision").selectedIndex].value,
+                'pPhase': document.getElementById("hf0101Phase").value,
+                'pBlock': document.getElementById("hf0101Block").value,
+                'pLot': document.getElementById("hf0101Lot").value,
+                'pCarCode': document.getElementById("ddl0101Vehicle").options[document.getElementById("ddl0101Vehicle").selectedIndex].value,
+                'pCategory01': document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value,
+                'pCategory02': document.getElementById("tbx0202Category").value,
+                'pActName': document.getElementById("tbx0101ActName").value,
+                'pActLocation': document.getElementById("tbx0101ActLocation").value,
+                'pActDate': document.getElementById("tbx0101ActDate").value,
+                'pCECode': document.getElementById("hf0101Estimate").value,
+                'pRemarks': document.getElementById("tbx0101Remarks").value,
+                'pChargeCode': document.getElementById("hf0101ChargeCode").value,
+                'pAcctCode': document.getElementById("hf0101AcctCode").value,
+                'pMisc': document.getElementById("hf0101Subsidiary").value,
+                'pDivision': document.getElementById("hf0101DivCode").value
             },
             success: function (response) {
                 fnAlertOnly('Record successfully saved.', 'success', 'btn btn-success');
@@ -1129,6 +1196,17 @@ function fn0101ShowFields(pMode) {
         document.getElementById("div0102Subdivision").style.display = "none";
         document.getElementById("div0102ChargeTo").style.display = "none";
 
+        //Particular
+        //Button
+        document.getElementById("btn11Add").style.display = "";
+        document.getElementById("div11SCM").style.display = "none";
+        document.getElementById("div11OSM").style.display = "none";
+
+        //Table
+        document.getElementById("table11Record").style.display = "none";
+        document.getElementById("table12Record").style.display = "none";
+        //Particular
+
         //Project Type
         if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) {
             document.getElementById("div0102ChargeTo").style.display = "";
@@ -1150,10 +1228,13 @@ function fn0101ShowFields(pMode) {
             document.getElementById("spn0102Estimate").innerText = "Batch";
             document.getElementById("tbx0101Estimate").placeholder = "Add batch";
             document.getElementById("div0102Subdivision").style.display = "";
+            //Table
+            document.getElementById("table12Record").style.display = "";
         } else if (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "" && (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "House Construction" || document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "House Construction - CCI") ) {
             document.getElementById("div0102Estimate").style.display = "";
             document.getElementById("spn0102Estimate").innerText = "Estimate";
             document.getElementById("tbx0101Estimate").placeholder = "Add estimate";
+            document.getElementById("table11Record").style.display = "";
         };
 
         //Project Type - Fuel
@@ -1218,7 +1299,21 @@ function fn0101ShowFields(pMode) {
         document.getElementById("div0101Subdivision").style.display = "none";
         document.getElementById("div0101ChargeTo").style.display = "none";
 
+        //Particular
+        //Button
+        document.getElementById("btn11Add").style.display = "none";
+        document.getElementById("div11SCM").style.display = "none";
+        document.getElementById("div11OSM").style.display = "none";
+
+        //Table
+        document.getElementById("table11Record").style.display = "none";
+        document.getElementById("table12Record").style.display = "none";
+        //Particular
+
         //Project Type
+        if (document.getElementById("lbl0101ProjectType").innerText == "Non OSM Project" || document.getElementById("lbl0101ProjectType").innerText == "OSM Project") {
+            document.getElementById("btn11Add").style.display = "";
+        };
         if (document.getElementById("lbl0101ProjectType").innerText == "Non OSM Project" || document.getElementById("lbl0101ProjectType").innerText == "OSM Project" || document.getElementById("lbl0101ProjectType").innerText.includes("Advance PO")) {
             document.getElementById("div0101ChargeTo").style.display = "";
         };
@@ -1238,9 +1333,19 @@ function fn0101ShowFields(pMode) {
             document.getElementById("div0101Estimate").style.display = "";
             document.getElementById("spn0101Estimate").innerText = "Batch";
             document.getElementById("div0101Subdivision").style.display = "";
-        } else if (document.getElementById("lbl0101Category").innerText != "" && (document.getElementById("lbl0101Category").innerText != "House Construction" || document.getElementById("lbl0101Category").innerText != "House Construction - CCI") ) {
+
+            document.getElementById("btn11Add").style.display = "none";
+            document.getElementById("div11SCM").style.display = "none";
+            document.getElementById("div11OSM").style.display = "";
+            document.getElementById("table12Record").style.display = "";
+        } else if (document.getElementById("lbl0101Category").innerText !== "" && (document.getElementById("lbl0101Category").innerText !== "House Construction" || document.getElementById("lbl0101Category").innerText !== "House Construction - CCI")) {
             document.getElementById("div0101Estimate").style.display = "";
             document.getElementById("spn0101Estimate").innerText = "Estimate";
+
+            document.getElementById("btn11Add").style.display = "none";
+            document.getElementById("div11SCM").style.display = "";
+            document.getElementById("div11OSM").style.display = "none";
+            document.getElementById("table11Record").style.display = "";
         };
 
         //Project Type - Fuel
@@ -1325,16 +1430,20 @@ function dd0101ProjectType_onchange(ddl0101ProjectType) {
     };
 };
 function ddl0101Purpose_onchange(ddl0101Purpose) {
+    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     if (ddl0101Purpose.value != "") {
         $('#ddl0101Category').val('').trigger('change');
-        fn0101GLAccount(ddl0101Purpose.value);
+        if (pMode == "ADD") fn0101GLAccount(ddl0101Purpose.value);
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
 function ddl0101Category_onchange(ddl0101Category) {
-    document.getElementById("tbx0101Estimate").value = "";
-    document.getElementById("hf0101Estimate").value = "";
+    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     if (ddl0101Category.value != "") {
+        if (pMode == "ADD") {
+            document.getElementById("tbx0101Estimate").value = "";
+            document.getElementById("hf0101Estimate").value = "";
+        };
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
@@ -1600,7 +1709,591 @@ function fn0101AddChargeTo(pCode, pDescription, pLock) {
     };
 };
 
+//project
+function fn0101Project() {
+    //Ajax
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+        data: {
+            'pFormCode': 'FRM000010',
+            'pType': 'Get - Project'
+        },
+        success: function (response) {
+            //Title
+            document.getElementById("h0101ProjectTitle").innerText = response[0].Title;
+            grid03Api.setGridOption("rowData", response);
+        },
+        complete: function (response) {
+            grid03Api.setGridOption("loading", false);
+        }
+    });
+
+    //AG Grid
+    let gridDiv = document.querySelector('#table0101Project');
+    let gridOptions;
+
+    // Destroy old grid if exists
+    gridDiv.innerHTML = "";
+
+    const gridTheme = agGrid.themeQuartz.withParams({
+        wrapperBorder: true,
+        headerRowBorder: false,
+    });
+
+    gridOptions = {
+        theme: gridTheme,
+        suppressCellFocus: true,
+        suppressDragLeaveHidesColumns: true,
+        enableCellTextSelection: true,
+        rowSelection: 'single',
+        loading: true,
+        columnDefs: [
+            {
+                headerName: "Action",
+                field: "Action",
+                sortable: false,
+                resizable: false,
+                lockPosition: true,
+                width: 75,
+                cellRenderer: params => params.value
+            },
+            {
+                headerName: "Project",
+                field: "Description",
+                filter: 'agTextColumnFilter',
+                tooltipField: "Description",
+                flex: 1,
+                minWidth: 350
+            }
+        ],
+        rowData: [],
+        pagination: false,
+    };
+    grid03Api = agGrid.createGrid(gridDiv, gridOptions);
+
+    $("#mdl0101Project").modal("show");
+};
+function fn0101AddProject(pSubdCode, pPhase, pBlock, pLot, pDesc) {
+    document.getElementById("hf0101Subdivision").value = pSubdCode;
+    document.getElementById("hf0101Phase").value = pPhase;
+    document.getElementById("hf0101Block").value = pBlock;
+    document.getElementById("hf0101Lot").value = pLot;
+    document.getElementById("tbx0101Project").value = pDesc;
+
+    //modal
+    $("#mdl0101Project").modal("hide");
+};
+
 //overview
+
+//particular
+function fn0102LoadParticular(pMode, pID) {
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+        data: {
+            'pFormCode': 'FRM000010',
+            'pType': 'Get - Particular - OSM',
+            'pID': pID
+        },
+        success: function (response) {
+            try {
+                //display loader
+                document.getElementById("div0102LoaderParticular").style.display = "";
+                //display loader
+
+                if (response[0].Category.includes("House Construction")) {
+
+                    if ($.fn.DataTable.isDataTable('#table12Record')) {
+                        $('#table12Record').DataTable().clear().destroy();
+                    };
+
+                    //disable column type detection
+                    DataTable.types().forEach(type => {
+                        DataTable.type(type, 'detect', () => false);
+                    });
+                    //disable column type detection
+
+                    //sort date by yyyy/mm/dd
+                    $.fn.dataTable.moment('MM/DD/YYYY');
+                    //sort date by yyyy/mm/dd
+
+                    //datatable
+                    var table12Record = $("#table12Record").DataTable({
+                        processing: true,
+                        bFilter: true,
+                        bPaginate: false,
+                        bInfo: false,
+                        scrollCollapse: true,
+                        paging: false,
+                        lengthChange: false,
+                        select: true,
+                        data: response,
+                        rowCallback: function (row, data, index) {
+                            if (data.Scope != '') {
+                                $(row).css({
+                                    'background-color': '#BFF5C0', 
+                                    'font-weight': 'bold' 
+                                });
+                            };
+                        },
+                        columns: [
+                            {
+                                data: 'Action',
+                                render: function (data, type, row) {
+                                    if (row.Scope != '') {
+                                        return '';
+                                    };
+                                    return data;
+                                }
+                            },
+                            { data: 'Type' },
+                            { data: 'Item' },
+                            { data: 'Qty' },
+                            { data: 'Unit' },
+                            { data: 'BdgtAmt' },
+                            { data: 'Status' },
+                            { data: 'POQty' },
+                            { data: 'SRQty' },
+                            { data: 'Remarks' }
+                        ],
+                        rowId: 'rowId',
+                        columnDefs: [
+                            {
+                                targets: [0, 1],
+                                orderable: false
+                            },
+                            {
+                                targets: [3, 5, 7, 8],
+                                className: 'dt-body-right',
+                                render: $.fn.dataTable.render.number(',', '.', 2)
+                            },
+                            {
+                                targets: [2],
+                                className: 'tbody-nowrap-auto'
+                            }
+                        ],
+                        initComplete: function () {
+                            this.api().cells().every(function () {
+                                var cell = this.node();
+                                $(cell).attr('title', $(cell).text());
+                            });
+                        },
+                        ordering: false
+                    });
+                    //datatable
+
+                    //search
+                    $('#tbx1101FindRecord').on('keyup', function () {
+                        table12Record.search(this.value).draw();
+                    });
+                    //search
+
+                } else {
+                    if ($.fn.DataTable.isDataTable('#table11Record')) {
+                        $('#table11Record').DataTable().clear().destroy();
+                    };
+
+                    //disable column type detection
+                    DataTable.types().forEach(type => {
+                        DataTable.type(type, 'detect', () => false);
+                    });
+                    //disable column type detection
+
+                    //sort date by yyyy/mm/dd
+                    $.fn.dataTable.moment('MM/DD/YYYY');
+                    //sort date by yyyy/mm/dd
+
+                    //datatable
+                    var table11Record = $("#table11Record").DataTable({
+                        processing: true,
+                        bFilter: true,
+                        bPaginate: false,
+                        bInfo: false,
+                        scrollCollapse: true,
+                        paging: false,
+                        lengthChange: false,
+                        select: true,
+                        data: response,
+                        rowCallback: function (row, data, index) {
+                            if (index % 2 === 0) {
+                                $(row).css('background-color', '#f0f9ff');
+                            } else {
+                                $(row).css('background-color', '#ffffff');
+                            }
+                        },
+                        columns: [
+                            { data: 'Action' },
+                            { data: 'ChangeItem' },
+                            { data: 'ChangeQty' },
+                            { data: 'ItemName' },
+                            { data: 'Qty' },
+                            { data: 'UMName' },
+                            { data: 'Cost' },
+                            { data: 'Total' },
+                            { data: 'Classification' },
+                            { data: 'Commodity' },
+                            { data: 'Remarks' },
+                            { data: 'PRNo' },
+                            { data: 'PRSeqNo' },
+                            { data: 'PRItem' },
+                            { data: 'PRQty' },
+                            { data: 'PRUnit' }
+                        ],
+                        rowId: 'rowId',
+                        columnDefs: [
+                            {
+                                targets: [0, 1, 2],
+                                orderable: false
+                            },
+                            {
+                                targets: [4, 6, 7, 14],
+                                className: 'dt-body-right',
+                                render: $.fn.dataTable.render.number(',', '.', 2)
+                            },
+                            {
+                                targets: [3, 8, 9, 10, 13],
+                                className: 'tbody-nowrap-auto'
+                            }
+                        ],
+                        initComplete: function () {
+                            this.api().cells().every(function () {
+                                var cell = this.node();
+                                $(cell).attr('title', $(cell).text());
+                            });
+                        },
+                        createdRow: function (row, data, dataIndex) {
+                            $(row).css('cursor', 'pointer');
+                        },
+                        ordering: false
+                    });
+                    //datatable
+
+                    //search
+                    $('#tbx1101FindRecord').on('keyup', function () {
+                        table11Record.search(this.value).draw();
+                    });
+                    //search
+
+                }
+
+                //hide loader
+                document.getElementById("div0102LoaderParticular").style.display = "none";
+                //hide loader
+
+                //action button
+                if (pMode == "ADD") {
+                    const button = document.querySelectorAll('.action-button');
+                    for (const btn of button) {
+                        btn.classList.remove("btn-active-light");
+                        btn.disabled = true;
+                    }
+                } else if (pMode == "DTL") {
+                    const button = document.querySelectorAll('.action-button');
+                    for (const btn of button) {
+                        btn.classList.add("btn-active-light");
+                        btn.disabled = false;
+                    }
+                } else if (pMode == "UPD") {
+                    const button = document.querySelectorAll('.action-button');
+                    for (const btn of button) {
+                        btn.classList.remove("btn-active-light");
+                        btn.disabled = true;
+                    }
+                }
+                //action button
+            } catch (err) {
+                console.error('Error initializing DataTable:', err);
+            };
+        },
+    });
+};
+//delete - particular
+function fn0102Delete(pID, pSeqNo) {
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value, pID, pSeqNo);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+        };
+    });
+    function Validate(ID, pID, pSeqNo) {
+        fnFRMValidateRecord("06PRDtl", "Delete", ID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Delete_Dtl_Question(pID, pSeqNo);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+            };
+        });
+
+    };
+    function Delete_Dtl_Question(pID, pSeqNo) {
+        Swal.fire({
+            text: 'Remove record?',
+            icon: 'question',
+            iconColor: '#0095e8',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'btn btn-sm btn-info min-w-100px',
+                cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Detele_Ok(pID, pSeqNo);
+            }
+        });
+        function Detele_Ok(pID, pSeqNo) {
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Delete - Particular',
+                    'pID': pID,
+                    'pSeqNo': pSeqNo
+                },
+                success: function (response) {
+                    fnAlertOnly('Record successfully removed!', 'success', 'btn btn-success');
+                    //Particular
+                    fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                }
+            });
+        };
+    };
+};
+
+function btn11SCM() {
+
+};
+function fn0101ReBindOSM() {
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+        data: {
+            'pFormCode': 'FRM000010',
+            'pType': 'Get - OSM Record',
+            'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
+        },
+        success: function (response) {
+            grid05Api.setGridOption("rowData", response); 
+        }
+    });
+};
+function btn11OSM() {
+    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
+    if (pMode == "DTL") {
+        //Bind
+
+        //Ajax
+        $.ajax({
+            type: "POST",
+            url: "Assets/Handler/FRM/FRM000010HND.ashx",
+            data: {
+                'pFormCode': 'FRM000010',
+                'pType': 'Get - OSM Record',
+                'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
+            },
+            success: function (response) {
+                grid05Api.setGridOption("rowData", response);
+            },
+            complete: function (response) {
+                grid05Api.setGridOption("loading", false);
+            }
+        });
+
+        //AG Grid
+        let gridDiv = document.querySelector('#table0101OSM');
+        let gridOptions;
+
+        //Destroy
+        if (grid05Api) {
+            grid05Api.destroy();
+            grid05Api = null;
+        };
+
+        // Destroy old grid if exists
+        gridDiv.innerHTML = "";
+
+        const gridTheme = agGrid.themeQuartz.withParams({
+            wrapperBorder: true,
+            headerRowBorder: false,
+        });
+
+        gridOptions = {
+            theme: gridTheme,
+            suppressCellFocus: true,
+            suppressDragLeaveHidesColumns: true,
+            enableCellTextSelection: true,
+            rowSelection: 'single',
+            loading: true,
+            getRowStyle: params => {
+                if (params.data.WBSNo == '') {
+                    return { backgroundColor: '#BFF5C0' };
+                }
+                return null;
+            },
+            columnDefs: [
+                {
+                    headerName: "Action",
+                    field: "Action",
+                    sortable: false,
+                    resizable: false,
+                    lockPosition: true,
+                    width: 75,
+                    cellRenderer: params => {
+                        if (params.data.WBSNo == '') {
+                            return '';
+                        };
+                        return params.value
+                    }
+                },
+                {
+                    headerName: "Particular",
+                    field: "Particular",
+                    filter: 'agTextColumnFilter',
+                    tooltipField: "Particular",
+                    flex: 1,
+                    minWidth: 350,
+                    cellStyle: params => {
+                        if (params.data.WBSNo == '') {
+                            return { fontWeight: 'bold' }
+                        }
+                        return null;
+                    }
+                },
+                {
+                    headerName: "Unit",
+                    field: "Unit",
+                    filter: 'agTextColumnFilter',
+                    tooltipField: "Unit",
+                    width: 100,
+                    cellRenderer: params => {
+                        if (params.data.WBSNo == '') {
+                            return '';
+                        };
+                        return params.value;
+                    }
+                },
+                {
+                    headerName: "Qty - Balance",
+                    field: "Qty1",
+                    tooltipField: "Qty1",
+                    width: 150,
+                    cellClass: "text-end",
+                    cellStyle: { fontWeight: 'bold' },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (params.data.WBSNo == '') {
+                            return ''
+                        }
+                        if (isNaN(value)) {
+                            value = parseFloat(params.data.Qty1) || 0;
+                        }
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    },
+                },
+                {
+                    headerName: "Qty - Approval",
+                    field: "Qty2",
+                    tooltipField: "Qty2",
+                    width: 150,
+                    cellClass: "text-end",
+                    cellStyle: { fontWeight: 'bold' },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (params.data.WBSNo == '') {
+                            return ''
+                        }
+                        if (isNaN(value)) {
+                            value = parseFloat(params.data.Qty2) || 0;
+                        }
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    },
+                },
+                {
+                    headerName: "Qty - Available",
+                    field: "Qty3",
+                    tooltipField: "Qty3",
+                    width: 150,
+                    cellClass: "text-end",
+                    cellStyle: { fontWeight: 'bold' },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (params.data.WBSNo == '') {
+                            return ''
+                        }
+                        if (isNaN(value)) {
+                            value = parseFloat(params.data.Qty3) || 0;
+                        }
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    },
+                },
+                {
+                    headerName: "Remarks",
+                    field: "Remarks",
+                    editable: true
+                }
+            ],
+            rowData: [],
+            pagination: false,
+        };
+        grid05Api = agGrid.createGrid(gridDiv, gridOptions);
+
+        //Modal
+        $("#mdl0101OSM").modal("show");
+    };
+};
+function fn0101AddOSM(pWBSNo) {
+    let rowData = null;
+    grid05Api.forEachNode(node => {
+        if (node.data.WBSNo == pWBSNo) {
+            rowData = node.data;
+        };
+    });
+    if (rowData) {
+        let ItemSrs = '';
+        if (rowData.WBSNo != '') {
+            ItemSrs = `${rowData.WBSNo}©${rowData.Particular}©${(0).toFixed(2)}©${rowData.Unit}©${rowData.Remarks || ''}`;
+        };
+        //Add
+        if (ItemSrs != '') {
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Add - Record (OSM)',
+                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value,
+                    'pItemSrs': ItemSrs
+                },
+                success: function (response) {
+                    fnAlertOnly('Record successfully saved.', 'success', 'btn btn-success');
+                    //Particular
+                    fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                    //ReBind
+                    fn0101ReBindOSM();
+                }
+            });
+        };
+    };
+};
+//particular
 
 //attachment
 function fn0201LoadAttachment(pMode, pID) {

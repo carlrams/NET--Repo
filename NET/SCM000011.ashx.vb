@@ -69,7 +69,7 @@ Public Class SCM000011
                 Dim pFType = context.Request("pFType")
 
                 Dim json As String = Me.Validate_Record(pID, pValue01, pValue02, pGroup, pFType)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010102" And pType = "Validate - House Construction - Record" Then
@@ -81,7 +81,7 @@ Public Class SCM000011
                 Dim pFType = context.Request("pFType")
 
                 Dim json As String = Me.Validate02_Record(pID, pValue01, pValue02, pGroup, pFType)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -91,7 +91,7 @@ Public Class SCM000011
                 Dim Year = context.Request("Year")
 
                 Dim json As String = Me.SCD010000_Get_Form_Year(Year)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCD010000" And Type = "Dashboard - Batch (Project)" Then
@@ -99,7 +99,7 @@ Public Class SCM000011
                 Dim Year = context.Request("Year")
 
                 Dim json As String = Me.SCD010000_Get_Batch_Year(Year)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -107,7 +107,7 @@ Public Class SCM000011
             If pFormCode = "SCM010100" And pType = "Contract Management - For Award - Header" Then
 
                 Dim json As String = Me.SCM010100_Get_Header()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010100" And pType = "Contract Management - Get Record - Repair" Then
@@ -115,13 +115,13 @@ Public Class SCM000011
                 Dim pEmpCode = CIIS_EmpCode
 
                 Dim json As String = Me.SCM010100_Get_Record_Repair(pEmpCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010100" And pType = "Contract Management - Get Record - House Construction" Then
 
                 Dim json As String = Me.SCM010100_Get_Record_House_Construction()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010100" And pType = "Contract Management - Get Record - Repair Details" Then
@@ -130,7 +130,7 @@ Public Class SCM000011
                 Dim pEmpCode = CIIS_EmpCode
 
                 Dim json As String = Me.SCM010100_Get_Record_Repair_Details(pDivCode, pEmpCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010100" And pType = "Contract Management - Get Record - House Construction Details" Then
@@ -138,7 +138,7 @@ Public Class SCM000011
                 Dim pDivCode = context.Request("pDivCode")
 
                 Dim json As String = Me.SCM010100_Get_Record_House_Construction_Details(pDivCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010100" And pType = "Contract Management - Get Record" Then
@@ -147,7 +147,7 @@ Public Class SCM000011
                 Dim pSubdCode = context.Request("pSubdCode")
 
                 Dim json As String = Me.SCM010100_Get_Record(pCode, pSubdCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010100" And pType = "Contract Management - House Construction - Get Record" Then
@@ -155,7 +155,7 @@ Public Class SCM000011
                 Dim pSubdCode = context.Request("pSubdCode")
 
                 Dim json As String = Me.SCM010100_House_Construction_Get_Record(pSubdCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "For Award - Project Image" Then
@@ -163,7 +163,7 @@ Public Class SCM000011
                 Dim pID = context.Request("pID")
 
                 Dim json As String = Me.SCM010101_For_Award_Img(pID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "For Award - General" Then
@@ -171,7 +171,7 @@ Public Class SCM000011
                 Dim pID = context.Request("pID")
 
                 Dim json As String = Me.SCM010101_For_Award_General(pID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "For Award - Get Compose Email" Then
@@ -189,7 +189,7 @@ Public Class SCM000011
                 Dim pID = context.Request("pID")
 
                 Dim json As String = Me.SCM010101_Get_Upload_Record(pID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "Upload - Download" Then
@@ -199,7 +199,7 @@ Public Class SCM000011
                 Dim pDownloadedBy = CIIS_EmpCode
 
                 Dim json As String = Me.Upload_Download(pID, pFileName, pDownloadedBy)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "Upload - Delete" Then
@@ -209,7 +209,7 @@ Public Class SCM000011
                 Dim pDownloadedBy = CIIS_EmpCode
 
                 Dim json As String = Me.Upload_Delete(pID, pFileName, pDownloadedBy)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "Upload - Get Record (Notice)" Then
@@ -217,7 +217,7 @@ Public Class SCM000011
                 Dim pID = context.Request("pID")
 
                 Dim json As String = Me.SCM010101_Get_Upload_Record_Notice(pID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "Upload - Download (Notice)" Then
@@ -227,7 +227,7 @@ Public Class SCM000011
                 Dim pDownloadedBy = CIIS_EmpCode
 
                 Dim json As String = Me.Upload_Download_Notice(pID, pFileName, pDownloadedBy)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "Upload - Delete (Notice)" Then
@@ -237,7 +237,7 @@ Public Class SCM000011
                 Dim pDownloadedBy = CIIS_EmpCode
 
                 Dim json As String = Me.Upload_Delete_Notice(pID, pFileName, pDownloadedBy)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "For Award - Get Contractor (List)" Then
@@ -245,7 +245,7 @@ Public Class SCM000011
                 Dim pID = context.Request("pID")
 
                 Dim json As String = Me.For_Award_Get_Contractor_List(pID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "For Award - Get Contractor (List - Project)" Then
@@ -253,13 +253,13 @@ Public Class SCM000011
                 Dim pCode = context.Request("pCode")
 
                 Dim json As String = Me.For_Award_Get_Contractor_List_Project(pCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "For Award - Get Contractor" Then
 
                 Dim json As String = Me.Get_Contractor()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010101" And pType = "For Award - Email (COF)" Then
@@ -342,7 +342,7 @@ Public Class SCM000011
                 Dim Code = context.Request("Code")
 
                 Dim json As String = Me.SCM010100_Get_Details(Code)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010100" And Type = "Contractor" Then
@@ -350,7 +350,7 @@ Public Class SCM000011
                 Dim ConType = context.Request("ConType")
 
                 Dim json As String = Me.SCM010100_Get_Contractor(ConType)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010100" And Type = "Contractor (Batch)" Then
@@ -358,7 +358,7 @@ Public Class SCM000011
                 'Dim BatchType = context.Request("BatchType")
 
                 Dim json As String = Me.SCM010100_Get_BatchContractor()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010100" And Type = "Submit" Then
@@ -377,7 +377,7 @@ Public Class SCM000011
                 Dim Code = context.Request("Code")
 
                 Dim json As String = Me.SCM010100_Upd_Form(FormNo, FCode, Category, ConType, ConNo, Price, VAT, EWT, DP, RF, PriorStart, Code)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010100" And Type = "Deadline" Then
@@ -388,7 +388,7 @@ Public Class SCM000011
                 Dim FormNo = context.Request("FormNo")
 
                 Dim json As String = Me.SCM010100_Upd_Deadline(FCode, DateFrom, DateTo, FormNo)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010100" And Type = "Contractor Note" Then
@@ -397,13 +397,13 @@ Public Class SCM000011
                 Dim Code = context.Request("Code")
 
                 Dim json As String = Me.SCM010100_Con_Notes(FCode, Code)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010100" And Type = "Message Notification" Then
 
                 Dim json As String = Me.SCM010100_Get_Notified()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010100" And Type = "Form Details (Project)" Then
@@ -412,7 +412,7 @@ Public Class SCM000011
                 Dim Code = context.Request("Code")
 
                 Dim json As String = Me.SCM010100_Get_Form_List(Subd, Code)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010100" And Type = "Form Details (Batch)" Then
@@ -420,7 +420,7 @@ Public Class SCM000011
                 Dim Subd = context.Request("Subd")
 
                 Dim json As String = Me.SCM010100_Get_Batch_List(Subd)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -430,7 +430,7 @@ Public Class SCM000011
                 Dim ID = context.Request("ID")
 
                 Dim json As String = Me.SCM010101_Get_Deadline(ID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -440,7 +440,7 @@ Public Class SCM000011
                 Dim ID = context.Request("ID")
 
                 Dim json As String = Me.SCM010102_Get_Deadline(ID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010102" And pType = "For Award - Email (House Construction)" Then
@@ -463,13 +463,13 @@ Public Class SCM000011
             If pFormCode = "SCM010200" And pType = "Contract Management - Awarded - Header" Then
 
                 Dim json As String = Me.SCM010200_Get_Awarded_Header()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010200" And pType = "Contract Management - Awarded - Repair" Then
 
                 Dim json As String = Me.SCM010200_Get_Awarded_Record()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010200" And pType = "Contract Management - Awarded - Repair Details" Then
@@ -477,7 +477,7 @@ Public Class SCM000011
                 Dim pDivCode = context.Request("pDivCode")
 
                 Dim json As String = Me.SCM010200_Get_Awarded_Record_Repair(pDivCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010200" And pType = "Contract Management - Get Record - Awarded" Then
@@ -485,13 +485,13 @@ Public Class SCM000011
                 Dim pSubdCode = context.Request("pSubdCode")
 
                 Dim json As String = Me.SCM010200_Get_Record_Awarded(pSubdCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010200" And pType = "Contract Management - Awarded - House Construction" Then
 
                 Dim json As String = Me.SCM010200_Awarded_House_Construction()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010200" And pType = "Contract Management - Awarded - House Construction Details" Then
@@ -499,7 +499,7 @@ Public Class SCM000011
                 Dim pDivCode = context.Request("pDivCode")
 
                 Dim json As String = Me.SCM010200_Awarded_House_Construction_Details(pDivCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010200" And pType = "Contract Management - Get Record - Awarded - House Construction" Then
@@ -507,7 +507,7 @@ Public Class SCM000011
                 Dim pSubdCode = context.Request("pSubdCode")
 
                 Dim json As String = Me.SCM010200_Get_Record_Awarded_House_Construction(pSubdCode)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010200" And Type = "Form Details (Project)" Then
@@ -515,7 +515,7 @@ Public Class SCM000011
                 Dim Subd = context.Request("Subd")
 
                 Dim json As String = Me.SCM010200_Get_Form_List(Subd)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010200" And Type = "Form Details (Batch)" Then
@@ -523,7 +523,7 @@ Public Class SCM000011
                 Dim Subd = context.Request("Subd")
 
                 Dim json As String = Me.SCM010200_Get_Batch_List(Subd)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010102" And pType = "For Award - House Construction - Project Image" Then
@@ -531,7 +531,7 @@ Public Class SCM000011
                 Dim pID = context.Request("pID")
 
                 Dim json As String = Me.SCM010102_For_Award_Img(pID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf pFormCode = "SCM010102" And pType = "For Award - House Construction - General" Then
@@ -539,7 +539,7 @@ Public Class SCM000011
                 Dim pID = context.Request("pID")
 
                 Dim json As String = Me.SCM010102_For_Award_House_Construction_General(pID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -549,7 +549,7 @@ Public Class SCM000011
                 Dim Subd = context.Request("Subd")
 
                 Dim json As String = Me.SCM010300_Get_Form_List(Subd)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM010300" And Type = "Form Details (Batch)" Then
@@ -557,7 +557,7 @@ Public Class SCM000011
                 Dim Subd = context.Request("Subd")
 
                 Dim json As String = Me.SCM010300_Get_Batch_List(Subd)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -567,7 +567,7 @@ Public Class SCM000011
                 Dim Subd = context.Request("Subd")
 
                 Dim json As String = Me.SCM010400_Get_Form_List(Subd)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -577,7 +577,7 @@ Public Class SCM000011
                 Dim ID = context.Request("ID")
 
                 Dim json As String = Me.SCM020000_Get_Verification(ID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "Contractor Details (For Approval)" Then
@@ -585,25 +585,25 @@ Public Class SCM000011
                 Dim ID = context.Request("ID")
 
                 Dim json As String = Me.SCM020000_Get_Details_Approval(ID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "Contractor Details (Approved)" Then
 
                 Dim json As String = Me.SCM020000_Get_Details_Approved(ID)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "For Approval (Contractor)" Then
 
                 Dim json As String = Me.SCM020000_Get_Record_Approval()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "For Verification (Contractor)" Then
 
                 Dim json As String = Me.SCM020000_Get_Record_Verification()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "User details (Contrator)" Then
@@ -611,31 +611,31 @@ Public Class SCM000011
                 Dim Num = context.Request("Num")
 
                 Dim json As String = Me.SCM020000_Get_Details(Num)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "For Resubmission (Contractor)" Then
 
                 Dim json As String = Me.SCM020000_Get_Record_Resubmission()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "For Approved (Contractor)" Then
 
                 Dim json As String = Me.SCM020000_Get_Record_Approved()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "For Declined (Contractors)" Then
 
                 Dim json As String = Me.SCM020000_Get_Record_Declined()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM020000" And Type = "Get Record - Contractor" Then
 
                 Dim json As String = Me.SCM020000_Get_Record_Contractor()
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -645,7 +645,7 @@ Public Class SCM000011
                 Dim Find = context.Request("Find")
 
                 Dim json As String = Me.SCM040101_Get_Item_Upd_List(Find)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM040101" And Type = "Get Item - Upd" Then
@@ -655,7 +655,7 @@ Public Class SCM000011
                 Dim UpdateDate = context.Request("UpdateDate")
 
                 Dim json As String = Me.SCM040101_Get_Item_Upd_Info(SeqNo, ItemCode, UpdateDate)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM040101" And Type = "Find Record" Then
@@ -664,7 +664,7 @@ Public Class SCM000011
                 Dim Post = context.Request("Post")
 
                 Dim json As String = Me.SCM040101_Get_Record_List(Find, Post)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM040101" And Type = "Search Item - Add" Then
@@ -672,7 +672,7 @@ Public Class SCM000011
                 Dim Find = context.Request("Find")
 
                 Dim json As String = Me.SCM040101_Get_Item_Add_List(Find)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             ElseIf FormCode = "SCM040101" And Type = "Get Item - Add" Then
@@ -682,7 +682,7 @@ Public Class SCM000011
                 Dim UpdateDate = context.Request("UpdateDate")
 
                 Dim json As String = Me.SCM040101_Get_Item_Add_Info(SeqNo, ItemCode, UpdateDate)
-                context.Response.ContentType = "text/json"
+                context.Response.ContentType = "application/json"
                 context.Response.Write(json)
 
             End If
@@ -1156,7 +1156,7 @@ Public Class SCM000011
         Query.Append("where ")
         Query.Append("  [A].tbl_from = 'Form_CRT' ")
         Query.Append("  and [A].status not in ('Accepted', 'Cancelled', 'Declined') ")
-        'Query.Append("  and [A].approver = @pEmpCode ")
+        Query.Append("  and [A].approver = @pEmpCode ")
         Query.Append("  and [B].ContractStatus not in ('Awarded', 'Cancelled', 'Declined') ")
         Query.Append("  and ISNULL([B].Subdivision, '') not in ('Rawland') ")
         Query.Append("  and ISNULL([B].Subdivision, '') <> '' ")
@@ -1284,7 +1284,7 @@ Public Class SCM000011
         Query.Append("where ")
         Query.Append("  [A].tbl_from = 'Form_CRT' ")
         Query.Append("  and [A].status not in ('Accepted', 'Cancelled', 'Declined') ")
-        'Query.Append("  and [A].approver = @pEmpCode ")
+        Query.Append("  and [A].approver = @pEmpCode ")
         Query.Append("  and [D].DivCode = @pDivCode ")
         Query.Append("  and [B].ContractStatus not in ('Awarded', 'Cancelled', 'Declined') ")
         Query.Append("  and ISNULL([B].Subdivision, '') not in ('Rawland') ")
@@ -1388,7 +1388,7 @@ Public Class SCM000011
         Query.Append("  ,ISNULL((select count(1) from SCM_TagContractors [C] left join Form_HWHdr [D] on [C].tag_code = [D].HWCode where [D].Subd = [A].Subd), 0) [SrtByTag] ")
         Query.Append("  ,ISNULL((select count(1) from SCM_TagContractors [C] left join Form_HWHdr [D] on [C].tag_code = [D].HWCode where [D].Subd = [A].Subd and [C].acct_status IS NULL and [C].status = 0), 0) [Endorsed] ")
         Query.Append("  ,ISNULL((select count(1) from SCM_TagContractors [C] left join Form_HWHdr [D] on [C].tag_code = [D].HWCode where [D].Subd = [A].Subd and [C].acct_status IS NULL and [C].status = 1), 0) [Applied] ")
-        Query.Append("  ,ISNULL((select count(1) from SCM_TagContractors [C] left join Form_HWHdr [D] on [C].tag_code = [D].HWCode where [D].Subd = [A].Subd and [C].acct_status in ('Cancelled', 'Declined') and [D].status = 1), 0) [Declined] ")
+        Query.Append("  ,ISNULL((select count(1) from SCM_TagContractors [C] left join Form_HWHdr [D] on [C].tag_code = [D].HWCode where [D].Subd = [A].Subd and [C].acct_status in ('Cancelled', 'Declined') and [C].status = 1), 0) [Declined] ")
         Query.Append("  ,ISNULL((select count(1) from SCM_TagContractors [C] left join Form_HWHdr [D] on [C].tag_code = [D].HWCode where [D].Subd = [A].Subd and [C].acct_status in ('Due') and [C].status = 1), 0) [Due] ")
         Query.Append("from ")
         Query.Append("  Form_HWHdr [A] ")
@@ -2546,8 +2546,8 @@ Public Class SCM000011
         'execute procedure
 
         'view/download
-        'Dim View As String = "https://ciisportal.calmarland.com/Assets/Upload/Contracts/FRM000009/" & pID & "/" & pFileName
-        Dim View As String = "/Assets/Upload/Contracts/FRM000009/" & pID & "/" & pFileName
+        Dim View As String = "https://ciisportal.calmarland.com/Assets/Upload/Contracts/FRM000009/" & pID & "/" & pFileName
+        'Dim View As String = "/Assets/Upload/Contracts/FRM000009/" & pID & "/" & pFileName
         'view/download
 
         'variable
@@ -2714,8 +2714,8 @@ Public Class SCM000011
         'execute procedure
 
         'view/download
-        'Dim View As String = "https://ciisportal.calmarland.com/Assets/Upload/Contracts/Notice/FRM000009/" & pID & "/" & pFileName
-        Dim View As String = "/Assets/Upload/Contracts/Notice/FRM000009/" & pID & "/" & pFileName
+        Dim View As String = "https://ciisportal.calmarland.com/Assets/Upload/Contracts/Notice/FRM000009/" & pID & "/" & pFileName
+        'Dim View As String = "/Assets/Upload/Contracts/Notice/FRM000009/" & pID & "/" & pFileName
         'view/download
 
         'variable
@@ -3084,6 +3084,16 @@ Public Class SCM000011
                             body = pContent
                             mail.Body = body
                             mail.IsBodyHtml = True
+
+                            'attachment
+                            Dim folderPath As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/FRM000009/" & pID & "/")
+                            If Directory.Exists(folderPath) Then
+                                For Each filePath As String In Directory.GetFiles(folderPath)
+                                    Dim attachment As New System.Net.Mail.Attachment(filePath)
+                                    mail.Attachments.Add(attachment)
+                                Next
+                            End If
+                            'attachment
 
                             smtp.Send(mail)
                             mail.Dispose()
@@ -4172,6 +4182,16 @@ Public Class SCM000011
                             body = pContent
                             mail.Body = body
                             mail.IsBodyHtml = True
+
+                            'attachment
+                            Dim folderPath As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/FRM000009/" & pID & "/")
+                            If Directory.Exists(folderPath) Then
+                                For Each filePath As String In Directory.GetFiles(folderPath)
+                                    Dim attachment As New System.Net.Mail.Attachment(filePath)
+                                    mail.Attachments.Add(attachment)
+                                Next
+                            End If
+                            'attachment
 
                             smtp.Send(mail)
                             mail.Dispose()

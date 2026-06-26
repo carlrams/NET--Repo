@@ -68,6 +68,7 @@
 									<button id="btn0101Add" class="btn btn-sm btn-icon btn-add align-self-center m-1" title="Add" onclick="fn0101Add();return false;"><i class="las la-plus fs-2"></i></button>
 									<button id="btn0101Delete" class="btn btn-sm btn-icon btn-delete align-self-center m-1" title="Remove" onclick="fn0101Delete();return false;"><i class="las la-trash fs-2"></i></button>
 									<button id="btn0101Edit" class="btn btn-sm btn-icon btn-edit align-self-center m-1" title="Edit" onclick="fn0101Edit();return false;"><i id="i0101Edit" class="las la-pencil-alt fs-2"></i></button>
+                                    <button id="btn0101Print" class="btn btn-sm btn-icon btn-tools align-self-center m-1" title="Print" onclick="fn0101Print();return false;"><i class="las la-print fs-2"></i></button>
 									<button id="btn0101ChangeStatus" class="btn btn-sm btn-secondary align-self-center m-1" title="Change Status" onclick="fn0101ChangeStatus();return false;">Change Status</button>
 								
 								</div>
@@ -156,7 +157,6 @@
 				                    <span id="lbl0101Project" class="form-control">-</span>
                                 </div>
                                 <div id="div0101ChargeTo" class="input-group input-group-sm mb-2" style="display: none;">
-				                    <span class="input-group-text input-group-text-top min-w-150px">Charge To</span>
 				                    <span class="input-group-text input-group-text-top min-w-150px">Charge To</span>
 				                    <span id="lbl0101ChargeTo" class="form-control">-</span>
                                 </div>
@@ -307,7 +307,7 @@
 								<div id="div0102Project" class="input-group input-group-sm mb-2" style="display: none;">
 									<span class="input-group-text min-w-150px required">Project</span>
 									<div class="d-flex align-items-center position-relative w-100" style="margin-left:1px">
-										<input id="tbx0101Project" type="text" class="form-control form-control-sm border-0 m-0" readonly="readonly" value="" />
+										<input id="tbx0101Project" type="text" class="form-control form-control-sm border-0 m-0" placeholder="Add project" readonly="readonly" value="" />
 										<input id="hf0101Subdivision" type="hidden" value="" />
 										<input id="hf0101Phase" type="hidden" value="" />
 										<input id="hf0101Block" type="hidden" value="" />
@@ -350,11 +350,132 @@
                                 </div>
 
                                 <div class="input-group input-group-sm mt-2">
-                                    <span class="input-group-text min-w-150px">Remarks</span>
+                                    <span class="input-group-text min-w-150px required">Remarks</span>
                                     <textarea id="tbx0101Remarks" class="form-control" placeholder="Add remarks" maxlength="1000" rows="3" cols=""></textarea>
                                 </div>
 
                             </div>
+                            
+                         <!--begin:: Particular -->
+						<div class="card">
+							<div class="card-header">
+								<div class="card-title fs-3 fw-bolder">Particular</div>
+							</div>
+							<div class="border-bottom border-gray-200 px-4 py-3">
+								<div class="d-flex flex-stack">
+									<div class="d-flex ms-5">
+										<button id="btn11Add" class="btn btn-sm btn-icon btn-add align-self-center m-1 p-5" title="Add Particular" onclick="fn11Add();return false;" style="display: none;"><i class="las la-plus fs-2"></i></button>
+                                        
+										<div id="div11SCM" title="(SCM - Estimate - Purchase Request)" class="menu menu-l-rounded menu-column menu-lg-row menu-title-gray-700 menu-state-icon-primary menu-state-bullet-primary align-items-stretch btn-sm btn-add align-self-center m-1" data-kt-menu="true" style="display: none;">
+											<div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion">
+												<span class="menu-link">
+													<span class="menu-title text-white" id="mnuSCM" runat="server">SCM - Purchase Req.</span>
+												</span>
+												<div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown menu-rounded-0 py-lg-4 w-lg-300px">
+													<div class="menu-item">
+														<a class="menu-link py-3" onclick="btn11SCM(); return false;">
+															<span class="menu-title">Add Item</span>
+														</a>
+													</div>
+													<div class="menu-item">
+														<a class="menu-link py-3" onclick="btn11UplSCM(); return false;">
+															<span class="menu-title">Upload Item</span>
+														</a>
+													</div>
+												</div>
+											</div>
+										</div>
+                                        
+										<div id="div11OSM" title="(OSM - Estimate - Stock Request)" class="menu menu-l-rounded menu-column menu-lg-row menu-title-gray-700 menu-state-icon-primary menu-state-bullet-primary align-items-stretch btn-sm btn-add align-self-center m-1" data-kt-menu="true" style="display: none;">
+											<div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion">
+												<span class="menu-link">
+													<span class="menu-title text-white" id="Span1" runat="server">OSM - Stock Req.</span>
+												</span>
+												<div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown menu-rounded-0 py-lg-4 w-lg-300px">
+													<div class="menu-item">
+														<a class="menu-link py-3" onclick="btn11OSM(); return false;">
+															<span class="menu-title">Add Item</span>
+														</a>
+													</div>
+													<div class="menu-item">
+														<a class="menu-link py-3" onclick="btn11UplOSM(); return false;">
+															<span class="menu-title">Upload Item</span>
+														</a>
+													</div>
+												</div>
+											</div>
+										</div>
+
+									</div>
+                                    
+                                    <div class="position-relative me-5">
+                                        <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+                                                <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+                                            </svg>
+                                        </span>
+                                        <input id="tbx1101FindRecord" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-10" placeholder="Search" />
+                                    </div>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="table-responsive">
+									<div id="div0102LoaderParticular" class="table-loading-message">
+										Loading...
+									</div>
+
+                                    <!-- Non House Construction -->
+									<table id="table11Record" class="table table-row-bordered border table-hover rounded g-2 w-100 align-middle" style="display: none;">
+										<thead class="fw-bold">
+											<tr class="fw-bold fs-7 text-gray-800">
+												<th class="min-w-50px mw-50px border-end" style="padding-left:15px"><span title="Action"><i class='las la-bars fs-3'></i></span></th>
+												<th class="min-w-75px mw-75px border-end">Type</th>
+												<th class="min-w-300px mw-300px border-end">Particular</th>
+												<th class="min-w-50px mw-50px border-end">QTY</th>
+												<th class="min-w-75px mw-75px border-end">Unit</th>
+												<th class="min-w-150px mw-150px border-end">Budget</th>
+												<th class="min-w-150px mw-150px border-end">Status</th>
+												<th class="min-w-50px mw-50px border-end">PO</th>
+												<th class="min-w-150px mw-150px border-end">SR / WT / RT</th>
+												<th class="min-w-50px mw-50px border-end">CP</th>
+                                                <th class="min-w-150px mw-150px border-end">Cost</th>
+                                                <th class="min-w-150px mw-150px border-end">Total</th>
+												<th class="min-w-200px mw-200px border-end nowrap">Remarks</th>
+											</tr>
+										</thead>
+										<tbody>
+
+										</tbody>
+									</table>
+                                    <!-- Non House Construction -->
+
+                                    <!-- House Construction -->
+									<table id="table12Record" class="table table-row-bordered border table-hover rounded g-2 w-100 align-middle" style="display: none;">
+										<thead class="fw-bold">
+											<tr class="fw-bold fs-7 text-gray-800">
+												<th class="min-w-50px mw-50px border-end" style="padding-left:15px"><span title="Action"><i class='las la-bars fs-3'></i></span></th>
+												<th class="min-w-75px mw-75px border-end">Type</th>
+												<th class="min-w-300px mw-300px border-end">Particular</th>
+												<th class="min-w-50px mw-50px border-end">QTY</th>
+												<th class="min-w-75px mw-75px border-end">Unit</th>
+												<th class="min-w-150px mw-150px border-end">Budget</th>
+												<th class="min-w-150px mw-150px border-end">Status</th>
+												<th class="min-w-75px mw-75px border-end">For PO</th>
+												<th class="min-w-75px mw-75px border-end">For SR</th>
+												<th class="min-w-200px mw-200px border-end nowrap">Remarks</th>
+											</tr>
+										</thead>
+										<tbody>
+
+										</tbody>
+									</table>
+                                    <!-- House Construction -->
+
+								</div>
+							</div>
+						</div>
+                        <!--End:: Particular -->
 
                         <!--begin:: Attatchment -->
                         <div class="card">
@@ -959,6 +1080,128 @@
 					</div>
 					<div class="modal-body">
                         <div id="table0101Charging" style="height: 70vh;"></div>
+					</div>
+                    <div class="modal-footer">
+                         <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
+        
+		<div id="mdl0101Project" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+			<div class="modal-dialog mw-650px">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 id="h0101ProjectTitle" class="modal-title">-</h5>
+						<div class="card-toolbar">
+							<div class="d-flex flex-stack">
+								<div class="position-relative me-5">
+									<span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+											<rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1"
+												transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+											<path
+												d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z"
+												fill="currentColor" />
+										</svg>
+									</span>
+									<input id="tbx0101FindProject" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-10" placeholder="Search" oninput="grid03Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindProject').value);" />
+								</div>
+								<div class="d-flex align-items-center">
+									<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-danger" data-bs-dismiss="modal" aria-label="Close" title="Close">
+										<span class="svg-icon svg-icon-1">
+											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+												<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+												<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+											</svg>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-body">
+						<div id="table0101Project" style="height: 70vh;"></div>
+					</div>
+                    <div class="modal-footer">
+                         <a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Close</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
+        
+		<div id="mdl0101SCM" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+	        <div class="modal-dialog modal-fullscreen">
+	            <div class="modal-content shadow-none">
+					<div class="modal-header">
+                        <h5 class="modal-title">Add Particular - SCM (Stock Request)</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex flex-stack">
+                                <div class="position-relative me-1">
+                                    <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+				                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+					                        <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+				                        </svg>
+                                    </span>
+                                    <input id="tbx0101FindSCM" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid04Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindSCM').value);" />
+                                </div>
+                            </div>
+                            <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+				                <span class="svg-icon svg-icon-1">
+					                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+						                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+					                </svg>
+				                </span>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-body">
+                        <div id="table0101SCM" style="height: 100%; border: none;"></div>
+					</div>
+                    <div class="modal-footer">
+                         <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
+
+		<div id="mdl0101OSM" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+	        <div class="modal-dialog modal-fullscreen">
+	            <div class="modal-content shadow-none">
+					<div class="modal-header">
+                        <h5 class="modal-title">Add Particular - OSM (Stock Request)</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex flex-stack">
+                                <div class="position-relative me-1">
+                                    <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+				                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+					                        <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+				                        </svg>
+                                    </span>
+                                    <input id="tbx0101FindOSM" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid05Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindOSM').value);" />
+                                </div>
+                            </div>
+                            <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+				                <span class="svg-icon svg-icon-1">
+					                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+						                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+					                </svg>
+				                </span>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-body">
+                        <div id="table0101OSM" style="height: 100%; border: none;"></div>
 					</div>
                     <div class="modal-footer">
                          <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">

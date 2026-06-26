@@ -17,6 +17,8 @@ Imports System.Data.SqlTypes
 Imports Microsoft.Reporting.Map.WebForms.VirtualEarth
 Imports System.Web.Services.Description
 Imports System.EnterpriseServices
+Imports iTextSharp.text
+Imports iTextSharp.text.pdf
 
 Public Class FRM000049HND
     Implements System.Web.IHttpHandler
@@ -28,10 +30,10 @@ Public Class FRM000049HND
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.20"
+    Dim DataSource As String = "10.10.30.10"
     Dim catalog As String = "cldc_live_acc"
     Dim catalogdb As String = "calmardbLive"
-    Dim UserID As String = "ciisv2"
+    Dim UserID As String = "ciis"
     Dim Password As String = "Cii5s"
     Private oFCodeValue As String
     'connection
@@ -83,8 +85,10 @@ Public Class FRM000049HND
                 Dim pDept = context.Request("pDept")
                 Dim pSite = context.Request("pSite")
                 Dim pLocation = context.Request("pLocation")
+                Dim pPurpose = context.Request("pPurpose")
+                Dim pNote = context.Request("pNote")
 
-                Dim json As String = Me.Save_New_Record_0201(pDateRequired, pGPDate, pIssuedTo, pDept, pSite, pLocation)
+                Dim json As String = Me.Save_New_Record_0201(pDateRequired, pGPDate, pIssuedTo, pDept, pSite, pLocation, pPurpose, pNote)
 
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
@@ -100,8 +104,10 @@ Public Class FRM000049HND
                 Dim pDept = context.Request("pDept")
                 Dim pSite = context.Request("pSite")
                 Dim pLocation = context.Request("pLocation")
+                Dim pPurpose = context.Request("pPurpose")
+                Dim pNote = context.Request("pNote")
 
-                Dim json As String = Me.Update_New_Record_0201(pFrmCode, pID, pDateRequired, pGPDate, pIssuedTo, pDept, pSite, pLocation)
+                Dim json As String = Me.Update_New_Record_0201(pFrmCode, pID, pDateRequired, pGPDate, pIssuedTo, pDept, pSite, pLocation, pPurpose, pNote)
 
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
@@ -421,6 +427,8 @@ Public Class FRM000049HND
         Query.Append("    ,[G].description   ")
         Query.Append("    ,[B].Site ")
         Query.Append("	,[B].Location ")
+        Query.Append("	,[B].Purpose ")
+        Query.Append("	,[B].Notes ")
         Query.Append("    ,[A].formtitle [Title]  ")
         Query.Append("from  ")
         Query.Append("    oop_form_hdr [A]  ")
@@ -461,6 +469,8 @@ Public Class FRM000049HND
                     .Dept = If(IsDBNull(DR("description")), "-", DR("description")),
                     .Site = If(IsDBNull(DR("Site")), "-", DR("Site")),
                     .Location = If(IsDBNull(DR("Location")), "-", DR("Location")),
+                    .Purpose = If(IsDBNull(DR("Purpose")), "-", DR("Purpose")),
+                    .Note = If(IsDBNull(DR("Notes")), "-", DR("Notes")),
                     .Title = If(IsDBNull(DR("Title")), "-", DR("Title"))
                     })
 
@@ -493,6 +503,8 @@ Public Class FRM000049HND
         Query.Append("    ,[B].Department   ")
         Query.Append("    ,[B].Site ")
         Query.Append("	,[B].Location ")
+        Query.Append("	,[B].Purpose ")
+        Query.Append("	,[B].Notes ")
         Query.Append("    ,[A].formtitle [Title]  ")
         Query.Append("from  ")
         Query.Append("    oop_form_hdr [A]  ")
@@ -533,6 +545,8 @@ Public Class FRM000049HND
                     .Dept = If(IsDBNull(DR("Department")), "-", DR("Department")),
                     .Site = If(IsDBNull(DR("Site")), "-", DR("Site")),
                     .Location = If(IsDBNull(DR("Location")), "-", DR("Location")),
+                    .Purpose = If(IsDBNull(DR("Purpose")), "-", DR("Purpose")),
+                    .Note = If(IsDBNull(DR("Notes")), "-", DR("Notes")),
                     .Title = If(IsDBNull(DR("Title")), "-", DR("Title"))
                     })
 
@@ -558,7 +572,7 @@ Public Class FRM000049HND
             Return 0
         End If
     End Function
-    Function Save_New_Record_0201(pDateRequired, pGPDate, pIssuedTo, pDept, pSite, pLocation)
+    Function Save_New_Record_0201(pDateRequired, pGPDate, pIssuedTo, pDept, pSite, pLocation, pPurpose, pNote)
         Dim result As New Dictionary(Of String, String)
         Try
             Using SqlConn As New SqlClient.SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
@@ -573,6 +587,8 @@ Public Class FRM000049HND
                     SqlCmd.Parameters.AddWithValue("@pDept", pDept)
                     SqlCmd.Parameters.AddWithValue("@pSite", pSite)
                     SqlCmd.Parameters.AddWithValue("@pLocation", pLocation)
+                    SqlCmd.Parameters.AddWithValue("@pPurpose", pPurpose)
+                    SqlCmd.Parameters.AddWithValue("@pNote", pNote)
 
                     SqlCmd.Parameters.AddWithValue("@pCreatedBy", CIIS_EmpCode)
 
@@ -595,7 +611,7 @@ Public Class FRM000049HND
         Dim serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
         Return serializer.Serialize(result)
     End Function
-    Function Update_New_Record_0201(pFrmCode, pID, pDateRequired, pGPDate, pIssuedTo, pDept, pSite, pLocation)
+    Function Update_New_Record_0201(pFrmCode, pID, pDateRequired, pGPDate, pIssuedTo, pDept, pSite, pLocation, pPurpose, pNote)
         Dim result As New Dictionary(Of String, String)
         Try
             Using SqlConn As New SqlClient.SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
@@ -613,6 +629,8 @@ Public Class FRM000049HND
                     SqlCmd.Parameters.AddWithValue("@pDept", pDept)
                     SqlCmd.Parameters.AddWithValue("@pSite", pSite)
                     SqlCmd.Parameters.AddWithValue("@pLocation", pLocation)
+                    SqlCmd.Parameters.AddWithValue("@pPurpose", pPurpose)
+                    SqlCmd.Parameters.AddWithValue("@pNote", pNote)
 
                     SqlCmd.Parameters.AddWithValue("@pUpdatedBy", CIIS_EmpCode)
 
@@ -990,17 +1008,6 @@ Public Class FRM000049HND
             Query.Append("order by ")
             Query.Append("   [Order1] ")
             Query.Append("   ,[Order2] ")
-        ElseIf pTblName = "AssetEmployee" Then
-            Query.Append("select * from ( ")
-            Query.Append("    select  '' as [Code], 'Select an approver' as [Name]  ")
-            Query.Append("    union  ")
-            Query.Append("    select emp_no as [Code], fullname as [Name]  ")
-            Query.Append("    from employee  ")
-            Query.Append("    where lock = '1'  ")
-            Query.Append("	and emp_no in ('MN2025090002', 'MN2024120001', 'MN2022080004')) t ")
-            Query.Append("order by  ")
-            Query.Append("    case when t.Code = '' then 1  ")
-            Query.Append("    else 2 end, t.[Name]  ")
         ElseIf pTblName = "EmployeeApprover" Then
             Query.Append("select * from ( ")
             Query.Append("    select  '' as [Code], 'Select an approver' as [Name]  ")
@@ -1024,22 +1031,8 @@ Public Class FRM000049HND
             Query.Append("      ,'Approve' [Name] ")
             Query.Append("   union ")
             Query.Append("   select ")
-            Query.Append("      'Clarify' [Code] ")
-            Query.Append("      ,'Clarify' [Name] ")
-            Query.Append("   union ")
-            Query.Append("   select ")
             Query.Append("      'Cancelled' [Code] ")
             Query.Append("      ,'Cancel' [Name] ")
-            Query.Append("end ")
-            Query.Append("else if (select top 1 created_by from oop_form_hdr where f_code = '" & pID & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & pID & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & pID & "' and status = '') in ('Clarification') ")
-            Query.Append("begin ")
-            Query.Append("   select ")
-            Query.Append("      '' [Code] ")
-            Query.Append("      ,'Select a status' [Name] ")
-            Query.Append("   union")
-            Query.Append("   select")
-            Query.Append("      'Reply' [Code] ")
-            Query.Append("      ,'Reply' [Name] ")
             Query.Append("end ")
             Query.Append("else if (select top 1 created_by from oop_form_hdr where f_code = '" & pID & "') in ('" & CIIS_EmpCode & "') ")
             Query.Append("begin ")
@@ -1062,22 +1055,8 @@ Public Class FRM000049HND
             Query.Append("      ,'Approve' [Name] ")
             Query.Append("   union ")
             Query.Append("   select ")
-            Query.Append("      'Clarify' [Code] ")
-            Query.Append("      ,'Clarify' [Name] ")
-            Query.Append("   union ")
-            Query.Append("   select ")
             Query.Append("      'Declined' [Code] ")
             Query.Append("      ,'Decline' [Name] ")
-            Query.Append("end ")
-            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pID & "' and status = '') in ('Clarification') ")
-            Query.Append("begin ")
-            Query.Append("   select ")
-            Query.Append("      '' [Code] ")
-            Query.Append("      ,'Select a status' [Name] ")
-            Query.Append("   union")
-            Query.Append("   select")
-            Query.Append("      'Reply' [Code] ")
-            Query.Append("      ,'Reply' [Name] ")
             Query.Append("end ")
             Query.Append("else if (select top 1 status from oop_form_hdr where f_code = '" & pID & "') in ('For Cancellation') ")
             Query.Append("begin ")
@@ -1158,47 +1137,33 @@ Public Class FRM000049HND
 
     End Function
 
-    Function Generate_Report_1010(pID As String, context As HttpContext) As String
 
+    Function Generate_Report_1010(pID As String, context As HttpContext) As String
         Dim result As New Dictionary(Of String, String)
 
         Try
-            ' Define paths
+            ' Paths
             Dim reportFolderPath = context.Server.MapPath("~/Assets/Report/" & pID & "/")
             Dim pdfFolderPath = context.Server.MapPath("~/Assets/PDF/" & pID & "/")
 
-            ' Create report folder if it doesn't exist
-            If Not Directory.Exists(reportFolderPath) Then
-                Directory.CreateDirectory(reportFolderPath)
-            End If
+            ' Ensure folders exist
+            If Not Directory.Exists(reportFolderPath) Then Directory.CreateDirectory(reportFolderPath)
+            If Not Directory.Exists(pdfFolderPath) Then Directory.CreateDirectory(pdfFolderPath)
 
-            ' Delete existing files in the report folder
-            Dim reportDir As New DirectoryInfo(reportFolderPath)
-            For Each file In reportDir.GetFiles()
-                file.Delete()
-            Next
+            ' Clean old files
+            For Each f In New DirectoryInfo(reportFolderPath).GetFiles() : f.Delete() : Next
+            For Each f In New DirectoryInfo(pdfFolderPath).GetFiles() : f.Delete() : Next
 
-            ' Create PDF folder if it doesn't exist
-            If Not Directory.Exists(pdfFolderPath) Then
-                Directory.CreateDirectory(pdfFolderPath)
-            End If
-
-            ' Delete existing files in the PDF folder
-            Dim pdfDir As New DirectoryInfo(pdfFolderPath)
-            For Each file In pdfDir.GetFiles()
-                file.Delete()
-            Next
-
-            ' Copy template report
+            ' Copy template
             File.Copy(context.Server.MapPath("~/Assets/Report/AMD03RPT01.rpt"), Path.Combine(reportFolderPath, "AMD03RPT01.rpt"), True)
 
-            ' Load and configure report
+            ' Load report
             Dim RptDoc As New ReportDocument()
             RptDoc.Load(Path.Combine(reportFolderPath, "AMD03RPT01.rpt"))
 
-            Dim logoninfo As TableLogOnInfo
+            ' Set DB logon
             For Each tbcurrent As Table In RptDoc.Database.Tables
-                logoninfo = tbcurrent.LogOnInfo()
+                Dim logoninfo As TableLogOnInfo = tbcurrent.LogOnInfo
                 logoninfo.ConnectionInfo.ServerName = DataSource
                 logoninfo.ConnectionInfo.DatabaseName = catalog
                 logoninfo.ConnectionInfo.UserID = UserID
@@ -1208,19 +1173,49 @@ Public Class FRM000049HND
 
             RptDoc.SetDatabaseLogon(UserID, Password, DataSource, catalog)
             RptDoc.SetParameterValue("@pAcctNo", pID)
+            RptDoc.SetParameterValue("@pAcctNo", pID, "AMD03RPT03.rpt")
 
-            ' Export to PDF
-            Dim stream As Stream = RptDoc.ExportToStream(ExportFormatType.PortableDocFormat)
-            Dim buf(CInt(stream.Length - 1)) As Byte
-            stream.Read(buf, 0, buf.Length)
-            File.WriteAllBytes(Path.Combine(pdfFolderPath, "AMD03RPT01.pdf"), buf)
+            ' Export original PDF to memory
+            Dim origStream As Stream = RptDoc.ExportToStream(ExportFormatType.PortableDocFormat)
+            Dim origPdfBytes(CInt(origStream.Length - 1)) As Byte
+            origStream.Read(origPdfBytes, 0, origPdfBytes.Length)
+            origStream.Close()
 
+            Dim outputPdfPath = Path.Combine(pdfFolderPath, "AMD03RPT01_Duplicated.pdf")
+
+            'Using ms As New MemoryStream(origPdfBytes)
+            '    Dim reader As New PdfReader(ms)
+
+            '    Dim longPage As New iTextSharp.text.Rectangle(612, 936) ' 8.5 x 13
+            '    Dim doc As New Document(longPage)
+            '    Dim writer As PdfWriter = PdfWriter.GetInstance(doc, New FileStream(outputPdfPath, FileMode.Create))
+            '    doc.Open()
+
+            '    Dim cb As PdfContentByte = writer.DirectContent
+            '    Dim importedPage As PdfImportedPage = writer.GetImportedPage(reader, 1)
+
+            '    Dim srcHeight As Single = reader.GetPageSize(1).Height
+            '    Dim longHeight As Single = longPage.Height
+            '    Dim halfHeight As Single = longHeight / 2
+
+            '    If srcHeight <= halfHeight Then
+            '        cb.AddTemplate(importedPage, 0, longHeight - srcHeight)
+            '        cb.AddTemplate(importedPage, 0, halfHeight - srcHeight)
+
+            '    Else
+            '        cb.AddTemplate(importedPage, 0, longHeight - srcHeight)
+            '        doc.NewPage()
+            '        cb.AddTemplate(importedPage, 0, longHeight - srcHeight)
+            '    End If
+
+            '    doc.Close()
+            'End Using
             ' Cleanup
             RptDoc.Close()
             RptDoc.Dispose()
 
-            ' Encrypt path and return response
-            Dim encryptedPath As String = EncryptionHelper.EncryptString("~/Assets/PDF/" & pID & "/AMD03RPT01.pdf")
+            ' Encrypt path and return
+            Dim encryptedPath As String = EncryptionHelper.EncryptString("~/Assets/PDF/" & pID & "/AMD03RPT01_Duplicated.pdf")
             result("status") = "success"
             result("viewUrl") = "MNU020200?View=" & encryptedPath
 
@@ -1231,6 +1226,7 @@ Public Class FRM000049HND
 
         Return New JavaScriptSerializer().Serialize(result)
     End Function
+
 #End Region
 
 #Region "Validate"
@@ -1293,6 +1289,10 @@ Public Class FRM000049HND
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
                 Query.Append("end ")
+                Query.Append("else if (Select top 1 GPCode from Form_Gatepass_Dtl where GPCode = (select tbl_code from oop_form_hdr where f_code = '" & pID & "')) is NULL ")
+                Query.Append("begin   ")
+                Query.Append("    select 'Please add particular first!'   ")
+                Query.Append("end  ")
                 Query.Append("else ")
                 Query.Append("begin ")
                 Query.Append("   select '' ")
@@ -1331,7 +1331,7 @@ Public Class FRM000049HND
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
                 Query.Append("end ")
-                Query.Append("else if (select status from oop_form_dtl_appr where f_code = '" & pID & "' and seq_no = " & Value & ") in ('Approved','Clarification','Clarify','Reply','Cancelled','Declined') ")
+                Query.Append("else if (select status from oop_form_dtl_appr where f_code = '" & pID & "' and seq_no = " & Value & ") in ('Approved','Clarification','Cancelled','Declined') ")
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
                 Query.Append("end ")
@@ -1345,7 +1345,7 @@ Public Class FRM000049HND
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
                 Query.Append("end ")
-                Query.Append("else if (select status from oop_form_dtl_appr where f_code = '" & pID & "' and seq_no = " & Value & ") in ('Approved','Clarification','Clarify','Reply','Cancelled','Declined') ")
+                Query.Append("else if (select status from oop_form_dtl_appr where f_code = '" & pID & "' and seq_no = " & Value & ") in ('Approved','Clarification','Cancelled','Declined') ")
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
                 Query.Append("end ")
@@ -1360,7 +1360,7 @@ Public Class FRM000049HND
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
                 Query.Append("end ")
-                Query.Append("else if (select status from oop_form_dtl_appr where f_code = '" & pID & "' and seq_no = " & Value & ") in ('Approved','Clarification','Clarify','Reply','Cancelled','Declined') ")
+                Query.Append("else if (select status from oop_form_dtl_appr where f_code = '" & pID & "' and seq_no = " & Value & ") in ('Approved','Clarification','Cancelled','Declined') ")
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
                 Query.Append("end ")
@@ -1486,13 +1486,21 @@ Public Class FRM000049HND
                 Query.Append("end ")
             End If
             If Type = "PrintStatus" Then
-                Query.Append("if (select status from oop_form_hdr where f_code = '" & pID & "') not in ('Accepted')  ")
-                Query.Append("begin  ")
-                Query.Append("    select 'Form is not yet accepted!'  ")
+                Query.Append("if (Select GPCode from Form_Gatepass_Dtl where GPCode = (select tbl_code from oop_form_hdr where f_code = '" & pID & "')) is NULL ")
+                Query.Append("begin   ")
+                Query.Append("    select 'Please add particular first!'   ")
                 Query.Append("end  ")
-                Query.Append("else  ")
-                Query.Append("begin  ")
-                Query.Append("    select ''  ")
+                Query.Append("else if (Select top 1 f_code from oop_form_dtl_appr where f_code = '" & pID & "') is NULL ")
+                Query.Append("begin   ")
+                Query.Append("    select 'Please add an approval path!'   ")
+                Query.Append("end  ")
+                Query.Append("else if (select status from oop_form_dtl_appr where f_code = '" & pID & "' and seq_no = 4) not in ('Approved')   ")
+                Query.Append("begin   ")
+                Query.Append("    select 'Form is not yet approved!'   ")
+                Query.Append("end    ")
+                Query.Append("else   ")
+                Query.Append("begin   ")
+                Query.Append("    select ''   ")
                 Query.Append("end ")
             End If
             'get total task

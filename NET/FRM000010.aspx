@@ -2514,6 +2514,7 @@
                     });
                 },
 				success: function (response) {
+                    console.log(pID, pItemNo, document.getElementById("ContentPlaceHolder1_lbl01ProjectCat").innerText);
                     //display loader
 					document.getElementById("div06PRDtlLoader").style.display = "";
 					document.querySelector(".cbx06AddAll").checked = false;

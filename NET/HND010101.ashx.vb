@@ -44,16 +44,16 @@ Public Class HND010101
             If Type = "Project" Then
 
                 'create new folder
-                If Directory.Exists(HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/" & FormCode & "/" & ID & "/")) = False Then
-                    Directory.CreateDirectory(HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/" & FormCode & "/" & ID & "/"))
-                End If
-                'If Directory.Exists("C:\inetpub\ciis.net\Assets\Upload\Contracts\" & FormCode & "\" & ID & "\") = False Then
-                '    Directory.CreateDirectory("C:\inetpub\ciis.net\Assets\Upload\Contracts\" & FormCode & "\" & ID & "\")
+                'If Directory.Exists(HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/" & FormCode & "/" & ID & "/")) = False Then
+                '    Directory.CreateDirectory(HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/" & FormCode & "/" & ID & "/"))
                 'End If
+                If Directory.Exists("C:\inetpub\ciis.net\Assets\Upload\Contracts\" & FormCode & "\" & ID & "\") = False Then
+                    Directory.CreateDirectory("C:\inetpub\ciis.net\Assets\Upload\Contracts\" & FormCode & "\" & ID & "\")
+                End If
                 'create new folder
 
-                Dim FilesPath As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/" & FormCode & "/" & ID & "/")
-                'Dim FilesPath As String = "C:\inetpub\ciis.net\Assets\Upload\Contracts\" & FormCode & "\" & ID & "\"
+                'Dim FilesPath As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/" & FormCode & "/" & ID & "/")
+                Dim FilesPath As String = "C:\inetpub\ciis.net\Assets\Upload\Contracts\" & FormCode & "\" & ID & "\"
                 Dim Files As String()
                 For Each s As String In context.Request.Files
                     Dim File As HttpPostedFile = context.Request.Files(s)
@@ -98,8 +98,8 @@ Public Class HND010101
                         FileName = Replace(FileName, "ñ", "n")
                         FileName = Replace(FileName, "Ñ", "N")
 
-                        Dim Path As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/" & FormCode & "/" & ID & "/") & FileName
-                        'Dim Path As String = "C:\inetpub\ciis.net\Assets\Upload\Contracts\" & FormCode & "\" & ID & "\" & FileName
+                        'Dim Path As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/" & FormCode & "/" & ID & "/") & FileName
+                        Dim Path As String = "C:\inetpub\ciis.net\Assets\Upload\Contracts\" & FormCode & "\" & ID & "\" & FileName
                         File.SaveAs(Path)
 
                         'create connection
@@ -196,16 +196,16 @@ Public Class HND010101
             ElseIf Type = "Notice" Then
 
                 'create new folder
-                If Directory.Exists(HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/Notice/" & FormCode & "/" & ID & "/")) = False Then
-                    Directory.CreateDirectory(HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/Notice/" & FormCode & "/" & ID & "/"))
-                End If
-                'If Directory.Exists("C:\inetpub\ciis.net\Assets\Upload\Contracts\Notice\" & FormCode & "\" & ID & "\") = False Then
-                '    Directory.CreateDirectory("C:\inetpub\ciis.net\Assets\Upload\Contracts\Notice\" & FormCode & "\" & ID & "\")
+                'If Directory.Exists(HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/Notice/" & FormCode & "/" & ID & "/")) = False Then
+                '    Directory.CreateDirectory(HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/Notice/" & FormCode & "/" & ID & "/"))
                 'End If
+                If Directory.Exists("C:\inetpub\ciis.net\Assets\Upload\Contracts\Notice\" & FormCode & "\" & ID & "\") = False Then
+                    Directory.CreateDirectory("C:\inetpub\ciis.net\Assets\Upload\Contracts\Notice\" & FormCode & "\" & ID & "\")
+                End If
                 'create new folder
 
-                Dim FilesPath As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/Notice/" & FormCode & "/" & ID & "/")
-                'Dim FilesPath As String = "C:\inetpub\ciis.net\Assets\Upload\Contracts\Notice\" & FormCode & "\" & ID & "\"
+                'Dim FilesPath As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/Notice/" & FormCode & "/" & ID & "/")
+                Dim FilesPath As String = "C:\inetpub\ciis.net\Assets\Upload\Contracts\Notice\" & FormCode & "\" & ID & "\"
                 Dim Files As String()
                 For Each s As String In context.Request.Files
                     Dim File As HttpPostedFile = context.Request.Files(s)
@@ -250,8 +250,8 @@ Public Class HND010101
                         FileName = Replace(FileName, "ñ", "n")
                         FileName = Replace(FileName, "Ñ", "N")
 
-                        Dim Path As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/Notice/" & FormCode & "/" & ID & "/") & FileName
-                        'Dim Path As String = "C:\inetpub\ciis.net\Assets\Upload\Contracts\Notice\" & FormCode & "\" & ID & "\" & FileName
+                        'Dim Path As String = HttpContext.Current.Server.MapPath("~/Assets/Upload/Contracts/Notice/" & FormCode & "/" & ID & "/") & FileName
+                        Dim Path As String = "C:\inetpub\ciis.net\Assets\Upload\Contracts\Notice\" & FormCode & "\" & ID & "\" & FileName
                         File.SaveAs(Path)
 
                         'create connection

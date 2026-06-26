@@ -355,11 +355,14 @@ function fn0101LoadOverview(pMode, pID) {
         ddl01Dept("")
         document.getElementById("tbx01Site").value = "";
         document.getElementById("tbx01Location").value = "";
+        document.getElementById("tbx01Purpose").value = "";
+        document.getElementById("tbx01Notes").value = "";
   
 
         fn98Load("");
         fn99Load("");
         fn989Load("");
+        fn11Load("");
         fn03010101Load("");
         fn04010101Load("");
         //content
@@ -382,7 +385,7 @@ function fn0101LoadOverview(pMode, pID) {
                         "lbl01ID", "lbl01FormType", "lbl01DateRequested",
                         "lbl01DateRequired", "lbl01RequestedBy", "lbl01AssignedTo",
                         "lbl01EndorsedTo", "lbl01Status", "lbl01GPDate",
-                        "lbl01IssuedTo", "lbl01Dept", "lbl01Site", "lbl01Location"
+                        "lbl01IssuedTo", "lbl01Dept", "lbl01Site", "lbl01Location", "lbl01Purpose", "lbl01Note"
                     ];
 
                     fields.forEach(id => {
@@ -455,6 +458,8 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("lbl01Dept").innerText = response[0].Dept;
                 document.getElementById("lbl01Site").innerText = response[0].Site;
                 document.getElementById("lbl01Location").innerText = response[0].Location;
+                document.getElementById("lbl01Purpose").innerText = response[0].Purpose;
+                document.getElementById("lbl01Note").innerText = response[0].Note;
                 //content
             },
 
@@ -522,6 +527,8 @@ function fn0101LoadOverview(pMode, pID) {
                 ddl01Dept(response[0].Dept)
                 document.getElementById("tbx01Site").value = response[0].Site;
                 document.getElementById("tbx01Location").value = response[0].Location;
+                document.getElementById("tbx01Purpose").value = response[0].Purpose;
+                document.getElementById("tbx01Notes").value = response[0].Note;
             },
         });
     }
@@ -802,7 +809,9 @@ function fn0101Edit() {
                 'pIssuedTo': document.getElementById("ddl01IssuedTo").value,
                 'pDept': document.getElementById("ddl01Dept").value,
                 'pSite': document.getElementById("tbx01Site").value,
-                'pLocation': document.getElementById("tbx01Location").value
+                'pLocation': document.getElementById("tbx01Location").value,
+                'pPurpose': document.getElementById("tbx01Purpose").value,
+                'pNote': document.getElementById("tbx01Notes").value
               
             },
             success: function (response) {
@@ -814,6 +823,7 @@ function fn0101Edit() {
                 fn0101LoadOverview(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
                 fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
                 if (window.opener && typeof window.opener.FRMUpdate === 'function') window.opener.FRMUpdate(response.oReturn);
+                fn11Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
 
 
             },
@@ -852,7 +862,9 @@ function fn0101Edit() {
                 'pIssuedTo': document.getElementById("ddl01IssuedTo").value,
                 'pDept': document.getElementById("ddl01Dept").value,
                 'pSite': document.getElementById("tbx01Site").value,
-                'pLocation': document.getElementById("tbx01Location").value
+                'pLocation': document.getElementById("tbx01Location").value,
+                'pPurpose': document.getElementById("tbx01Purpose").value,
+                'pNote': document.getElementById("tbx01Notes").value
                
             },
             success: function (response) {
@@ -863,7 +875,9 @@ function fn0101Edit() {
                 document.getElementById('ContentPlaceHolder1_hdnPrevID').value = ID
                 fn0101LoadOverview(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
                 fn04010101Load(ID)
+                fn11Load(ID);
                 if (window.opener && typeof window.opener.FRMUpdate === 'function') window.opener.FRMUpdate(ID);
+
             },
             error: function (xhr, status, error) {
                 Swal.close();
@@ -1037,12 +1051,24 @@ function fn11Load(pID) {
         },
     });
 };
-
 function fn11Add() {
-    document.getElementById("hdn03Mode").value = "ADD";
-    document.getElementById("hdn03ID").value = document.getElementById("ContentPlaceHolder1_hdnID").value + '-0-0';
-    fn03Load(document.getElementById("hdn03Mode").value, document.getElementById("hdn03ID").value);
-    $('#mdl03View').modal('show');
+    fn01IfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            fn13Validate("01Overview", "Save", "", function (response) {
+                if (response[0].oReturn == "") {
+                    document.getElementById("hdn03Mode").value = "ADD";
+                    document.getElementById("hdn03ID").value = document.getElementById("ContentPlaceHolder1_hdnID").value + '-0-0';
+                    fn03Load(document.getElementById("hdn03Mode").value, document.getElementById("hdn03ID").value);
+                    $('#mdl03View').modal('show');
+                } else {
+                    fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+                };
+            });
+        } else {
+            fn01AlertOnly('No active form found.', 'warning', 'btn btn-warning');
+        };
+    });
+
 };
 function fn11View(pMode, pID) {
     fnIfExist('Form_Gatepass_Dtl', 'DTLCode', pID, function (response) {
@@ -1059,9 +1085,17 @@ function fn11View(pMode, pID) {
 function fn11Delete(pMode, pID) {
     fn01IfExist('Form_Gatepass_Dtl', 'DTLCode', pID, function (response) {
         if (response[0].oReturn == "1") {
-            document.getElementById("hdn03Mode").value = pMode;
-            document.getElementById("hdn03ID").value = pID;
-            fn03Delete();
+
+            fn13Validate("01Overview", "Save", "", function (response) {
+                if (response[0].oReturn == "") {
+                    document.getElementById("hdn03Mode").value = pMode;
+                    document.getElementById("hdn03ID").value = pID;
+                    fn03Delete();
+                } else {
+                    fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+                };
+            });
+
         } else {
             window.location.replace("MNU040100");
         };
@@ -1071,16 +1105,47 @@ function fn11Delete(pMode, pID) {
 function fn11Edit(pMode, pID) {
     fnIfExist('Form_Gatepass_Dtl', 'DTLCode', pID, function (response) {
         if (response[0].oReturn == "1") {
-            fn03Load(pMode, pID)
-            document.getElementById("hdn03Mode").value = pMode;
-            document.getElementById("hdn03ID").value = pID;
-            $('#mdl03View').modal('show');
+            fn13Validate("01Overview", "Save", "", function (response) {
+                if (response[0].oReturn == "") {
+                    fn03Load(pMode, pID)
+                    document.getElementById("hdn03Mode").value = pMode;
+                    document.getElementById("hdn03ID").value = pID;
+                    $('#mdl03View').modal('show');
+                } else {
+                    fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+                };
+            });
+
         } else {
             window.location.replace("MNU040100");
         };
     });
 
 };
+function onIsReturnChange(el) {
+    const val = el.value;
+
+    if (val === "0") { 
+        $('#tbx03DateReturn')
+            .val('')
+            .prop('disabled', true);
+        $('#spn03DateReturn')
+            .removeClass('required')
+
+    } else if (val === "1") { 
+        $('#tbx03DateReturn')
+            .val('')
+            .prop('disabled', false);
+        $('#spn03DateReturn')
+            .addClass('required')
+    } else {
+        $('#tbx03DateReturn')
+            .val('')
+            .prop('disabled', true);
+        $('#spn03DateReturn')
+            .removeClass('required')
+    }
+}
 function fn03Load(pMode, pID) {
     if (pMode == "ADD") {
         //title
@@ -1209,17 +1274,52 @@ function fn03Refresh() {
     fn03Load(document.getElementById("hdn03Mode").value, document.getElementById("hdn03ID").value);
 };
 function fn03Add() {
-    document.getElementById("hdn03Mode").value = "ADD";
-    document.getElementById("hdn03ID").value = "000000000000";
-    fn03Load(document.getElementById("hdn03Mode").value, document.getElementById("hdn03ID").value);
+    fn01IfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            fn13Validate("01Overview", "Save", "", function (response) {
+                if (response[0].oReturn == "") {
+                    document.getElementById("hdn03Mode").value = "ADD";
+                    document.getElementById("hdn03ID").value = "000000000000";
+                    fn03Load(document.getElementById("hdn03Mode").value, document.getElementById("hdn03ID").value);
+                } else {
+                    fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+                };
+            });
+
+        } else {
+            fn01AlertOnly('No active form found.', 'warning', 'btn btn-warning');
+        };
+    });
+
 };
 function fn03Delete() {
     if (document.getElementById('hdn03Mode').value == "ADD") {
-        Cancel_Add_Question();
+        fn13Validate("01Overview", "Save", "", function (response) {
+            if (response[0].oReturn == "") {
+                Cancel_Add_Question();
+            } else {
+                fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+            };
+        });
+
     } else if (document.getElementById('hdn03Mode').value == "DTL") {
-        Delete_Dtl_Question(document.getElementById('hdn03ID').value);
+        fn13Validate("01Overview", "Save", "", function (response) {
+            if (response[0].oReturn == "") {
+                Delete_Dtl_Question(document.getElementById('hdn03ID').value);
+            } else {
+                fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+            };
+        });
+
     } else if (document.getElementById('hdn03Mode').value == "UPD") {
-        Cancel_Upd_Question(document.getElementById('hdn03ID').value);
+        fn13Validate("01Overview", "Save", "", function (response) {
+            if (response[0].oReturn == "") {
+                Cancel_Upd_Question(document.getElementById('hdn03ID').value);
+            } else {
+                fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+            };
+        });
+
     }
 
 
@@ -1342,11 +1442,39 @@ function fn0311Delete(pFormCode, pTblName, pTblCode, callBack) {
 function fn03Edit() {
     //validate
     if (document.getElementById('hdn03Mode').value == "ADD") {
-        ValidateFields("");
+        fn01IfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+            if (response[0].oReturn == "1") {
+                fn13Validate("01Overview", "Save", "", function (response) {
+                    if (response[0].oReturn == "") {
+                        ValidateFields("");
+                    } else {
+                        fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+                    };
+                });
+
+            } else {
+                fn01AlertOnly('No active form found.', 'warning', 'btn btn-warning');
+            };
+        });
+
     } else if (document.getElementById('hdn03Mode').value == "DTL") {
-        Edit_Dtl_Ok_Await(document.getElementById("hdn03ID").value);
+        fn13Validate("01Overview", "Save", "", function (response) {
+            if (response[0].oReturn == "") {
+                Edit_Dtl_Ok_Await(document.getElementById("hdn03ID").value);
+            } else {
+                fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+            };
+        });
+
     } else if (document.getElementById('hdn03Mode').value == "UPD") {
-        ValidateFields(document.getElementById("hdn03ID").value);
+        fn13Validate("01Overview", "Save", "", function (response) {
+            if (response[0].oReturn == "") {
+                ValidateFields(document.getElementById("hdn03ID").value);
+            } else {
+                fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+            };
+        });
+
     }
     function ValidateFields(ID) {
         if (document.getElementById("tbx03Part").value == "") {
@@ -1361,7 +1489,7 @@ function fn03Edit() {
             fn01AlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("ddl03IsReturn").value == "") {
             fn01AlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
-        } else if (document.getElementById("tbx03DateReturn").value == "") {
+        } else if (document.getElementById("ddl03IsReturn").value == "1" && document.getElementById("tbx03DateReturn").value == "") {
             fn01AlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else {
             Edit_Question(ID);
@@ -1773,44 +1901,24 @@ function fn989Update(pSeqNo) {
 function fn989Save() {
     fn13Validate("04ApprovalPath", "Save(ReasonForDelay)", document.getElementById('hdnSeqNo').value, function (response) {
         if (response[0].oReturn == "") {
-            Swal.fire({
-                text: 'Save record?',
-                icon: 'question',
-                iconColor: '#0095e8',
-                buttonsStyling: false,
-                showCancelButton: true,
-                confirmButtonText: "Yes",
-                cancelButtonText: 'Cancel',
-                customClass: {
-                    confirmButton: 'btn btn-sm btn-info min-w-100px',
-                    cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Save_Ok(FormCode, document.getElementById('hdnSeqNo').value);
-                }
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000049HND.ashx",
+                data: {
+                    'pFunction': 'Save-Record-989',
+                    'pFrmCode': FormCode,
+                    'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
+                    'pReason': document.getElementById('tbx04ReasonForDelay').value,
+                    'pSeqNo': pSeqNo,
+                },
+                success: function (response) {
+                    fn01AlertOnly('Record successfully saved.', 'success', 'btn btn-success');
+                    fn989Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
+                    fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
+                    $('#mdl01ReasonForDelay').modal('hide');
+                    fn0101LoadOverview(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value)
+                },
             });
-            function Save_Ok(FormCode, pSeqNo) {
-                $.ajax({
-                    type: "POST",
-                    url: "Assets/Handler/FRM/FRM000049HND.ashx",
-                    data: {
-                        'pFunction': 'Save-Record-989',
-                        'pFrmCode': FormCode,
-                        'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
-                        'pReason': document.getElementById('tbx04ReasonForDelay').value,
-                        'pSeqNo': pSeqNo,
-                    },
-                    success: function (response) {
-                        fn01AlertOnly('Record successfully saved.', 'success', 'btn btn-success');
-                        fn989Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
-                        fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
-                        $('#mdl01ReasonForDelay').modal('hide');
-                        fn0101LoadOverview(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value)
-                    },
-                });
-            };
-
         } else {
             fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
         };
@@ -1881,13 +1989,9 @@ function fn989AddOpenApprover(pSeqno) {
     function validate() {
         fn13Validate("04ApprovalPath", "Save(Approver)", pSeqno, function (response) {
             if (response[0].oReturn == "") {
-                if (pSeqno == 2) {
-                    ddl04OpenAppr("", "AssetEmployee");
-                } else {
-                    ddl04OpenAppr("", "EmployeeApprover");
-                }
-                document.getElementById('hdnSeqNo').value = pSeqno
                 $('#mdl01ApproverOpen').modal('show');
+                ddl04OpenAppr("");
+                document.getElementById('hdnSeqNo').value = pSeqno
             } else {
                 fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
             };
@@ -1910,7 +2014,8 @@ function fn989Add(event) {
             if (response[0].oReturn == "") {
                 $('#mdl01Approver').modal('show');
 /*                $('#ddl04AddFrom').val('').trigger('change');*/
-                ddl04Template("");
+                ddl04OpenAppr("");
+                ddl04Template("");  
             } else {
                 fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
             };
@@ -1930,58 +2035,31 @@ function fn989SaveApproval() {
         if (document.getElementById("ddl04Template").value == "") {
             fn01AlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else {
-            Add();
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000049HND.ashx",
+                data: {
+                    'pFunction': 'Save-New-Record-989',
+                    'pFrmCode': FormCode,
+                    'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
+                    'pTypeApr': "Template",
+                    'pApprover': "",
+                    'pNoDays': "",
+                    'pTemplate': document.getElementById('ddl04Template').value,
+                    'pAddForm': ""
+
+                },
+                success: function (response) {
+                    fn01AlertOnly('Record successfully saved.', 'success', 'btn btn-success');
+                    fn989Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
+                    fn0101LoadOverview(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value)
+                    fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
+                    ddl04Template("");
+                    $('#mdl01Approver').modal('hide');
+                },
+            });
         }
     }
-    function Add() {
-        Swal.fire({
-            text: 'Add record?',
-            icon: 'question',
-            iconColor: '#0095e8',
-            buttonsStyling: false,
-            showCancelButton: true,
-            confirmButtonText: "Yes",
-            cancelButtonText: 'Cancel',
-            customClass: {
-                confirmButton: 'btn btn-sm btn-info min-w-100px',
-                cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fn13Validate("04ApprovalPath", "Add", "", function (response) {
-                    if (response[0].oReturn == "") {
-                        Save_Ok();
-                    } else {
-                        fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
-                    };
-                });
-            }
-        });
-    }
-    function Save_Ok() {
-        $.ajax({
-            type: "POST",
-            url: "Assets/Handler/FRM/FRM000049HND.ashx",
-            data: {
-                'pFunction': 'Save-New-Record-989',
-                'pFrmCode': FormCode,
-                'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
-                'pTypeApr': "Template",
-                'pApprover': "",
-                'pNoDays': "",
-                'pTemplate': document.getElementById('ddl04Template').value,
-                'pAddForm': ""
-
-            },
-            success: function (response) {
-                fn01AlertOnly('Record successfully saved.', 'success', 'btn btn-success');
-                fn989Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
-                fn0101LoadOverview(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value)
-                fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
-                ddl04Template("");
-            },
-        });
-    };
 }
 function fn989SaveOpenApproval() {
     fn13Validate("04ApprovalPath", "Save(Approver)", document.getElementById('hdnSeqNo').value, function (response) {
@@ -1995,59 +2073,28 @@ function fn989SaveOpenApproval() {
         if (document.getElementById("ddl04TempAppr").value == "") {
             fn01AlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else {
-            Add();
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000049HND.ashx",
+                data: {
+                    'pFunction': 'Save-New-Open-Record-989',
+                    'pFrmCode': FormCode,
+                    'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
+                    'pTemplate': document.getElementById('ddl04TempAppr').value,
+                    'pSeqNo': document.getElementById('hdnSeqNo').value
+
+                },
+                success: function (response) {
+                    fn01AlertOnly('Record successfully saved.', 'success', 'btn btn-success');
+                    fn989Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
+                    fn0101LoadOverview(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value)
+                    fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
+                    ddl04OpenAppr("");
+                    $('#mdl01ApproverOpen').modal('hide');
+                },
+            });
         }
     }
-    function Add() {
-        Swal.fire({
-            text: 'Add record?',
-            icon: 'question',
-            iconColor: '#0095e8',
-            buttonsStyling: false,
-            showCancelButton: true,
-            confirmButtonText: "Yes",
-            cancelButtonText: 'Cancel',
-            customClass: {
-                confirmButton: 'btn btn-sm btn-info min-w-100px',
-                cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fn13Validate("04ApprovalPath", "Save(Approver)", document.getElementById('hdnSeqNo').value, function (response) {
-                    if (response[0].oReturn == "") {
-                        Save_Ok();
-                    } else {
-                        fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
-                    };
-                });
-            }
-        });
-    }
-    function Save_Ok() {
-        $.ajax({
-            type: "POST",
-            url: "Assets/Handler/FRM/FRM000049HND.ashx",
-            data: {
-                'pFunction': 'Save-New-Open-Record-989',
-                'pFrmCode': FormCode,
-                'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
-                'pTemplate': document.getElementById('ddl04TempAppr').value,
-                'pSeqNo': document.getElementById('hdnSeqNo').value
-
-            },
-            success: function (response) {
-                fn01AlertOnly('Record successfully saved.', 'success', 'btn btn-success');
-                fn989Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
-                fn0101LoadOverview(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value)
-                fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
-                if (document.getElementById('hdnSeqNo').value == 2) {
-                    ddl04OpenAppr("", "AssetEmployee");
-                } else {
-                    ddl04OpenAppr("", "EmployeeApprover");
-                }
-            },
-        });
-    };
 }
 function ddl04AddFrom_onchange(pID) {
     if (pID === "Template") {
@@ -2095,13 +2142,13 @@ function ddl04Approver(pID) {
         },
     });
 }
-function ddl04OpenAppr(pID, Approver) {
+function ddl04OpenAppr(pID) {
     $.ajax({
         type: "POST",
         url: "Assets/Handler/FRM/FRM000049HND.ashx",
         data: {
             'pFunction': 'Get-Record-03-List',
-            'pTblName': Approver,
+            'pTblName': 'EmployeeApprover',
             'pPlaceHolder': '',
             'pFrmCode': FormCode,
             'pAprType': document.getElementById('hdnAprType').value,
@@ -2213,52 +2260,33 @@ function fn03010101SaveUser() {
         if (document.getElementById("ddl03User").value == "") {
             fn01AlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else {
-            Add();
+            Save_Ok();
         }
     }
-    function Add() {
-        Swal.fire({
-            text: 'Add record?',
-            icon: 'question',
-            iconColor: '#0095e8',
-            buttonsStyling: false,
-            showCancelButton: true,
-            confirmButtonText: "Yes",
-            cancelButtonText: 'Cancel',
-            customClass: {
-                confirmButton: 'btn btn-sm btn-info min-w-100px',
-                cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fn13Validate("03Subscribers", "Add", "", function (response) {
-                    if (response[0].oReturn == "") {
-                        Save_Ok();
-                    } else {
-                        fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
-                    };
-                });
-            }
-        });
-    }
     function Save_Ok() {
-        $.ajax({
-            type: "POST",
-            url: "Assets/Handler/FRM/FRM000049HND.ashx",
-            data: {
-                'pFunction': 'Save-New-Record-03010101',
-                'pFrmCode': FormCode,
-                'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
-                'pUser': document.getElementById('ddl03User').value,
+        fn13Validate("03Subscribers", "Add", "", function (response) {
+            if (response[0].oReturn == "") {
+                $.ajax({
+                    type: "POST",
+                    url: "Assets/Handler/FRM/FRM000052HND.ashx",
+                    data: {
+                        'pFunction': 'Save-New-Record-03010101',
+                        'pFrmCode': FormCode,
+                        'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
+                        'pUser': document.getElementById('ddl03User').value,
 
-            },
-            success: function (response) {
-                fn01AlertOnly('Record successfully saved.', 'success', 'btn btn-success');
-                ddl03User("")
-                fn03010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
-                fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
-                fn0101LoadOverview(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value)
-            },
+                    },
+                    success: function (response) {
+                        fn01AlertOnly('Record successfully saved.', 'success', 'btn btn-success');
+                        ddl03User("")
+                        fn03010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
+                        fn04010101Load(document.getElementById('ContentPlaceHolder1_hdnID').value);
+                        fn0101LoadOverview(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value)
+                    },
+                });
+            } else {
+                fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+            };
         });
     };
 }
@@ -2473,10 +2501,15 @@ function fn0101ChangeStatus() {
     //if exisit
     fn01IfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
         if (response[0].oReturn == "1") {
-
-            $('#mdl01Status').modal('show');
-            ddl01Status("")
-            document.getElementById("tbx01Note").value
+            fn13Validate("01Overview", "Status", '', function (response) {
+                if (response[0].oReturn == "") {
+                    $('#mdl01Status').modal('show');
+                    ddl01Status("")
+                    document.getElementById("tbx01Note").value
+                } else {
+                    fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+                };
+            });
         } else {
             fn01AlertOnly('No active form found.', 'warning', 'btn btn-warning');
         };

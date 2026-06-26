@@ -151,6 +151,25 @@ Public Class FRM000010HND
                 Dim pCode5 = context.Request("pCode5")
                 json = Me.Get_Charging(pTblFrom, pCode1, pCode2, pCode3, pCode4, pCode5)
 
+            ElseIf pFormCode = "FRM000010" And pType = "Get - Project" Then
+
+                json = Me.Get_Project()
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - Particular - SCM" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_Particular_SCM(pID)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - Particular - OSM" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_Particular_OSM(pID)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - OSM Record" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_OSM(pID)
+
             ElseIf pFormCode = "FRM000010" And pType = "Add - Record" Then
 
                 Dim pDateRequired = context.Request("pDateRequired")
@@ -163,7 +182,8 @@ Public Class FRM000010HND
                 Dim pBlock = context.Request("pBlock")
                 Dim pLot = context.Request("pLot")
                 Dim pCarCode = context.Request("pCarCode")
-                Dim pCategory = context.Request("pCategory")
+                Dim pCategory01 = context.Request("pCategory01")
+                Dim pCategory02 = context.Request("pCategory02")
                 Dim pActName = context.Request("pActName")
                 Dim pActLocation = context.Request("pActLocation")
                 Dim pActDate = context.Request("pActDate")
@@ -174,7 +194,48 @@ Public Class FRM000010HND
                 Dim pMisc = context.Request("pMisc")
                 Dim pRemarks = context.Request("pRemarks")
                 Dim pCreatedBy = CIIS_EmpCode
-                json = Me.Add_Record(pDateRequired, pPurchaseType, pDeptCode, pProjType, pPurpose, pSubdCode, pPhase, pBlock, pLot, pCarCode, pCategory, pActName, pActLocation, pActDate, pChargeCode, pAcctCode, pDivision, pCECode, pMisc, pRemarks, pCreatedBy)
+                json = Me.Add_Record(pDateRequired, pPurchaseType, pDeptCode, pProjType, pPurpose, pSubdCode, pPhase, pBlock, pLot, pCarCode, pCategory01, pCategory02, pActName, pActLocation, pActDate, pChargeCode, pAcctCode, pDivision, pCECode, pMisc, pRemarks, pCreatedBy)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Update - Record" Then
+
+                Dim pID = context.Request("pID")
+                Dim pDateRequired = context.Request("pDateRequired")
+                Dim pPurchaseType = context.Request("pPurchaseType")
+                Dim pDeptCode = context.Request("pDeptCode")
+                Dim pProjType = context.Request("pProjType")
+                Dim pPurpose = context.Request("pPurpose")
+                Dim pSubdCode = context.Request("pSubdCode")
+                Dim pPhase = context.Request("pPhase")
+                Dim pBlock = context.Request("pBlock")
+                Dim pLot = context.Request("pLot")
+                Dim pCarCode = context.Request("pCarCode")
+                Dim pCategory01 = context.Request("pCategory01")
+                Dim pCategory02 = context.Request("pCategory02")
+                Dim pActName = context.Request("pActName")
+                Dim pActLocation = context.Request("pActLocation")
+                Dim pActDate = context.Request("pActDate")
+                Dim pChargeCode = context.Request("pChargeCode")
+                Dim pAcctCode = context.Request("pAcctCode")
+                Dim pDivision = context.Request("pDivision")
+                Dim pCECode = context.Request("pCECode")
+                Dim pMisc = context.Request("pMisc")
+                Dim pRemarks = context.Request("pRemarks")
+                Dim pUpdatedBy = CIIS_EmpCode
+                json = Me.Update_Record(pID, pDateRequired, pPurchaseType, pDeptCode, pProjType, pPurpose, pSubdCode, pPhase, pBlock, pLot, pCarCode, pCategory01, pCategory02, pActName, pActLocation, pActDate, pChargeCode, pAcctCode, pDivision, pCECode, pMisc, pRemarks, pUpdatedBy)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Add - Record (OSM)" Then
+
+                Dim pID = context.Request("pID")
+                Dim pItemSrs = context.Request("pItemSrs")
+                Dim pCreatedBy = CIIS_EmpCode
+                json = Me.Add_Record_OSM(pID, pItemSrs, pCreatedBy)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Delete - Particular" Then
+
+                Dim pID = context.Request("pID")
+                Dim pSeqNo = context.Request("pSeqNo")
+                Dim pDeletedBy = CIIS_EmpCode
+                json = Me.Delete_Particular(pID, pSeqNo, pDeletedBy)
 
             End If
 
@@ -200,9 +261,71 @@ Public Class FRM000010HND
 
         'create variable
         Dim Query As New StringBuilder
+        Query.Append("declare @PRCode nvarchar(13) = isnull((select tbl_code from oop_form_hdr where f_code = '" & pID & "'), '') ")
         Dim Msg As String = ""
         'create variable
 
+
+        If pGroup = "06PRDtl" Then
+
+            'get total task
+            If pFType = "Add" Then
+                Query.Append("if (select status from oop_form_hdr where f_code = '" & pID & "') in ('Accepted','Declined','Cancelled') ")
+                Query.Append("begin ")
+                Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' in (select top 1 approver from oop_form_dtl_appr where f_code = '" & pID & "' and approver = 'MN2023120000' and status = '') and isnull((select justification from ogm_pr_hdr where pr_code = @PRCode), '') LIKE '%(Stock Request)%' ")
+                Query.Append("begin ")
+                Query.Append("  select '' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' not in (select created_by from oop_form_hdr where f_code = '" & pID & "') ")
+                Query.Append("begin ")
+                Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else ")
+                Query.Append("begin ")
+                Query.Append("   select '' ")
+                Query.Append("end ")
+            End If
+            If pFType = "Delete" Then
+                Query.Append("if (select status from oop_form_hdr where f_code = '" & pID & "') in ('Accepted','Declined','Cancelled') ")
+                Query.Append("begin ")
+                Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' in (select top 1 approver from oop_form_dtl_appr where f_code = '" & pID & "' and approver = 'MN2023120000' and status = '') and isnull((select justification from ogm_pr_hdr where pr_code = @PRCode), '') LIKE '%(Stock Request)%' ")
+                Query.Append("begin ")
+                Query.Append("  select '' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' not in (select created_by from oop_form_hdr where f_code = '" & pID & "') ")
+                Query.Append("begin ")
+                Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else ")
+                Query.Append("begin ")
+                Query.Append("   select '' ")
+                Query.Append("end ")
+            End If
+            If pFType = "Save" Then
+                Query.Append("if (select status from oop_form_hdr where f_code = '" & pID & "') in ('Accepted','Cancelled','Declined') ")
+                Query.Append("begin ")
+                Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' in (select top 1 approver from oop_form_dtl_appr where f_code = '" & pID & "' and approver = 'MN2023120000' and status = '') and isnull((select justification from ogm_pr_hdr where pr_code = @PRCode), '') LIKE '%(Stock Request)%' ")
+                Query.Append("begin ")
+                Query.Append("  select '' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' not in (select created_by [authorize] from oop_form_hdr where f_code = '" & pID & "' union select approver [authorize] from oop_form_dtl_appr where f_code = '" & pID & "' and type = 'Implementer') ")
+                Query.Append("begin ")
+                Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else ")
+                Query.Append("begin ")
+                Query.Append("   select '' ")
+                Query.Append("end ")
+            End If
+            'get total task
+
+        End If
 
         If pGroup = "04ApprovalPath" Then
 
@@ -646,6 +769,7 @@ Public Class FRM000010HND
         Query.Append("  ,[B].Lot [LotCode] ")
         Query.Append("  ,[M].CarCode + ' - ' + [M].PlateNo [VehicleName] ")
         Query.Append("  ,[B].PlateNo [VehiclePlate] ")
+        Query.Append("  ,[M].CarCode [VehicleCode] ")
         Query.Append("  ,[B].Type ")
         Query.Append("  ,[B].Category ")
         Query.Append("  ,[B].ActName ")
@@ -661,7 +785,7 @@ Public Class FRM000010HND
         Query.Append("  ,[B].department [DeptCode] ")
         Query.Append("  ,ISNULL((CASE WHEN [B].Misc = 'MISCELLANEOUS' THEN (select description from sub_misc where account = [B].AcctCode and code = [B].ChargeCode) ")
         Query.Append("                WHEN [B].Misc = 'MODEL HOUSE' THEN (select description from sub_house where code = [B].ChargeCode) ")
-        Query.Append("                WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode), '') ")
+        Query.Append("                WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode and ProjectType = [B].justification), '') ")
         Query.Append("                WHEN [B].Misc = 'SUBDIVISION' THEN (select description from sub_subdivision where code = [B].ChargeCode) ")
         Query.Append("                WHEN [B].Misc = 'PHASE' THEN (select description from sub_phase where code = [B].ChargeCode) ")
         Query.Append("                WHEN [B].Misc = 'VENDOR' THEN (select description from sub_vendor where code = [B].ChargeCode) ")
@@ -702,7 +826,7 @@ Public Class FRM000010HND
 
                     RecordList.Add(New With {
                         .FormNo = DR("f_code"),
-                        .FormType = "Price Inquiry",
+                        .FormType = "Purchase Request",
                         .DateCreated = DR("DateCreated"),
                         .DateRequired = DR("DateRequired"),
                         .RequestedBy = DR("RequestedBy"),
@@ -727,6 +851,7 @@ Public Class FRM000010HND
                         .LotCode = DR("LotCode"),
                         .VehicleName = DR("VehicleName"),
                         .VehiclePlate = DR("VehiclePlate"),
+                        .VehicleCode = DR("VehicleCode"),
                         .Type = DR("Type"),
                         .Category = DR("Category"),
                         .ActName = DR("ActName"),
@@ -1221,6 +1346,7 @@ Public Class FRM000010HND
         'set to max
         Return JsonConvert.SerializeObject(RecordList, Formatting.None)
         'display 
+
     End Function
     Function Get_Charging(pTblFrom, pCode1, pCode2, pCode3, pCode4, pCode5)
 
@@ -1269,10 +1395,583 @@ Public Class FRM000010HND
         'display
 
     End Function
+    Function Get_Project()
+
+        'get estimate
+        Dim Query As New StringBuilder
+        Query.Append("   select ")
+        Query.Append("      [A].LotCode [Code] ")
+        Query.Append("      ,[A].s_code [SubdCode] ")
+        Query.Append("      ,[A].p_code [PhaseCode] ")
+        Query.Append("      ,[A].b_code [BlockCode] ")
+        Query.Append("      ,[A].l_code [LotCode] ")
+        Query.Append("      ,[D].abbr + ' ' + [C].description + ' B' + [B].block + ' L' + [A].lot [Description] ")
+        Query.Append("   from ")
+        Query.Append("      eng_lot [A] ")
+        Query.Append("      left join eng_block [B] on [A].b_code = [B].b_code ")
+        Query.Append("      left join phase [C] on [A].p_code = [C].code ")
+        Query.Append("      left join subdivision [D] on [A].s_code = [D].code ")
+        Query.Append("   where ")
+        Query.Append("	    [A].LotCode in (select [E].LotCode from calmardblive.dbo.mstr_LotsInventory [E]) ")
+        Query.Append("   order by ")
+        Query.Append("      [Description] ")
+        'get estimate
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Action As New StringBuilder
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view mt-1' title='Select' onclick=""fn0101AddProject('" & DR("SubdCode") & "', '" & DR("PhaseCode") & "', '" & DR("BlockCode") & "', '" & DR("LotCode") & "', '" & DR("Description") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
+
+                    Dim Title As String = "Project - Record"
+
+                    RecordList.Add(New With {
+                        .Action = Action.ToString,
+                        .Code = DR("Code"),
+                        .Description = DR("Description"),
+                        .Title = Title
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'set to max
+        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
+        'display 
+
+    End Function
+    Function Get_Particular_SCM(pID)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("declare @ProjType nvarchar(180) = isnull((select justification from ogm_pr_hdr where form_no = @pID),'') ")
+        Query.Append("declare @Category nvarchar(180) = isnull((select Category from ogm_pr_hdr where form_no = @pID),'') ")
+        Query.Append("if @ProjType in ('OSM Project (Advance PO)', 'CCI Project (Advance PO)') and @Category in ('House Construction', 'House Construction - CCI') ")
+        Query.Append("begin ")
+        Query.Append("  select ")
+        Query.Append("      [A].seq_no [SeqNo] ")
+        Query.Append("      ,[A].pr_code [PRCode] ")
+        Query.Append("      ,@ProjType [ProjType] ")
+        Query.Append("      ,@Category [Category] ")
+        Query.Append("      ,(case when SCMNo != '' then 'SCM' when ItemNo != '' then 'OSM' else '' end) [OSM] ")
+        Query.Append("      ,[A].item [Item] ")
+        Query.Append("      ,[A].qty [Qty] ")
+        Query.Append("      ,[A].unit [Unit] ")
+        Query.Append("      ,[A].BdgtAmt ")
+        Query.Append("      ,[A].status [Status] ")
+        Query.Append("      ,[A].ForPO [POQty] ")
+        Query.Append("      ,([A].for_sr + [A].ForWT + [A].ForIR) [SRQty] ")
+        Query.Append("      ,[A].ForCP [CPQty] ")
+        Query.Append("      ,[A].unit_cost [CPCost] ")
+        Query.Append("      ,[A].tot_cost [CPTotal] ")
+        Query.Append("      ,[A].remarks [Remarks] ")
+        Query.Append("      ,(case when [A].ItemNo = '' then [A].SCMNo else [A].ItemNo end) [ItemNo] ")
+        Query.Append("      ,'' [Scope] ")
+        Query.Append("   from ")
+        Query.Append("      ogm_pr_dtl [A] ")
+        Query.Append("      left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
+        Query.Append("   where ")
+        Query.Append("      [B].f_code = @pID ")
+        Query.Append("end ")
+        Query.Append("else ")
+        Query.Append("begin ")
+        Query.Append("select ")
+        Query.Append("  [SeqNo] ")
+        Query.Append("  ,[PRCode] ")
+        Query.Append("  ,@ProjType [ProjType] ")
+        Query.Append("  ,@Category [Category] ")
+        Query.Append("  ,[OSM] ")
+        Query.Append("  ,(CASE WHEN [Item] = '' THEN [Scope] ELSE [Item] END) [Item] ")
+        Query.Append("  ,[Qty] ")
+        Query.Append("  ,[Unit] ")
+        Query.Append("  ,[BdgtAmt] ")
+        Query.Append("  ,[Status] ")
+        Query.Append("  ,[POQty] ")
+        Query.Append("  ,[SRQty] ")
+        Query.Append("  ,[CPQty] ")
+        Query.Append("  ,[CPCost] ")
+        Query.Append("  ,[CPTotal] ")
+        Query.Append("  ,[Remarks] ")
+        Query.Append("  ,[ItemNo] ")
+        Query.Append("  ,[Scope] ")
+        Query.Append("from ")
+        Query.Append("  (select ")
+        Query.Append("      0 [SeqNo] ")
+        Query.Append("      ,'' [PRCode] ")
+        Query.Append("      ,'' [OSM] ")
+        Query.Append("      ,'' [Item] ")
+        Query.Append("      ,NULL [Qty] ")
+        Query.Append("      ,'' [Unit] ")
+        Query.Append("      ,NULL [BdgtAmt] ")
+        Query.Append("      ,'' [Status] ")
+        Query.Append("      ,NULL [POQty] ")
+        Query.Append("      ,NULL [SRQty] ")
+        Query.Append("      ,NULL [CPQty] ")
+        Query.Append("      ,NULL [CPCost] ")
+        Query.Append("      ,NULL [CPTotal] ")
+        Query.Append("      ,'' [Remarks] ")
+        Query.Append("      ,'' [ItemNo] ")
+        Query.Append("      ,[D].Description [Scope] ")
+        Query.Append("      ,[D].WNo [WNo] ")
+        Query.Append("  from ")
+        Query.Append("      ogm_pr_dtl [A] ")
+        Query.Append("      left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
+        Query.Append("      left join Trxn_CEDtl_HouseCon [C] on [A].WBSNo = [C].WBSNo ")
+        Query.Append("      left join Mstr_Work [D] on [C].WCode = [D].WCode ")
+        Query.Append("  where ")
+        Query.Append("      [B].f_code = @pID ")
+        Query.Append("  group by ")
+        Query.Append("      [D].Description ")
+        Query.Append("      ,[D].WNo ")
+        Query.Append("  union ")
+        Query.Append("  select ")
+        Query.Append("      [A].seq_no [SeqNo] ")
+        Query.Append("      ,[A].pr_code [PRCode] ")
+        Query.Append("      ,(case when SCMNo != '' then 'SCM' when WBSNo != '' then 'OSM' else '' end) [OSM] ")
+        Query.Append("      ,[A].item [Item] ")
+        Query.Append("      ,[A].qty [Qty] ")
+        Query.Append("      ,[A].unit [Unit] ")
+        Query.Append("      ,[A].BdgtAmt ")
+        Query.Append("      ,[A].status [Status] ")
+        Query.Append("      ,[A].ForPO [POQty] ")
+        Query.Append("      ,([A].for_sr + [A].ForWT + [A].ForIR) [SRQty] ")
+        Query.Append("      ,[A].ForCP [CPQty] ")
+        Query.Append("      ,[A].unit_cost [CPCost] ")
+        Query.Append("      ,[A].tot_cost [CPTotal] ")
+        Query.Append("      ,[A].remarks [Remarks] ")
+        Query.Append("      ,(case when [A].WBSNo = '' then [A].SCMNo else [A].WBSNo end) [ItemNo] ")
+        Query.Append("      ,'' [Scope] ")
+        Query.Append("      ,ISNULL((select [D].WNo from Trxn_CEDtl_HouseCon [C] left join Mstr_Work [D] on [C].WCode = [D].WCode where [C].WBSNo  = [A].WBSNo GROUP BY [D].WNo), '') [WNo] ")
+        Query.Append("   from ")
+        Query.Append("      ogm_pr_dtl [A] ")
+        Query.Append("      left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
+        Query.Append("   where ")
+        Query.Append("      [B].f_code = @pID) [Tbl] ")
+        Query.Append("order by ")
+        Query.Append("  [WNo], [SeqNo] ")
+        Query.Append("end ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pID", pID)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Action As New StringBuilder
+                    Action.Append("<div class='action-toggle-wrapper' style='position: relative; display: inline-block;'>")
+                    Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this);return false;'><i class='las la-bars fs-3'></i></button>")
+                    Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn0102Delete('" & DR("PRCode") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn0102Edit('" & DR("PRCode") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
+                    Action.Append("   </div>")
+                    Action.Append("</div>")
+
+                    Dim Type As String
+                    If DR("ProjType") = "OSM Project (Advance PO)" And DR("OSM") <> "" Then
+                        Type = "SCM"
+                    ElseIf DR("ProjType") = "OSM Project (Stock Request)" And DR("OSM") <> "" Then
+                        Type = "OSM"
+                    ElseIf DR("ProjType").ToString.Contains("CCI Project") And DR("OSM") <> "" Then
+                        Type = "CCI"
+                    Else
+                        Type = ""
+                    End If
+
+                    RecordList.Add(New With {
+                        .Action = Action.ToString(),
+                        .PRCode = DR("PRCode"),
+                        .SeqNo = DR("SeqNo"),
+                        .Type = Type,
+                        .Item = DR("Item"),
+                        .Qty = DR("Qty"),
+                        .Unit = DR("Unit"),
+                        .BdgtAmt = DR("BdgtAmt"),
+                        .Status = DR("Status"),
+                        .POQty = DR("POQty"),
+                        .SRQty = DR("SRQty"),
+                        .CPQty = DR("CPQty"),
+                        .CPCost = DR("CPCost"),
+                        .CPTotal = DR("CPTotal"),
+                        .Remarks = DR("Remarks"),
+                        .ItemNo = DR("ItemNo"),
+                        .Scope = DR("Scope"),
+                        .Category = DR("Category")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'set to max
+        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
+        'display 
+
+    End Function
+    Function Get_Particular_OSM(pID)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("declare @ProjType nvarchar(180) = isnull((select justification from ogm_pr_hdr where form_no = @pID),'') ")
+        Query.Append("declare @Category nvarchar(180) = isnull((select Category from ogm_pr_hdr where form_no = @pID),'') ")
+        Query.Append("if @ProjType in ('OSM Project (Advance PO)', 'CCI Project (Advance PO)') and @Category in ('House Construction', 'House Construction - CCI') ")
+        Query.Append("begin ")
+        Query.Append("  select ")
+        Query.Append("      [A].seq_no [SeqNo] ")
+        Query.Append("      ,[A].pr_code [PRCode] ")
+        Query.Append("      ,@ProjType [ProjType] ")
+        Query.Append("      ,@Category [Category] ")
+        Query.Append("      ,(case when SCMNo != '' then 'SCM' when ItemNo != '' then 'OSM' else '' end) [OSM] ")
+        Query.Append("      ,[A].item [Item] ")
+        Query.Append("      ,[A].qty [Qty] ")
+        Query.Append("      ,[A].unit [Unit] ")
+        Query.Append("      ,[A].BdgtAmt ")
+        Query.Append("      ,[A].status [Status] ")
+        Query.Append("      ,[A].ForPO [POQty] ")
+        Query.Append("      ,([A].for_sr + [A].ForWT + [A].ForIR) [SRQty] ")
+        Query.Append("      ,[A].ForCP [CPQty] ")
+        Query.Append("      ,[A].unit_cost [CPCost] ")
+        Query.Append("      ,[A].tot_cost [CPTotal] ")
+        Query.Append("      ,[A].remarks [Remarks] ")
+        Query.Append("      ,(case when [A].ItemNo = '' then [A].SCMNo else [A].ItemNo end) [ItemNo] ")
+        Query.Append("      ,'' [Scope] ")
+        Query.Append("   from ")
+        Query.Append("      ogm_pr_dtl [A] ")
+        Query.Append("      left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
+        Query.Append("   where ")
+        Query.Append("      [B].f_code = @pID ")
+        Query.Append("end ")
+        Query.Append("else ")
+        Query.Append("begin ")
+        Query.Append("select ")
+        Query.Append("  [SeqNo] ")
+        Query.Append("  ,[PRCode] ")
+        Query.Append("  ,@ProjType [ProjType] ")
+        Query.Append("  ,@Category [Category] ")
+        Query.Append("  ,[OSM] ")
+        Query.Append("  ,(CASE WHEN [Item] = '' THEN [Scope] ELSE [Item] END) [Item] ")
+        Query.Append("  ,[Qty] ")
+        Query.Append("  ,[Unit] ")
+        Query.Append("  ,[BdgtAmt] ")
+        Query.Append("  ,[Status] ")
+        Query.Append("  ,[POQty] ")
+        Query.Append("  ,[SRQty] ")
+        Query.Append("  ,[CPQty] ")
+        Query.Append("  ,[CPCost] ")
+        Query.Append("  ,[CPTotal] ")
+        Query.Append("  ,[Remarks] ")
+        Query.Append("  ,[ItemNo] ")
+        Query.Append("  ,[Scope] ")
+        Query.Append("from ")
+        Query.Append("  (select ")
+        Query.Append("      0 [SeqNo] ")
+        Query.Append("      ,'' [PRCode] ")
+        Query.Append("      ,'' [OSM] ")
+        Query.Append("      ,'' [Item] ")
+        Query.Append("      ,NULL [Qty] ")
+        Query.Append("      ,'' [Unit] ")
+        Query.Append("      ,NULL [BdgtAmt] ")
+        Query.Append("      ,'' [Status] ")
+        Query.Append("      ,NULL [POQty] ")
+        Query.Append("      ,NULL [SRQty] ")
+        Query.Append("      ,NULL [CPQty] ")
+        Query.Append("      ,NULL [CPCost] ")
+        Query.Append("      ,NULL [CPTotal] ")
+        Query.Append("      ,'' [Remarks] ")
+        Query.Append("      ,'' [ItemNo] ")
+        Query.Append("      ,[D].Description [Scope] ")
+        Query.Append("      ,[D].WNo [WNo] ")
+        Query.Append("  from ")
+        Query.Append("      ogm_pr_dtl [A] ")
+        Query.Append("      left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
+        Query.Append("      left join Trxn_CEDtl_HouseCon [C] on [A].WBSNo = [C].WBSNo ")
+        Query.Append("      left join Mstr_Work [D] on [C].WCode = [D].WCode ")
+        Query.Append("  where ")
+        Query.Append("      [B].f_code = @pID ")
+        Query.Append("  group by ")
+        Query.Append("      [D].Description ")
+        Query.Append("      ,[D].WNo ")
+        Query.Append("  union ")
+        Query.Append("  select ")
+        Query.Append("      [A].seq_no [SeqNo] ")
+        Query.Append("      ,[A].pr_code [PRCode] ")
+        Query.Append("      ,(case when SCMNo != '' then 'SCM' when WBSNo != '' then 'OSM' else '' end) [OSM] ")
+        Query.Append("      ,[A].item [Item] ")
+        Query.Append("      ,[A].qty [Qty] ")
+        Query.Append("      ,[A].unit [Unit] ")
+        Query.Append("      ,[A].BdgtAmt ")
+        Query.Append("      ,[A].status [Status] ")
+        Query.Append("      ,[A].ForPO [POQty] ")
+        Query.Append("      ,([A].for_sr + [A].ForWT + [A].ForIR) [SRQty] ")
+        Query.Append("      ,[A].ForCP [CPQty] ")
+        Query.Append("      ,[A].unit_cost [CPCost] ")
+        Query.Append("      ,[A].tot_cost [CPTotal] ")
+        Query.Append("      ,[A].remarks [Remarks] ")
+        Query.Append("      ,(case when [A].WBSNo = '' then [A].SCMNo else [A].WBSNo end) [ItemNo] ")
+        Query.Append("      ,'' [Scope] ")
+        Query.Append("      ,ISNULL((select [D].WNo from Trxn_CEDtl_HouseCon [C] left join Mstr_Work [D] on [C].WCode = [D].WCode where [C].WBSNo  = [A].WBSNo GROUP BY [D].WNo), '') [WNo] ")
+        Query.Append("   from ")
+        Query.Append("      ogm_pr_dtl [A] ")
+        Query.Append("      left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
+        Query.Append("   where ")
+        Query.Append("      [B].f_code = @pID) [Tbl] ")
+        Query.Append("order by ")
+        Query.Append("  [WNo], [SeqNo] ")
+        Query.Append("end ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pID", pID)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Action As New StringBuilder
+                    Action.Append("<div class='action-toggle-wrapper' style='position: relative; display: inline-block;'>")
+                    Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this);return false;'><i class='las la-bars fs-3'></i></button>")
+                    Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn0102Delete('" & DR("PRCode") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn0102Edit('" & DR("PRCode") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-view' title='Tag' onclick=""fn0102Tag('" & pID & "', '" & DR("ItemNo") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-tag fs-3'></i></button>")
+                    Action.Append("   </div>")
+                    Action.Append("</div>")
+
+                    Dim Type As String
+                    If DR("ProjType") = "OSM Project (Advance PO)" And DR("OSM") <> "" Then
+                        Type = "SCM"
+                    ElseIf DR("ProjType") = "OSM Project (Stock Request)" And DR("OSM") <> "" Then
+                        Type = "OSM"
+                    ElseIf DR("ProjType").ToString.Contains("CCI Project") And DR("OSM") <> "" Then
+                        Type = "CCI"
+                    Else
+                        Type = ""
+                    End If
+
+                    RecordList.Add(New With {
+                        .Action = Action.ToString(),
+                        .PRCode = DR("PRCode"),
+                        .SeqNo = DR("SeqNo"),
+                        .Type = Type,
+                        .Item = DR("Item"),
+                        .Qty = DR("Qty"),
+                        .Unit = DR("Unit"),
+                        .BdgtAmt = DR("BdgtAmt"),
+                        .Status = DR("Status"),
+                        .POQty = DR("POQty"),
+                        .SRQty = DR("SRQty"),
+                        .CPQty = DR("CPQty"),
+                        .CPCost = DR("CPCost"),
+                        .CPTotal = DR("CPTotal"),
+                        .Remarks = DR("Remarks"),
+                        .ItemNo = DR("ItemNo"),
+                        .Scope = DR("Scope"),
+                        .Category = DR("Category")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'set to max
+        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
+        'display 
+
+    End Function
+    Function Get_OSM(pID)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("declare @CECode nvarchar(13) = isnull((select CECode from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("declare @SubdCode nvarchar(13) = isnull((select Subdivision from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("declare @Category nvarchar(180) = isnull((select Category from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("if @Category = 'House Construction' ")
+        Query.Append("begin ")
+        Query.Append("  select ")
+        Query.Append("      [WBSNo] ")
+        Query.Append("      ,[Particular] ")
+        Query.Append("      ,[Unit] ")
+        Query.Append("      ,[Qty1] ")
+        Query.Append("      ,[Qty2] ")
+        Query.Append("      ,([Qty1] - [Qty2]) [Qty3] ")
+        Query.Append("      ,[Count] ")
+        Query.Append("  from ")
+        Query.Append("      (select ")
+        Query.Append("          [B].WNo [Order01] ")
+        Query.Append("          ,'' [Order02] ")
+        Query.Append("          ,'' [WBSNo] ")
+        Query.Append("          ,[B].Description [Particular] ")
+        Query.Append("          ,'' [Unit] ")
+        Query.Append("          ,NULL [Qty1] ")
+        Query.Append("          ,NULL [Qty2] ")
+        Query.Append("          ,NULL [Count] ")
+        Query.Append("      from ")
+        Query.Append("          Trxn_CEDtl_HouseCon [A] ")
+        Query.Append("          left join Mstr_Work [B] on [A].WCode = [B].WCode ")
+        Query.Append("      where ")
+        Query.Append("          [A].BatchNo = @CECode ")
+        Query.Append("          and [A].Project = @SubdCode ")
+        Query.Append("          and [A].TblFrom = 'ogm_item' ")
+        Query.Append("          and isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) > 0 ")
+        Query.Append("      union ")
+        Query.Append("      select ")
+        Query.Append("          [B].WNo [Order01] ")
+        Query.Append("          ,[A].WBSNo [Order02] ")
+        Query.Append("          ,[A].WBSNo ")
+        Query.Append("          ,[A].Particular ")
+        Query.Append("          ,[c].abbr [Unit] ")
+        Query.Append("          ,([A].Qty + [A].QtyRev) - [A].QtyReq [Qty1] ")
+        Query.Append("          ,isnull((select sum([D].qty) from ogm_pr_dtl [D] left join oop_form_hdr [E] on [D].pr_code = [E].tbl_code where [D].WBSNo = [A].WBSNo and [E].tbl_from = 'ogm_pr_hdr' and [E].status not in ('Accepted','Declined','Cancelled')),0) [Qty2] ")
+        Query.Append("          ,isnull((select count(1) from ogm_pr_dtl [D] left join oop_form_hdr [E] on [D].pr_code = [E].tbl_code where [D].WBSNo = [A].WBSNo and [E].tbl_from = 'ogm_pr_hdr' and [E].f_code = @pID and [E].status not in ('Accepted','Declined','Cancelled')),0) [Count] ")
+        Query.Append("      from ")
+        Query.Append("          Trxn_CEDtl_HouseCon [A] ")
+        Query.Append("          left join Mstr_Work [B] on [A].WCode = [b].WCode ")
+        Query.Append("          left join sys_um [c] on [A].UMCode = [c].u_code ")
+        Query.Append("      where ")
+        Query.Append("          [A].BatchNo = @CECode ")
+        Query.Append("          and [A].Project = @SubdCode ")
+        Query.Append("          and [A].TblFrom = 'ogm_item' ")
+        Query.Append("          and isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) > 0) [A] ")
+        Query.Append("   order by ")
+        Query.Append("      [Order01] ")
+        Query.Append("      ,[Order02] ")
+        Query.Append("end ")
+        Query.Append("else if @Category = 'House Construction - CCI' ")
+        Query.Append("begin ")
+        Query.Append("  select ")
+        Query.Append("      [WBSNo] ")
+        Query.Append("      ,[Particular] ")
+        Query.Append("      ,[Unit] ")
+        Query.Append("      ,[Qty1] ")
+        Query.Append("      ,[Qty2] ")
+        Query.Append("      ,([Qty1] - [Qty2]) [Qty3] ")
+        Query.Append("      ,[Count] ")
+        Query.Append("  from ")
+        Query.Append("      (select ")
+        Query.Append("          [B].WNo [Order01] ")
+        Query.Append("          ,'' [Order02] ")
+        Query.Append("          ,'' [WBSNo] ")
+        Query.Append("          ,[B].Description [Particular] ")
+        Query.Append("          ,'' [Unit] ")
+        Query.Append("          ,NULL [Qty1] ")
+        Query.Append("          ,NULL [Qty2] ")
+        Query.Append("          ,0 [Count] ")
+        Query.Append("      from ")
+        Query.Append("          Trxn_CEDtl_HouseCon_CCI [A] ")
+        Query.Append("          left join Mstr_Work [B] on [A].WCode = [B].WCode ")
+        Query.Append("      where ")
+        Query.Append("          [A].BatchNo = @CECode ")
+        Query.Append("          and [A].Project = @SubdCode ")
+        Query.Append("          and [A].TblFrom = 'ogm_item' ")
+        Query.Append("          and isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) > 0 ")
+        Query.Append("      union ")
+        Query.Append("      select ")
+        Query.Append("          [B].WNo [Order01] ")
+        Query.Append("          ,[A].WBSNo [Order02] ")
+        Query.Append("          ,[A].WBSNo ")
+        Query.Append("          ,[A].Particular ")
+        Query.Append("          ,[c].abbr [Unit] ")
+        Query.Append("          ,([A].Qty + [A].QtyRev) - [A].QtyReq [Qty1] ")
+        Query.Append("          ,isnull((select sum([D].qty) from ogm_pr_dtl [D] left join oop_form_hdr [E] on [D].pr_code = [E].tbl_code where [D].WBSNo = [A].WBSNo and [E].tbl_from = 'ogm_pr_hdr' and [E].status not in ('Accepted','Declined','Cancelled')),0) [Qty2] ")
+        Query.Append("          ,isnull((select count(1) from ogm_pr_dtl [D] left join oop_form_hdr [E] on [D].pr_code = [E].tbl_code where [D].WBSNo = [A].WBSNo and [E].tbl_from = 'ogm_pr_hdr' and [E].f_code = @pID and [E].status not in ('Accepted','Declined','Cancelled')),0) [Count] ")
+        Query.Append("      from ")
+        Query.Append("          Trxn_CEDtl_HouseCon_CCI [A] ")
+        Query.Append("          left join Mstr_Work [B] on [A].WCode = [b].WCode ")
+        Query.Append("          left join sys_um [c] on [A].UMCode = [c].u_code ")
+        Query.Append("      where ")
+        Query.Append("          [A].BatchNo = @CECode ")
+        Query.Append("          and [A].Project = @SubdCode ")
+        Query.Append("          and [A].TblFrom = 'ogm_item' ")
+        Query.Append("          and isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) > 0) [A] ")
+        Query.Append("   order by ")
+        Query.Append("      [Order01] ")
+        Query.Append("      ,[Order02] ")
+        Query.Append("end ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pID", pID)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Action01 As New StringBuilder
+                    Action01.Append("<button id='btn0101AddOSM' class='btn btn-sm btn-icon btn-view mt-1' title='Select' onclick=""fn0101AddOSM('" & DR("WBSNo") & "');return false;""><i class='las la-check-circle fs-3'></i></button>")
+
+                    Dim Action02 As New StringBuilder
+                    Action02.Append("<button class='btn btn-sm btn-icon mt-1' title='Select' onclick=""return false;""><i class='las la-check-circle fs-3'></i></button>")
+
+                    RecordList.Add(New With {
+                        .Action = If(DR("Count") = 0, Action01.ToString(), Action02.ToString()),
+                        .Particular = DR("Particular"),
+                        .WBSNo = DR("WBSNo"),
+                        .Unit = DR("Unit"),
+                        .Qty1 = DR("Qty1"),
+                        .Qty2 = DR("Qty2"),
+                        .Qty3 = DR("Qty3")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'set to max
+        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
+        'display 
+
+    End Function
 #End Region
 
 #Region "CRUD - Record"
-    Function Add_Record(pDateRequired, pPurchaseType, pDeptCode, pProjType, pPurpose, pSubdCode, pPhase, pBlock, pLot, pCarCode, pCategory, pActName, pActLocation, pActDate, pChargeCode, pAcctCode, pDivision, pCECode, pMisc, pRemarks, pCreatedBy)
+    Function Add_Record(pDateRequired, pPurchaseType, pDeptCode, pProjType, pPurpose, pSubdCode, pPhase, pBlock, pLot, pCarCode, pCategory01, pCategory02, pActName, pActLocation, pActDate, pChargeCode, pAcctCode, pDivision, pCECode, pMisc, pRemarks, pCreatedBy)
 
         'variable
         Dim RecordList As New List(Of Object)()
@@ -1296,7 +1995,7 @@ Public Class FRM000010HND
         SqlCmd.Parameters.AddWithValue("@pBlock", pBlock)
         SqlCmd.Parameters.AddWithValue("@pLot", pLot)
         SqlCmd.Parameters.AddWithValue("@pCarCode", pCarCode)
-        SqlCmd.Parameters.AddWithValue("@pCategory", pCategory)
+        SqlCmd.Parameters.AddWithValue("@pCategory", If(pProjType = "OSM Project (Advance PO)" Or pProjType = "OSM Project (Stock Request)" Or pProjType = "CCI Project (Advance PO)" Or pProjType = "CCI Project (Stock Request)", pCategory01, If(pPurpose.ToString.Contains("REPAIR AND MAINTENANCE"), pCategory02, "")))
         SqlCmd.Parameters.AddWithValue("@pActName", pActName)
         SqlCmd.Parameters.AddWithValue("@pActLocation", pActLocation)
         SqlCmd.Parameters.AddWithValue("@pActDate", pActDate)
@@ -1321,6 +2020,136 @@ Public Class FRM000010HND
         'add value
         RecordList.Add(New With {
             .oFCode = oFCode.Value.ToString
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Update_Record(pID, pDateRequired, pPurchaseType, pDeptCode, pProjType, pPurpose, pSubdCode, pPhase, pBlock, pLot, pCarCode, pCategory01, pCategory02, pActName, pActLocation, pActDate, pChargeCode, pAcctCode, pDivision, pCECode, pMisc, pRemarks, pUpdatedBy)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Upd_FRM_FRM000010"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", "FRM000010")
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pDateRequired", pDateRequired)
+        SqlCmd.Parameters.AddWithValue("@pPurchaseType", pPurchaseType)
+        SqlCmd.Parameters.AddWithValue("@pDeptCode", pDeptCode)
+        SqlCmd.Parameters.AddWithValue("@pProjType", pProjType)
+        SqlCmd.Parameters.AddWithValue("@pPurpose", pPurpose)
+        SqlCmd.Parameters.AddWithValue("@pSubdCode", pSubdCode)
+        SqlCmd.Parameters.AddWithValue("@pPhase", pPhase)
+        SqlCmd.Parameters.AddWithValue("@pBlock", pBlock)
+        SqlCmd.Parameters.AddWithValue("@pLot", pLot)
+        SqlCmd.Parameters.AddWithValue("@pCarCode", pCarCode)
+        SqlCmd.Parameters.AddWithValue("@pCategory", If(pProjType = "OSM Project (Advance PO)" Or pProjType = "OSM Project (Stock Request)" Or pProjType = "CCI Project (Advance PO)" Or pProjType = "CCI Project (Stock Request)", pCategory01, If(pPurpose.ToString.Contains("REPAIR AND MAINTENANCE"), pCategory02, "")))
+        SqlCmd.Parameters.AddWithValue("@pActName", pActName)
+        SqlCmd.Parameters.AddWithValue("@pActLocation", pActLocation)
+        SqlCmd.Parameters.AddWithValue("@pActDate", pActDate)
+        SqlCmd.Parameters.AddWithValue("@pCECode", pCECode)
+        SqlCmd.Parameters.AddWithValue("@pRemarks", pRemarks)
+        SqlCmd.Parameters.AddWithValue("@pChargeCode", pChargeCode)
+        SqlCmd.Parameters.AddWithValue("@pAcctCode", pAcctCode)
+        SqlCmd.Parameters.AddWithValue("@pMisc", pMisc)
+        SqlCmd.Parameters.AddWithValue("@pDivCode", pDivision)
+        SqlCmd.Parameters.AddWithValue("@pUpdatedBy", pUpdatedBy)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Add_Record_OSM(pID, pItemSrs, pCreatedBy)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "New_FRM_FRM000010_PRDtl_OSM"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", "FRM000010")
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pItemSrs", pItemSrs)
+        SqlCmd.Parameters.AddWithValue("@pCreatedBy", pCreatedBy)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Delete_Particular(pID, pSeqNo, pDeletedBy)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Del_FRM_FRM000010_PRDtl"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", "FRM000010")
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pSeqNo", pSeqNo)
+        SqlCmd.Parameters.AddWithValue("@pDeletedBy", pDeletedBy)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
         })
         'add value
 

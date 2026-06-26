@@ -491,6 +491,7 @@ Public Class FRM000010
 
         'create variable
         Dim Query As New StringBuilder
+        Query.Append("declare @PRCode nvarchar(13) = isnull((select tbl_code from oop_form_hdr where f_code = '" & ltrlID.Text & "'), '') ")
         Dim Msg As String = ""
         'create variable
 
@@ -501,6 +502,10 @@ Public Class FRM000010
                 Query.Append("if (select status from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('Accepted','Declined','Cancelled') ")
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' in (select top 1 approver from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and approver = 'MN2023120000' and status = '') and isnull((select justification from ogm_pr_hdr where pr_code = @PRCode), '') LIKE '%(Stock Request)%' ")
+                Query.Append("begin ")
+                Query.Append("  select '' ")
                 Query.Append("end ")
                 Query.Append("else if '" + CIIS_EmpCode + "' not in (select created_by from oop_form_hdr where f_code = '" & ltrlID.Text & "') ")
                 Query.Append("begin ")
@@ -516,6 +521,10 @@ Public Class FRM000010
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
                 Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' in (select top 1 approver from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and approver = 'MN2023120000' and status = '') and isnull((select justification from ogm_pr_hdr where pr_code = @PRCode), '') LIKE '%(Stock Request)%' ")
+                Query.Append("begin ")
+                Query.Append("  select '' ")
+                Query.Append("end ")
                 Query.Append("else if '" + CIIS_EmpCode + "' not in (select created_by from oop_form_hdr where f_code = '" & ltrlID.Text & "') ")
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
@@ -529,6 +538,10 @@ Public Class FRM000010
                 Query.Append("if (select status from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('Accepted','Cancelled','Declined') ")
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' in (select top 1 approver from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and approver = 'MN2023120000' and status = '') and isnull((select justification from ogm_pr_hdr where pr_code = @PRCode), '') LIKE '%(Stock Request)%' ")
+                Query.Append("begin ")
+                Query.Append("  select '' ")
                 Query.Append("end ")
                 Query.Append("else if '" + CIIS_EmpCode + "' not in (select created_by [authorize] from oop_form_hdr where f_code = '" & ltrlID.Text & "' union select approver [authorize] from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and type = 'Implementer') ")
                 Query.Append("begin ")
@@ -695,6 +708,10 @@ Public Class FRM000010
                 Query.Append("if (select status from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('Accepted','Declined','Cancelled') ")
                 Query.Append("begin ")
                 Query.Append("   select 'Access denied!' ")
+                Query.Append("end ")
+                Query.Append("else if '" + CIIS_EmpCode + "' in (select top 1 approver from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and approver = 'MN2023120000' and status = '') and isnull((select justification from ogm_pr_hdr where pr_code = @PRCode), '') LIKE '%(Stock Request)%' ")
+                Query.Append("begin ")
+                Query.Append("  select '' ")
                 Query.Append("end ")
                 Query.Append("else if '" + CIIS_EmpCode + "' not in (select created_by from oop_form_hdr where f_code = '" & ltrlID.Text & "') ")
                 Query.Append("begin ")
@@ -994,7 +1011,7 @@ Public Class FRM000010
             'Project Type
             If lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI" Then pnl01Subdivision.Visible = True
 
-            If lbl01PurchaseType.Text = "Stock Request" And (lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI") Then
+            If lbl01OSMType.Text.Contains("Stock Request") Or lbl01OSMType.Text.Contains("Advance PO") Then
                 lbtn06PRDtlAdd.Visible = False
             Else
                 lbtn06PRDtlAdd.Visible = True
@@ -1215,6 +1232,7 @@ Public Class FRM000010
             Query.Append("                 WHEN [B].Misc = 'SUBDIVISION' THEN (select description from sub_subdivision where code = [B].ChargeCode) ")
             Query.Append("                 WHEN [B].Misc = 'PHASE' THEN (select description from sub_phase where code = [B].ChargeCode) ")
             Query.Append("                 WHEN [B].Misc = 'VENDOR' THEN (select description from sub_vendor where code = [B].ChargeCode) ")
+            Query.Append("                 WHEN [B].Misc = 'WAREHOUSE' THEN (select description from sub_warehouse where code = [B].ChargeCode) ")
             Query.Append("      ELSE '' END), '') [ChargeTo] ")
             Query.Append("   ,ISNULL([B].Misc, '') [Misc] ")
             Query.Append("   ,ISNULL([B].Division, '') [Division] ")
@@ -1259,7 +1277,11 @@ Public Class FRM000010
                         tbx01Department.Value = DR("DeptName")
                         hf01Department.Value = DR("DeptCode")
                         bind01Purpose(DR("PurchaseType"))
-                        ddl01Purpose.SelectedValue = DR("Purpose")
+                        If ddl01Purpose.Items.FindByValue(DR("Purpose").ToString()) IsNot Nothing Then
+                            ddl01Purpose.SelectedValue = DR("Purpose")
+                        Else
+                            ddl01Purpose.SelectedValue = ""
+                        End If
                         hf01Purpose.Value = DR("Purpose")
                         ddl01OSMAType.SelectedValue = DR("OSMType")
                         hf01OSMType.Value = DR("OSMType")
@@ -1404,10 +1426,11 @@ Public Class FRM000010
             Query.Append("   ,ISNULL([B].AcctCode, '') [AcctCode] ")
             Query.Append("   ,ISNULL((CASE WHEN [B].Misc = 'MISCELLANEOUS' THEN (select description from sub_misc where account = [B].AcctCode and code = [B].ChargeCode) ")
             Query.Append("                 WHEN [B].Misc = 'MODEL HOUSE' THEN (select description from sub_house where code = [B].ChargeCode) ")
-            Query.Append("                 WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode), '') ")
+            Query.Append("                 WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode and ProjectType = [B].justification), '') ")
             Query.Append("                 WHEN [B].Misc = 'SUBDIVISION' THEN (select description from sub_subdivision where code = [B].ChargeCode) ")
             Query.Append("                 WHEN [B].Misc = 'PHASE' THEN (select description from sub_phase where code = [B].ChargeCode) ")
             Query.Append("                 WHEN [B].Misc = 'VENDOR' THEN (select description from sub_vendor where code = [B].ChargeCode) ")
+            Query.Append("                 WHEN [B].Misc = 'WAREHOUSE' THEN (select description from sub_warehouse where code = [B].ChargeCode) ")
             Query.Append("      ELSE '' END), '') [ChargeTo] ")
             Query.Append("   ,ISNULL([B].Misc, '') [Misc] ")
             Query.Append("   ,ISNULL([B].Division, '') [Division] ")
@@ -1566,7 +1589,6 @@ Public Class FRM000010
 
     End Function
     Function bind01Purpose(Purchase)
-
         Dim Query As New StringBuilder
         Query.Append("declare @Purchase nvarchar(60) = '" & Purchase & "' ")
         Query.Append("declare @Purpose nvarchar(60) = '" & ddl01OSMAType.SelectedValue & "' ")
@@ -1648,7 +1670,70 @@ Public Class FRM000010
         upnl01Overview.Update()
 
     End Function
+    Function bind02Purpose(pProjType)
 
+        Dim Query As New StringBuilder
+        Query.Append("declare @ProjType nvarchar(60) = '" & pProjType & "' ")
+        'Query.Append("if @Purchase = 'Return' ")
+        'Query.Append("begin ")
+        'Query.Append("   select ")
+        'Query.Append("      '' [Value] ")
+        'Query.Append("      ,'Select purpose' [Text] ")
+        'Query.Append("   	 ,0 [Order] ")
+        'Query.Append("   union ")
+        'Query.Append("   select ")
+        'Query.Append("       Purpose [Value] ")
+        'Query.Append("       ,Purpose [Text] ")
+        'Query.Append("	    ,1 [Order] ")
+        'Query.Append("   from ")
+        'Query.Append("      Mstr_PurposeType ")
+        'Query.Append("   where ")
+        'Query.Append("      Type = 'Return' ")
+        'Query.Append("   order by ")
+        'Query.Append("      [Order] ")
+        'Query.Append("      ,[Text] ")
+        'Query.Append("end ")
+        Query.Append("if @ProjType = '' ")
+        Query.Append("begin ")
+        Query.Append("   select ")
+        Query.Append("      '' [Value] ")
+        Query.Append("      ,'Select purpose' [Text] ")
+        Query.Append("   	 ,0 [Order] ")
+        Query.Append("end ")
+        Query.Append("else ")
+        Query.Append("begin ")
+        Query.Append("   select ")
+        Query.Append("      '' [Value] ")
+        Query.Append("      ,'Select purpose' [Text] ")
+        Query.Append("   	 ,0 [Order] ")
+        Query.Append("   union ")
+        Query.Append("   select ")
+        Query.Append("       Type + ' - ' + Purpose [Value] ")
+        Query.Append("       ,Type + ' - ' + Purpose [Text] ")
+        Query.Append("	    ,1 [Order] ")
+        Query.Append("   from ")
+        Query.Append("      Mstr_PurposeType ")
+        Query.Append("   where  ")
+        Query.Append("      isnull(AcctCode, '') <> '' ")
+        Query.Append("      and ProjectType = @ProjType ")
+        Query.Append("   order by ")
+        Query.Append("     [Order], [Value] ")
+        Query.Append("end ")
+
+        Dim constr As String = "Data Source=" & DataSource & ";Initial Catalog=" & catalog & ";User ID=" & UserID & ";Password=" & Password
+        Dim con As New SqlConnection(constr)
+        Dim sda As New SqlDataAdapter(Query.ToString, con)
+        Dim dt As New DataTable()
+        sda.Fill(dt)
+
+        'fill data
+        ddl01Purpose.DataSource = dt
+        ddl01Purpose.DataValueField = "Value"
+        ddl01Purpose.DataTextField = "Text"
+        ddl01Purpose.DataBind()
+        'fill data
+
+    End Function
     Function bind01Vehicle()
 
         'get house
@@ -2690,6 +2775,7 @@ Public Class FRM000010
         'set value
 
         'display
+        bind02Purpose(ddl01OSMAType.SelectedValue)
         bind02Department()
         ShowFields()
         'display
@@ -3775,7 +3861,7 @@ Public Class FRM000010
 
         'get item
         Dim Query As New StringBuilder
-        If (lbl01OSMType.Text = "OSM Project (Advance PO)" Or lbl01OSMType.Text = "CCI Project (Advance PO)") And lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI" Then
+        If (lbl01OSMType.Text = "OSM Project (Advance PO)" Or lbl01OSMType.Text = "CCI Project (Advance PO)") And (lbl01ProjectCat.Text = "House Construction" Or lbl01ProjectCat.Text = "House Construction - CCI") Then
             Query.Append("  select ")
             Query.Append("      [A].seq_no [SeqNo] ")
             Query.Append("      ,(case when SCMNo != '' then 'SCM' when ItemNo != '' then 'OSM' else '' end) [OSM] ")
@@ -3937,7 +4023,7 @@ Public Class FRM000010
 
         'get item
         Dim Query As New StringBuilder
-        If (lbl01OSMType.Text = "OSM Project (Advance PO)" Or lbl01OSMType.Text = "CCI Project (Advance PO)") And lbl01ProjectCat.Text <> "House Construction" Or lbl01ProjectCat.Text <> "CCI Project" Then
+        If (lbl01OSMType.Text = "OSM Project (Advance PO)" Or lbl01OSMType.Text = "CCI Project (Advance PO)") And lbl01ProjectCat.Text <> "House Construction" Or lbl01ProjectCat.Text <> "House Construction - CCI" Then
             Query.Append("  select ")
             Query.Append("      [A].seq_no [SeqNo] ")
             Query.Append("      ,(case when SCMNo != '' then 'SCM' when ItemNo != '' then 'OSM' else '' end) [OSM] ")
@@ -4019,7 +4105,7 @@ Public Class FRM000010
             Query.Append("      ,FORMAT([A].unit_cost,'N2') [CPCost] ")
             Query.Append("      ,FORMAT([A].tot_cost,'N2') [CPTotal] ")
             Query.Append("      ,[A].remarks [Remarks] ")
-            Query.Append("      ,(case when [A].ItemNo = '' then [A].SCMNo else [A].ItemNo end) [ItemNo] ")
+            Query.Append("      ,(case when ISNULL([A].ItemNo,'') = '' then [A].SCMNo else ISNULL([A].ItemNo,'') end) [ItemNo] ")
             Query.Append("      ,'' [Scope] ")
             Query.Append("      ,ISNULL((select [D].WNo from Trxn_CEDtl [C] left join Mstr_Work [D] on [C].WCode = [D].WCode where [C].ItemNo = [A].ItemNo and [C].Particular = [A].item GROUP BY [D].WNo), '') [WNo] ")
             Query.Append("   from ")
@@ -4060,7 +4146,7 @@ Public Class FRM000010
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
                 While DR.Read()
                     'add new row
-                    Dim NewRowValues As Object() = {DR("SeqNo"), IIf(lbl01OSMType.Text = "OSM Project (Advance PO)", "SCM", IIf(lbl01OSMType.Text = "OSM Project (Stock Request)", "OSM", IIf(lbl01OSMType.Text = "CCI Project (Advance PO)", "CCI", IIf(lbl01OSMType.Text = "CCI Project (Stock Request)", "CCI", DR("OSM"))))), DR("Item"), DR("Qty"), DR("Unit"), DR("BdgtAmt"), DR("Status"), DR("POQty"), DR("SRQty"), DR("CPQty"), DR("CPCost"), DR("CPTotal"), DR("Remarks"), DR("ItemNo"), DR("Scope")}
+                    Dim NewRowValues As Object() = {DR("SeqNo"), IIf(lbl01OSMType.Text = "OSM Project (Advance PO)", "SCM", IIf(lbl01OSMType.Text = "OSM Project (Stock Request)", If(DR("ItemNo").ToString() <> "", "OSM", ""), IIf(lbl01OSMType.Text = "CCI Project (Advance PO)", "CCI", IIf(lbl01OSMType.Text = "CCI Project (Stock Request)", If(DR("ItemNo").ToString() <> "", "CCI", ""), DR("OSM"))))), DR("Item"), DR("Qty"), DR("Unit"), DR("BdgtAmt"), DR("Status"), DR("POQty"), DR("SRQty"), DR("CPQty"), DR("CPCost"), DR("CPTotal"), DR("Remarks"), DR("ItemNo"), DR("Scope")}
                     Dim NewRow As DataRow
                     NewRow = dtable.Rows.Add(NewRowValues)
                 End While
