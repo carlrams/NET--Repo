@@ -1211,6 +1211,100 @@
 				</div>
 			</div>
 		</div>
+
+		<div id="mdl0102Update" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+	        <div class="modal-dialog mw-650px">
+	            <div class="modal-content shadow-none">
+					<div class="modal-header">
+                        <h5 class="modal-title">Update Particular</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+				                <span class="svg-icon svg-icon-1">
+					                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+						                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+					                </svg>
+				                </span>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-body">
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px required">Particular</span>
+                            <input id="tbx0102Particular" class='form-control' type="text" value="" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px required">Qty</span>
+                            <input id="tbx0102Qty" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px required">Unit</span>
+                            <input id="tbx0102Unit" class='form-control' type="text" value="" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Budget</span>
+                            <input id="tbx0102Budget" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" />
+                        </div>
+
+						<div class="card-header">
+							<div class="card-title fs-3 fw-bolder">For Purchaser / Implementer</div>
+						</div>
+
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Status</span>
+                            <select id="ddl0102Status" data-kt-repeater="select2" data-dropdown-parent="#mdl0102Update" class="form-select form-select-sm form-select-border min-h-38px">
+                                <option value="">Select Status</option>
+                                <option value="Not in BOQ">Not in BOQ</option>
+                                <option value="Over">Over</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">For P.O.</span>
+                            <input id="tbx0102ForPO" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">For S.R.</span>
+                            <input id="tbx0102ForSR" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" />
+                        </div>
+                        
+						<div class="card-header">
+							<div class="card-title fs-3 fw-bolder">For Cash Purchase</div>
+						</div>
+                        
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Qty</span>
+                            <input id="tbx0102CPQty" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Cost</span>
+                            <input id="tbx0102Cost" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Total</span>
+                            <input id="tbx0102Total" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" />
+                        </div>
+                        <div class="input-group input-group-sm mt-2">
+                            <span class="input-group-text min-w-150px">Remarks</span>
+                            <textarea id="tbx0102Remarks" class="form-control" placeholder="Add remarks" maxlength="1000" rows="3" cols=""></textarea>
+                        </div>
+					</div>
+                    <div class="modal-footer">
+                        <button id="btn0102Update" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0102Update_Ok(this); return false;">
+                            <span class="indicator-label">
+                                Update
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
+                         <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
     </div>
     
 	<input id="hdnPrevID" runat="server" type="hidden" value="" />

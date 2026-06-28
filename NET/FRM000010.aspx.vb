@@ -5071,7 +5071,7 @@ Public Class FRM000010
             Query.Append("   ,FORMAT([A].BdgtAmt,'N2') [BdgtAmt] ")
             Query.Append("   ,[A].status [Status]  ")
             Query.Append("   ,FORMAT([A].ForPO,'N2') [POQty] ")
-            Query.Append("   ,FORMAT([A].for_sr + [A].FOrWT + [A].FOrIR,'N2') [SRQty] ")
+            Query.Append("   ,FORMAT([A].for_sr + [A].FOrWT + [A].ForIR,'N2') [SRQty] ")
             Query.Append("   ,FORMAT([A].ForCP,'N2') [CPQty] ")
             Query.Append("   ,FORMAT([A].unit_cost,'N2') [CPCost] ")
             Query.Append("   ,FORMAT([A].tot_cost,'N2') [CPTotal] ")

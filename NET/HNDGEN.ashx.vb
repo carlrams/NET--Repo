@@ -210,7 +210,7 @@ Public Class HNDGEN
             End If
 
         Catch ex As Exception
-
+            context.Response.Write("ERROR: " & ex.Message)
         End Try
     End Sub
 
