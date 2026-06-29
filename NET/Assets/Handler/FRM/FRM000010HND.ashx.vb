@@ -166,10 +166,20 @@ Public Class FRM000010HND
                 Dim pID = context.Request("pID")
                 json = Me.Get_Particular_OSM(pID)
 
-            ElseIf pFormCode = "FRM000010" And pType = "Get - OSM Record" Then
+            ElseIf pFormCode = "FRM000010" And pType = "Get - OSM Record (Batch)" Then
 
                 Dim pID = context.Request("pID")
-                json = Me.Get_OSM(pID)
+                json = Me.Get_OSM_Batch(pID)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - OSM Record (Estimate)" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_OSM_Estimate(pID)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - SCM Record" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_SCM(pID)
 
             ElseIf pFormCode = "FRM000010" And pType = "Get - Particular (Update)" Then
 
@@ -1858,7 +1868,7 @@ Public Class FRM000010HND
         'display 
 
     End Function
-    Function Get_OSM(pID)
+    Function Get_OSM_Batch(pID)
 
         'get query
         Dim Query As New StringBuilder
@@ -2009,6 +2019,101 @@ Public Class FRM000010HND
         'set to max
         Return JsonConvert.SerializeObject(RecordList, Formatting.None)
         'display 
+
+    End Function
+    Function Get_OSM_Estimate(pID)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("declare @CECode nvarchar(13) = isnull((select CECode from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("declare @SubdCode nvarchar(13) = isnull((select Subdivision from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("declare @Category nvarchar(180) = isnull((select Category from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("if @Category not in ('House Construction', 'House Construction - CCI') ")
+        Query.Append("begin ")
+        Query.Append("Select ")
+        Query.Append("   [Particular] ")
+        Query.Append("   ,[ItmNo] ")
+        Query.Append("   ,FORMAT([Qty1],'N2') [Qty1] ")
+        Query.Append("   ,FORMAT([Qty2],'N2') [Qty2] ")
+        Query.Append("   ,FORMAT([Qty1] - [Qty2],'N2') [Qty3] ")
+        Query.Append("   ,[UOM] ")
+        Query.Append("from ")
+        Query.Append("   (select ")
+        Query.Append("      0 [SeqNo] ")
+        Query.Append("      ,NULL [ItmNo] ")
+        Query.Append("      ,[B].WNo [ItemNo] ")
+        Query.Append("      ,[B].WNo [No] ")
+        Query.Append("      ,[B].Description [Particular] ")
+        Query.Append("      ,NULL [Qty1] ")
+        Query.Append("      ,NULL [Qty2] ")
+        Query.Append("      ,NULL [UOM] ")
+        Query.Append("   from ")
+        Query.Append("      Trxn_CEDtl [A] ")
+        Query.Append("      left join Mstr_Work [B] on [A].WCode = [B].WCode ")
+        Query.Append("   where ")
+        Query.Append("      [A].CECode = @CECode ")
+        Query.Append("      and [A].TblFrom = 'ogm_item' ")
+        Query.Append("   union ")
+        Query.Append("   select ")
+        Query.Append("      [A].SeqNo ")
+        Query.Append("      ,[A].ItemNo [ItmNo] ")
+        Query.Append("      ,[C].WNo [ItemNo] ")
+        Query.Append("      ,'' [No] ")
+        Query.Append("      ,[A].Particular ")
+        Query.Append("      ,isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) [Qty1] ")
+        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Accepted','Declined','Cancelled')),0) [Qty2] ")
+        Query.Append("      ,[B].abbr [UOM] ")
+        Query.Append("   FROM ")
+        Query.Append("      Trxn_CEDtl [A] ")
+        Query.Append("      left join sys_um [B] on [A].UMCode = [B].u_code ")
+        Query.Append("      left join Mstr_Work [C] on [A].WCode = [C].WCode ")
+        Query.Append("   where ")
+        Query.Append("      [A].CECode = @CECode ")
+        Query.Append("      and [A].TblFrom = 'ogm_item' ) [A] ")
+        Query.Append("where ")
+        Query.Append("   [Qty1] > 0 ")
+        Query.Append("order by ")
+        Query.Append("   [ItemNo] ")
+        Query.Append("   ,[SeqNo] ")
+        Query.Append("end ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pID", pID)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    RecordList.Add(New With {
+                        .Particular = DR("Particular"),
+                        .ItmNo = DR("ItmNo"),
+                        .Qty1 = DR("Qty1"),
+                        .Qty2 = DR("Qty2"),
+                        .Qty3 = DR("Qty3"),
+                        .Unit = DR("UOM")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'set to max
+        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
+        'display 
+
+    End Function
+    Function Get_SCM(pID)
 
     End Function
     Function Get_Particular_Update(pID, pSeqNo)

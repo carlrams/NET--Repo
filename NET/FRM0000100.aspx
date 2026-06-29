@@ -1173,7 +1173,7 @@
 			</div>
 		</div>
 
-		<div id="mdl0101OSM" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+		<div id="mdl0101OSMBatch" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
 	        <div class="modal-dialog modal-fullscreen">
 	            <div class="modal-content shadow-none">
 					<div class="modal-header">
@@ -1187,7 +1187,7 @@
 					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
 				                        </svg>
                                     </span>
-                                    <input id="tbx0101FindOSM" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid05Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindOSM').value);" />
+                                    <input id="tbx0101FindOSMBatch" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid05Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindOSMBatch').value);" />
                                 </div>
                             </div>
                             <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
@@ -1201,9 +1201,56 @@
                         </div>
 					</div>
 					<div class="modal-body">
-                        <div id="table0101OSM" style="height: 100%; border: none;"></div>
+                        <div id="table0101OSMBatch" style="height: 100%; border: none;"></div>
 					</div>
                     <div class="modal-footer">
+                         <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
+        
+		<div id="mdl0101OSMEstimate" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+	        <div class="modal-dialog modal-fullscreen">
+	            <div class="modal-content shadow-none">
+					<div class="modal-header">
+                        <h5 class="modal-title">Add Particular - OSM (Stock Request)</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex flex-stack">
+                                <div class="position-relative me-1">
+                                    <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+				                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+					                        <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+				                        </svg>
+                                    </span>
+                                    <input id="tbx0101FindOSMEstimate" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid06Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindOSMEstimate').value);" />
+                                </div>
+                            </div>
+                            <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+				                <span class="svg-icon svg-icon-1">
+					                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+						                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+					                </svg>
+				                </span>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-body">
+                        <div id="table0101OSMEstimate" style="height: 100%; border: none;"></div>
+					</div>
+                    <div class="modal-footer">
+                        <button id="btn0102SaveEstimate" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0102SaveEstimate_Ok(this); return false;">
+                            <span class="indicator-label">
+                                Save
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
                          <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
                              <span class="indicator-label">Cancel</span>
                          </a>
