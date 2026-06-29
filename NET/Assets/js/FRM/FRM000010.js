@@ -6,6 +6,7 @@ let grid03Api;
 
 let grid04Api;
 let grid05Api;
+let grid06Api;
 //form
 
 //attachment
@@ -34,6 +35,51 @@ function fnFRMValidateRecord(pGroup, pFType, pID, pValue01, pValue02, callBack) 
 //validate
 
 //number formatting
+function formatNumber(value) {
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+};
+function fnComputeVal() {
+    var PurchaseType = document.getElementById("lbl0101PurchaseType").innerText;
+    var UpdQty = document.getElementById("tbx0102Qty");
+    var UpdPO = document.getElementById("tbx0102ForPO");
+    var UpdSR = document.getElementById("tbx0102ForSR");
+    var UpdCP = document.getElementById("tbx0102CPQty");
+    var UpdCost = document.getElementById("tbx0102Cost");
+    var UpdTotal = document.getElementById("tbx0102Total");
+
+    //Condition
+    if (PurchaseType.includes("Return")) {
+        UpdSR.value = UpdQty.value;
+        UpdCP.value = "0.00";
+    };
+    if (PurchaseType.includes("Transfer")) {
+        UpdSR.value = UpdQty.value;
+        UpdCP.value = "0.00";
+    };
+
+    //For PO
+    var POVal = parseFloat(UpdQty.value.replace(',', '')) - (parseFloat(UpdSR.value.replace(',', '')) + parseFloat(UpdCP.value.replace(',', '')));
+    var PONewVal = POVal.toFixed(2);
+    var POParts = PONewVal.toString().split(".");
+    var PONum = POParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (POParts[1] ? "." + POParts[1] : "");
+    if (PONum == "NaN") {
+        PONum = "0.00";
+    };
+    UpdPO.value = PONum;
+
+    //FOR CP
+    var TotVal = parseFloat(UpdCP.value.replace(',', '')) * parseFloat(UpdCost.value.replace(',', ''));
+    var TotNewVal = TotVal.toFixed(2);
+    var TotParts = TotNewVal.toString().split(".");
+    var TotNum = TotParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (TotParts[1] ? "." + TotParts[1] : "");
+    if (TotNum == "NaN") {
+        TotNum = "0.00";
+    }
+    UpdTotal.value = TotNum;
+};
 function FormatNumeric(ID) {
     var NumVal = document.getElementById(ID);
     var RawValue = NumVal.value.replace(/,/g, "");
@@ -75,7 +121,6 @@ function isNumberKey(e, input) {
 //general
 function fn01Load() {
     fn0101LoadOverview(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
-    fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
     fn0201LoadAttachment(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
     fn0301LoadNotes(document.getElementById('ContentPlaceHolder1_hdnID').value);
     fn0401LoadApprover(document.getElementById('ContentPlaceHolder1_hdnID').value);
@@ -294,7 +339,6 @@ function fn0101LoadOverview(pMode, pID) {
                 'pID': pID
             },
             success: function (response) {
-
                 if (!response || response.length === 0 || !response[0]) {
 
                     // Title
@@ -408,6 +452,10 @@ function fn0101LoadOverview(pMode, pID) {
                 fn0101ShowFields(pMode);
                 //show fields
 
+                //particular
+                fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                //particular
+
             },
         });
     } else if (pMode == "UPD") {
@@ -503,7 +551,9 @@ function fn0101LoadOverview(pMode, pID) {
                 fn0101ShowFields(pMode);
                 //show fields
 
-
+                //particular
+                fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                //particular
             },
         });
     }
@@ -743,7 +793,7 @@ function fn0101Edit() {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if ((document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) && document.getElementById("tbx0101ChargeTo").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
-        } else if (document.getElementById("tbx0101Remarks").value == "") { 
+        } else if (document.getElementById("tbx0101Remarks").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else {
             Edit_Question(ID);
@@ -953,7 +1003,7 @@ function ddl0103ChangeStatus_onchange(ddl0103ChangeStatus) {
     const ddlStatus = ddl0103ChangeStatus.value;
 
     if (ddlStatus === "Clarify") {
-        document.getElementById("pnl01ClarifyTo").style.display = "";
+        document.getElementById("pnl01ClarifyTo").fnstyle.display = "";
     }
     if (ddlStatus === "Declined") {
         document.getElementById("spn01Note").classList.add("required");
@@ -1230,7 +1280,7 @@ function fn0101ShowFields(pMode) {
             document.getElementById("div0102Subdivision").style.display = "";
             //Table
             document.getElementById("table12Record").style.display = "";
-        } else if (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "" && (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "House Construction" || document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "House Construction - CCI") ) {
+        } else if (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "" && (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "House Construction" || document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "House Construction - CCI")) {
             document.getElementById("div0102Estimate").style.display = "";
             document.getElementById("spn0102Estimate").innerText = "Estimate";
             document.getElementById("tbx0101Estimate").placeholder = "Add estimate";
@@ -1525,7 +1575,7 @@ function fn0101Estimate() {
 
                 $("#mdl0101Estimate").modal("show");
             }
-        } else if (ddl0101Category != "" && (ddl0101Category != "House Construction" || ddl0101Category != "House Construction - CCI") ) {
+        } else if (ddl0101Category != "" && (ddl0101Category != "House Construction" || ddl0101Category != "House Construction - CCI")) {
             //Ajax
             $.ajax({
                 type: "POST",
@@ -1789,6 +1839,7 @@ function fn0101AddProject(pSubdCode, pPhase, pBlock, pLot, pDesc) {
 
 //particular
 function fn0102LoadParticular(pMode, pID) {
+    //Ajax
     $.ajax({
         type: "POST",
         url: "Assets/Handler/FRM/FRM000010HND.ashx",
@@ -1802,8 +1853,8 @@ function fn0102LoadParticular(pMode, pID) {
                 //display loader
                 document.getElementById("div0102LoaderParticular").style.display = "";
                 //display loader
-
-                if (response[0].Category.includes("House Construction")) {
+                const Category = document.getElementById("lbl0101Category").innerText;
+                if (Category.includes("House Construction")) {
 
                     if ($.fn.DataTable.isDataTable('#table12Record')) {
                         $('#table12Record').DataTable().clear().destroy();
@@ -1833,8 +1884,8 @@ function fn0102LoadParticular(pMode, pID) {
                         rowCallback: function (row, data, index) {
                             if (data.Scope != '') {
                                 $(row).css({
-                                    'background-color': '#BFF5C0', 
-                                    'font-weight': 'bold' 
+                                    'background-color': '#BFF5C0',
+                                    'font-weight': 'bold'
                                 });
                             };
                         },
@@ -2031,7 +2082,7 @@ function fn0102Delete(pID, pSeqNo) {
     };
     function Delete_Dtl_Question(pID, pSeqNo) {
         Swal.fire({
-            text: 'Remove record?',
+            text: 'Remove particular?',
             icon: 'question',
             iconColor: '#0095e8',
             buttonsStyling: false,
@@ -2067,7 +2118,579 @@ function fn0102Delete(pID, pSeqNo) {
         };
     };
 };
+//update - particular
+function fn0102Edit(pID, pSeqNo) {
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(pID, pSeqNo);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+        };
+    });
+    function Validate(pID, pSeqNo) {
+        fnFRMValidateRecord("06PRDtl", "Save", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                View_Particular(pID, pSeqNo);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+            };
+        });
+    };
+    function View_Particular(pID, pSeqNo) {
+        //Ajax
+        $.ajax({
+            type: "POST",
+            url: "Assets/Handler/FRM/FRM000010HND.ashx",
+            data: {
+                'pFormCode': 'FRM000010',
+                'pType': 'Get - Particular (Update)',
+                'pID': pID,
+                'pSeqNo': pSeqNo
+            },
+            success: function (response) {
+                //Condition
+                const isHouseConstruction = response[0].Category.includes("House Construction");
+                const fields = ["tbx0102Particular", "tbx0102Qty", "tbx0102Unit", "tbx0102Budget"];
+                fields.forEach(id => {
+                    document.getElementById(id).readOnly = isHouseConstruction;
+                });
 
+                //Record
+                document.getElementById("tbx0102Particular").value = response[0].Item;
+                document.getElementById("tbx0102Qty").value = formatNumber(response[0].Qty);
+                document.getElementById("tbx0102Unit").value = response[0].Unit;
+                document.getElementById("tbx0102Budget").value = formatNumber(response[0].BdgtAmt);
+                $('#ddl0102Status').val(response[0].Status).trigger('change');
+                document.getElementById("tbx0102ForPO").value = formatNumber(response[0].POQty);
+                document.getElementById("tbx0102ForSR").value = formatNumber(response[0].SRQty);
+                document.getElementById("tbx0102CPQty").value = formatNumber(response[0].CPQty);
+                document.getElementById("tbx0102Cost").value = formatNumber(response[0].Cost);
+                document.getElementById("tbx0102Total").value = formatNumber(response[0].Total);
+                document.getElementById("tbx0102Remarks").value = response[0].Remarks;
+                document.getElementById("ContentPlaceHolder1_hdnPRSeqNo").value = pSeqNo;
+
+                //Modal
+                $('#mdl0102Update').modal("show");
+            }
+        });
+    };
+};
+function fn0102Update_Ok(Btn) {
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = true;
+    // Show loading indicator
+    Btn.setAttribute('data-kt-indicator', 'on');
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value, document.getElementById('ContentPlaceHolder1_hdnPRSeqNo').value);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        };
+    });
+    function Validate(pID, pSeqNo) {
+        fnFRMValidateRecord("06PRDtl", "Save", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Validate_Particular(pID, pSeqNo);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            };
+        });
+    };
+    function Validate_Particular(pID, pSeqNo) {
+        if (document.getElementById("tbx0102Particular").value == "") {
+            fnAlertOnly('Some fields are missing!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        } else if (document.getElementById("tbx0102Qty").value <= 0) {
+            fnAlertOnly('Some fields are missing!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        } else if (document.getElementById("tbx0102Unit").value == "") {
+            fnAlertOnly('Some fields are missing!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        } else {
+            Update_Particular(pID, pSeqNo);
+        }
+    };
+    function Update_Particular(pID, pSeqNo) {
+        Swal.fire({
+            text: 'Update particular?',
+            icon: 'question',
+            iconColor: '#0095e8',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'btn btn-sm btn-info min-w-100px',
+                cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Update_Ok(pID, pSeqNo);
+            } else {
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            }
+        });
+        function Update_Ok(pID, pSeqNo) {
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Update - Particular',
+                    'pID': pID,
+                    'pSeqNo': pSeqNo,
+                    'pItem': document.getElementById("tbx0102Particular").value,
+                    'pQty': document.getElementById("tbx0102Qty").value,
+                    'pUnit': document.getElementById("tbx0102Unit").value,
+                    'pBdgtAmt': document.getElementById("tbx0102Budget").value,
+                    'pStatus': document.getElementById("ddl0102Status").options[document.getElementById("ddl0102Status").selectedIndex].value,
+                    'pForPO': document.getElementById("tbx0102ForPO").value,
+                    'pForSR': document.getElementById("tbx0102ForSR").value,
+                    'pForCP': document.getElementById("tbx0102CPQty").value,
+                    'pCost': document.getElementById("tbx0102Cost").value,
+                    'pTotal': document.getElementById("tbx0102Total").value,
+                    'pRemarks': document.getElementById("tbx0102Remarks").value
+                },
+                success: function (response) {
+                    fnAlertOnly('Record successfully updated!', 'success', 'btn btn-success');
+                    //Bind
+                    fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                    //Modal
+                    $('#mdl0102Update').modal("hide");
+                }
+            });
+        };
+    };
+};
+function fn0102Tag(pID, pItemNo, pSeqNo) {
+    //Ajax
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+        data: {
+            'pFormCode': 'FRM000010',
+            'pType': 'Get - Tagging Units',
+            'pID': pID,
+            'pItemNo': pItemNo
+        },
+        success: function (response) {
+            grid06Api.setGridOption("rowData", response);
+        },
+        complete: function (response) {
+            grid06Api.setGridOption("loading", false);
+        }
+    });
+
+    //AG Grid
+    let gridDiv = document.querySelector('#table0102Tag');
+    let gridOptions;
+
+    // Destroy old grid if exists
+    gridDiv.innerHTML = "";
+
+    const gridTheme = agGrid.themeQuartz.withParams({
+        wrapperBorder: true,
+        headerRowBorder: false,
+    });
+
+    gridOptions = {
+        onGridSizeChanged: function (params) {
+            const isMobile = params.clientWidth < 768;
+
+            if (isMobile) {
+                params.api.applyColumnState({
+                    defaultState: { pinned: null }
+                });
+            } else {
+                params.api.applyColumnState({
+                    state: [
+                        { colId: 'Qty4', pinned: 'right' },
+                        { colId: 'QtyReq', pinned: 'right' }
+                    ]
+                });
+            }
+        },
+        theme: gridTheme,
+        suppressCellFocus: true,
+        suppressDragLeaveHidesColumns: true,
+        enableCellTextSelection: true,
+        rowSelection: 'single',
+        loading: true,
+        onRowSelected: params => {
+            const node = params.node;
+            if (params.node.isSelected()) {
+                node.setDataValue('QtyReq', node.data.Qty3);
+            } else {
+                node.setDataValue('QtyReq', 0);
+            }
+        },
+        columnDefs: [
+            {
+                headerName: "Action",
+                field: "isChecked",
+                resizable: false,
+                sortable: false,
+                width: 75,
+                checkboxSelection: true
+            },
+            {
+                headerName: "Est. Title",
+                field: "Title",
+                filter: 'agTextColumnFilter',
+                tooltipField: "Title",
+                flex: 1,
+                minWidth: 280
+            },
+            {
+                headerName: "Project",
+                field: "Project",
+                filter: 'agTextColumnFilter',
+                tooltipField: "Project",
+                width: 250
+            },
+            {
+                headerName: "Unit",
+                field: "Unit",
+                filter: 'agTextColumnFilter',
+                tooltipField: "Unit",
+                width: 100,
+                cellRenderer: params => {
+                    if (params.data.WBSNo == '') {
+                        return '';
+                    };
+                    return params.value;
+                }
+            },
+            {
+                headerName: "Qty - Balance",
+                field: "Qty1",
+                tooltipField: "Qty1",
+                width: 150,
+                cellClass: "text-end",
+                cellStyle: { fontWeight: 'bold' },
+                valueFormatter: params => {
+                    let value = parseFloat(params.value);
+                    if (isNaN(value)) {
+                        value = parseFloat(params.data.Qty1) || 0;
+                    }
+                    return value.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                },
+            },
+            {
+                headerName: "Qty - Approval",
+                field: "Qty2",
+                tooltipField: "Qty2",
+                width: 150,
+                cellClass: "text-end",
+                cellStyle: { fontWeight: 'bold' },
+                valueFormatter: params => {
+                    let value = parseFloat(params.value);
+                    if (isNaN(value)) {
+                        value = parseFloat(params.data.Qty2) || 0;
+                    }
+                    return value.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                },
+            },
+            {
+                headerName: "Qty - Available",
+                field: "Qty3",
+                tooltipField: "Qty3",
+                width: 150,
+                cellClass: "text-end",
+                cellStyle: { fontWeight: 'bold' },
+                valueFormatter: params => {
+                    let value = parseFloat(params.value);
+                    if (isNaN(value)) {
+                        value = parseFloat(params.data.Qty3) || 0;
+                    }
+                    return value.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                },
+            },
+            {
+                headerName: "Qty - Tagged",
+                field: "Qty4",
+                tooltipField: "Qty4",
+                width: 150,
+                pinned: "right",
+                cellClass: "text-end",
+                editable: true,
+                cellEditor: 'agNumberCellEditor',
+                cellEditorParams: {
+                    min: 0,
+                },
+                cellStyle: { fontWeight: 'bold' },
+                valueParser: params => {
+                    let newValue = parseFloat(params.newValue);
+                    const maxValue = parseFloat(params.data.Qty4) || 0;
+                    if (isNaN(newValue) || newValue < 0) {
+                        return 0;
+                    }
+                    if (newValue > maxValue) {
+                        return maxValue;
+                    }
+                    return newValue;
+                },
+                valueFormatter: params => {
+                    let value = parseFloat(params.value);
+                    if (isNaN(value)) {
+                        value = parseFloat(params.data.Qty2) || 0;
+                    }
+                    return value.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                },
+            },
+            {
+                headerName: "Qty - Request",
+                field: "QtyReq",
+                width: 150,
+                pinned: "right",
+                editable: true,
+                cellEditor: 'agNumberCellEditor',
+                cellClass: "text-end",
+                cellEditorParams: {
+                    min: 0, 
+                },
+                cellStyle: { fontWeight: 'bold' },
+                valueParser: params => {
+                    let newValue = parseFloat(params.newValue);
+                    const maxValue = parseFloat(params.data.Qty3) || 0;
+                    if (isNaN(newValue) || newValue < 0) {
+                        return 0;
+                    }
+                    if (newValue > maxValue) {
+                        return maxValue;
+                    }
+                    return newValue;
+                },
+                valueFormatter: params => {
+                    let value = parseFloat(params.value);
+                    if (isNaN(value)) value = 0;
+                    return value.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
+        ],
+        rowData: [],
+        pagination: false,
+    };
+    grid06Api = agGrid.createGrid(gridDiv, gridOptions);
+
+    $("#mdl0102Tag").modal("show");
+};
+function fn0102Tag_Ok(Btn) {
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = true;
+    // Show loading indicator
+    Btn.setAttribute('data-kt-indicator', 'on');
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        };
+    });
+    function Validate(pID) {
+        fnFRMValidateRecord("06PRDtl", "Save", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Tag_Particular(pID);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            };
+        });
+    };
+    function Tag_Particular(pID) {
+        const selectedRows = grid06Api.getSelectedRows();
+        let pItemSrs = selectedRows.map(i =>
+            `${i.ItemNo}©${i.Particular}©${(i.QtyReq).toFixed(2)}©${i.LotCode}©${i.AcctCode}©${i.DivCode}©${i.DeptCode}©${i.Subsidiary}©${i.Code}`
+        ).join('®');
+        //Condition
+        if (pItemSrs) {
+            Swal.fire({
+                text: 'Save record?',
+                icon: 'question',
+                iconColor: '#0095e8',
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-sm btn-info min-w-100px',
+                    cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
+                }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                        data: {
+                            'pFormCode': 'FRM000010',
+                            'pType': 'Update - Particular (Tag)',
+                            'pID': pID,
+                            'pItemSrs': pItemSrs
+                        },
+                        success: async function (response) {
+                            //modal
+                            $("#mdl0102Tag").modal("hide");
+                            //alert
+                            fnAlertOnly('Record successfully tagged.', 'success', 'btn btn-success');
+                            //Bind
+                            fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                            // Disable the clicked button to avoid multiple clicks
+                            Btn.disabled = false;
+                            // Hide loading indication
+                            Btn.removeAttribute('data-kt-indicator');
+                        }
+                    });
+                } else {
+                    // Disable the clicked button to avoid multiple clicks
+                    Btn.disabled = false;
+                    // Hide loading indication
+                    Btn.removeAttribute('data-kt-indicator');
+                };
+            });
+        } else {
+            fnAlertOnly('No record selected.', 'error', 'btn btn-danger');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        }
+    };
+};
+function fn0102Return_Ok(Btn) {
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = true;
+    // Show loading indicator
+    Btn.setAttribute('data-kt-indicator', 'on');
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        };
+    });
+    function Validate(pID) {
+        fnFRMValidateRecord("06PRDtl", "Save", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Return_Particular(pID);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            };
+        });
+    };
+    function Return_Particular(pID) {
+        const selectedRows = grid06Api.getSelectedRows();
+        let pItemSrs = selectedRows.map(i =>
+            `${i.ItemNo}©${i.Particular}©${(i.Qty4).toFixed(2)}©${i.LotCode}©${i.AcctCode}©${i.DivCode}©${i.DeptCode}©${i.Subsidiary}©${i.Code}`
+        ).join('®');
+        //Condition
+        if (pItemSrs) {
+            Swal.fire({
+                text: 'Return selected record?',
+                icon: 'question',
+                iconColor: '#0095e8',
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-sm btn-info min-w-100px',
+                    cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
+                }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                        data: {
+                            'pFormCode': 'FRM000010',
+                            'pType': 'Return - Particular (Tag)',
+                            'pID': pID,
+                            'pItemSrs': pItemSrs
+                        },
+                        success: async function (response) {
+                            //modal
+                            $("#mdl0102Tag").modal("hide");
+                            //alert
+                            fnAlertOnly('Record successfully returned.', 'success', 'btn btn-success');
+                            //Bind
+                            fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                            // Disable the clicked button to avoid multiple clicks
+                            Btn.disabled = false;
+                            // Hide loading indication
+                            Btn.removeAttribute('data-kt-indicator');
+                        }
+                    });
+                } else {
+                    // Disable the clicked button to avoid multiple clicks
+                    Btn.disabled = false;
+                    // Hide loading indication
+                    Btn.removeAttribute('data-kt-indicator');
+                };
+            });
+        } else {
+            fnAlertOnly('No record selected.', 'error', 'btn btn-danger');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        }
+    };
+};
 function btn11SCM() {
 
 };
@@ -2081,7 +2704,7 @@ function fn0101ReBindOSM() {
             'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
         },
         success: function (response) {
-            grid05Api.setGridOption("rowData", response); 
+            grid05Api.setGridOption("rowData", response);
         }
     });
 };

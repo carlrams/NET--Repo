@@ -68,6 +68,15 @@ Partial Public Class FRM0000100
     Protected WithEvents hdnSeqNo As Global.System.Web.UI.HtmlControls.HtmlInputHidden
 
     '''<summary>
+    '''hdnPRSeqNo control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents hdnPRSeqNo As Global.System.Web.UI.HtmlControls.HtmlInputHidden
+
+    '''<summary>
     '''Master property.
     '''</summary>
     '''<remarks>
