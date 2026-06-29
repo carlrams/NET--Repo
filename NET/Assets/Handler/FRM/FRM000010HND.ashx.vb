@@ -170,12 +170,6 @@ Public Class FRM000010HND
                 Dim pID = context.Request("pID")
                 json = Me.Get_OSM(pID)
 
-            ElseIf pFormCode = "FRM000010" And pType = "Get - Particular (Update)" Then
-
-                Dim pID = context.Request("pID")
-                Dim pSeqNo = context.Request("pSeqNo")
-                json = Me.Get_Particular_Update(pID, pSeqNo)
-
             ElseIf pFormCode = "FRM000010" And pType = "Add - Record" Then
 
                 Dim pDateRequired = context.Request("pDateRequired")
@@ -1591,8 +1585,8 @@ Public Class FRM000010HND
                     Action.Append("<div class='action-toggle-wrapper' style='position: relative; display: inline-block;'>")
                     Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this);return false;'><i class='las la-bars fs-3'></i></button>")
                     Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn0102Delete('" & pID & "', '" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn0102Edit('" & pID & "', '" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn0102Delete('" & DR("PRCode") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn0102Edit('" & DR("PRCode") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
                     Action.Append("   </div>")
                     Action.Append("</div>")
 
@@ -1771,8 +1765,8 @@ Public Class FRM000010HND
                     Action.Append("<div class='action-toggle-wrapper' style='position: relative; display: inline-block;'>")
                     Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this);return false;'><i class='las la-bars fs-3'></i></button>")
                     Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn0102Delete('" & pID & "', '" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn0102Edit('" & pID & "', '" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn0102Delete('" & DR("PRCode") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn0102Edit('" & DR("PRCode") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
                     Action.Append("      <button class='btn btn-sm btn-icon btn-view' title='Tag' onclick=""fn0102Tag('" & pID & "', '" & DR("ItemNo") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-tag fs-3'></i></button>")
                     Action.Append("   </div>")
                     Action.Append("</div>")
@@ -1847,7 +1841,7 @@ Public Class FRM000010HND
         Query.Append("          ,'' [Unit] ")
         Query.Append("          ,NULL [Qty1] ")
         Query.Append("          ,NULL [Qty2] ")
-        Query.Append("          ,0 [Count] ")
+        Query.Append("          ,NULL [Count] ")
         Query.Append("      from ")
         Query.Append("          Trxn_CEDtl_HouseCon [A] ")
         Query.Append("          left join Mstr_Work [B] on [A].WCode = [B].WCode ")
@@ -1960,77 +1954,6 @@ Public Class FRM000010HND
                         .Qty1 = DR("Qty1"),
                         .Qty2 = DR("Qty2"),
                         .Qty3 = DR("Qty3")
-                    })
-
-                End While
-                DR.Close()
-                ConStr.Close()
-            End Using
-        End Using
-        'read record
-
-        'set to max
-        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
-        'display 
-
-    End Function
-    Function Get_Particular_Update(pID, pSeqNo)
-
-        'get query
-        Dim Query As New StringBuilder
-        Query.Append("declare @Category nvarchar(180) = isnull((select Category from ogm_pr_hdr where form_no = @pID), '') ")
-        Query.Append("select ")
-        Query.Append("   [A].seq_no [SeqNo] ")
-        Query.Append("   ,[A].item [Item] ")
-        Query.Append("   ,FORMAT([A].qty,'N2') [Qty] ")
-        Query.Append("   ,[A].unit [Unit] ")
-        Query.Append("   ,FORMAT([A].BdgtAmt,'N2') [BdgtAmt] ")
-        Query.Append("   ,[A].status [Status]  ")
-        Query.Append("   ,FORMAT([A].ForPO,'N2') [POQty] ")
-        Query.Append("   ,FORMAT([A].for_sr + [A].FOrWT + [A].ForIR,'N2') [SRQty] ")
-        Query.Append("   ,FORMAT([A].ForCP,'N2') [CPQty] ")
-        Query.Append("   ,FORMAT([A].unit_cost,'N2') [CPCost] ")
-        Query.Append("   ,FORMAT([A].tot_cost,'N2') [CPTotal] ")
-        Query.Append("   ,[A].remarks [Remarks] ")
-        Query.Append("   ,@Category [Category] ")
-        Query.Append("from ")
-        Query.Append("   ogm_pr_dtl [A] ")
-        Query.Append("   left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
-        Query.Append("where ")
-        Query.Append("  [B].f_Code = @pID ")
-        Query.Append("  and [A].seq_no = @pSeqNo ")
-        'get query
-
-        'variable
-        Dim RecordList As New List(Of Object)()
-        'variable
-
-        'read record
-        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
-            Using Cmd As New SqlCommand(Query.ToString)
-                Cmd.CommandType = CommandType.Text
-                Cmd.Parameters.AddWithValue("@pID", pID)
-                Cmd.Parameters.AddWithValue("@pSeqNo", pSeqNo)
-                Cmd.Connection = ConStr
-                ConStr.Open()
-
-                Dim DR As SqlDataReader = Cmd.ExecuteReader
-                While DR.Read()
-
-                    RecordList.Add(New With {
-                        .SeqNo = DR("SeqNo"),
-                        .Item = DR("Item"),
-                        .Qty = DR("Qty"),
-                        .Unit = DR("Unit"),
-                        .BdgtAmt = DR("BdgtAmt"),
-                        .Status = DR("Status"),
-                        .POQty = DR("POQty"),
-                        .SRQty = DR("SRQty"),
-                        .CPQty = DR("CPQty"),
-                        .Cost = DR("CPCost"),
-                        .Total = DR("CPTotal"),
-                        .Remarks = DR("Remarks"),
-                        .Category = DR("Category")
                     })
 
                 End While

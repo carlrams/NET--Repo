@@ -34,51 +34,6 @@ function fnFRMValidateRecord(pGroup, pFType, pID, pValue01, pValue02, callBack) 
 //validate
 
 //number formatting
-function formatNumber(value) {
-    return new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }).format(value);
-};
-function fnComputeVal() {
-    const PurchaseType = document.getElementById("lbl0101PurchaseType").innerText;
-    const UpdQty = document.getElementById("tbx0102Qty").value;
-    const UpdPO = document.getElementById("tbx0102ForPO").value;
-    const UpdSR = document.getElementById("tbx0102ForSR").value;
-    const UpdCP = document.getElementById("tbx0102CPQty").value;
-    const UpdCost = document.getElementById("tbx0102Cost").value;
-    const UpdTotal = document.getElementById("tbx0102Total").value;
-
-    //Condition
-    if (PurchaseType.includes("Return")) {
-        UpdSR = UpdQty;
-        UpdCP = "0.00";
-    };
-    if (PurchaseType.includes("Transfer")) {
-        UpdSR = UpdQty;
-        UpdCP = "0.00";
-    };
-
-    //For PO
-    var POVal = parseFloat(UpdQty.replace(',', '')) - parseFloat(UpdSR.replace(',', '')) + parseFloat(UpdCP.replace(',', ''));
-    var PONewVal = POVal.toFixed(2);
-    var POParts = PONewVal.toString().split(".");
-    var PONum = POParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (POParts[1] ? "." + POParts[1] : "");
-    if (PONum == "Nan") {
-        PONum = "0.00";
-    };
-    UpdPO = PONum;
-
-    //FOR CP
-    var TotVal = parseFloat(UpdCP.replace(',', '')) * parseFloat(UpdCost.replace(',', ''));
-    var TotNewVal = TotVal.toFixed(2);
-    var TotParts = TotNewVal.toString().split(".");
-    var TotNum = TotParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (TotParts[1] ? "." + TotParts[1] : "");
-    if (TotNum == "NaN") {
-        TotNum = "0.00";
-    }
-    UpdTotal = TotNum;
-};
 function FormatNumeric(ID) {
     var NumVal = document.getElementById(ID);
     var RawValue = NumVal.value.replace(/,/g, "");
@@ -339,6 +294,7 @@ function fn0101LoadOverview(pMode, pID) {
                 'pID': pID
             },
             success: function (response) {
+
                 if (!response || response.length === 0 || !response[0]) {
 
                     // Title
@@ -997,7 +953,7 @@ function ddl0103ChangeStatus_onchange(ddl0103ChangeStatus) {
     const ddlStatus = ddl0103ChangeStatus.value;
 
     if (ddlStatus === "Clarify") {
-        document.getElementById("pnl01ClarifyTo").fnstyle.display = "";
+        document.getElementById("pnl01ClarifyTo").style.display = "";
     }
     if (ddlStatus === "Declined") {
         document.getElementById("spn01Note").classList.add("required");
@@ -1833,7 +1789,6 @@ function fn0101AddProject(pSubdCode, pPhase, pBlock, pLot, pDesc) {
 
 //particular
 function fn0102LoadParticular(pMode, pID) {
-    //Ajax
     $.ajax({
         type: "POST",
         url: "Assets/Handler/FRM/FRM000010HND.ashx",
@@ -2076,7 +2031,7 @@ function fn0102Delete(pID, pSeqNo) {
     };
     function Delete_Dtl_Question(pID, pSeqNo) {
         Swal.fire({
-            text: 'Remove particular?',
+            text: 'Remove record?',
             icon: 'question',
             iconColor: '#0095e8',
             buttonsStyling: false,
@@ -2110,63 +2065,6 @@ function fn0102Delete(pID, pSeqNo) {
                 }
             });
         };
-    };
-};
-//update - particular
-function fn0102Edit(pID, pSeqNo) {
-    //if exists
-    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
-        if (response[0].oReturn == "1") {
-            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value, pID, pSeqNo);
-        } else {
-            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
-        };
-    });
-    function Validate(ID, pID, pSeqNo) {
-        fnFRMValidateRecord("06PRDtl", "Save", ID, "", "", function (response) {
-            if (response[0].Msg === "") {
-                Update_Particular(pID, pSeqNo);
-            } else {
-                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
-            };
-        });
-    };
-    function Update_Particular(pID, pSeqNo) {
-        //Ajax
-        $.ajax({
-            type: "POST",
-            url: "Assets/Handler/FRM/FRM000010HND.ashx",
-            data: {
-                'pFormCode': 'FRM000010',
-                'pType': 'Get - Particular (Update)',
-                'pID': pID,
-                'pSeqNo': pSeqNo
-            },
-            success: function (response) {
-                //Condition
-                const isHouseConstruction = response[0].Category.includes("House Construction");
-                const fields = ["tbx0102Particular", "tbx0102Qty", "tbx0102Unit", "tbx0102Budget"];
-                fields.forEach(id => {
-                    document.getElementById(id).readOnly = isHouseConstruction;
-                });
-
-                //Record
-                document.getElementById("tbx0102Particular").value = response[0].Item;
-                document.getElementById("tbx0102Qty").value = formatNumber(response[0].Qty);
-                document.getElementById("tbx0102Unit").value = response[0].Unit;
-                document.getElementById("tbx0102Budget").value = formatNumber(response[0].BdgtAmt);
-                $('#ddl0102Status').val(response[0].Status).trigger('change');
-                document.getElementById("tbx0102ForPO").value = formatNumber(response[0].POQty);
-                document.getElementById("tbx0102ForSR").value = formatNumber(response[0].SRQty);
-                document.getElementById("tbx0102CPQty").value = formatNumber(response[0].CPQty);
-                document.getElementById("tbx0102Cost").value = formatNumber(response[0].Cost);
-                document.getElementById("tbx0102Total").value = formatNumber(response[0].Total);
-                document.getElementById("tbx0102Remarks").value = response[0].Remarks;
-
-                //Modal
-                $('#mdl0102Update').modal("show");
-            }
-        });
     };
 };
 
