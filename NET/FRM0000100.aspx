@@ -428,17 +428,23 @@
                                     <!-- Non House Construction -->
 									<table id="table11Record" class="table table-row-bordered border table-hover rounded g-2 w-100 align-middle" style="display: none;">
 										<thead class="fw-bold">
+                                            <tr>
+                                                <th colspan="7" data-dt-order="disable"></th>
+                                                <th colspan="2" data-dt-order="disable">For</th>
+                                                <th colspan="3" data-dt-order="disable">For Cash Purchase</th>
+                                                <th colspan="1" data-dt-order="disable"></th>
+                                            </tr>
 											<tr class="fw-bold fs-7 text-gray-800">
 												<th class="min-w-50px mw-50px border-end" style="padding-left:15px"><span title="Action"><i class='las la-bars fs-3'></i></span></th>
 												<th class="min-w-75px mw-75px border-end">Type</th>
 												<th class="min-w-300px mw-300px border-end">Particular</th>
-												<th class="min-w-50px mw-50px border-end">QTY</th>
+												<th class="min-w-150px mw-150px border-end">QTY</th>
 												<th class="min-w-75px mw-75px border-end">Unit</th>
 												<th class="min-w-150px mw-150px border-end">Budget</th>
 												<th class="min-w-150px mw-150px border-end">Status</th>
-												<th class="min-w-50px mw-50px border-end">PO</th>
+												<th class="min-w-150px mw-150px border-end">PO</th>
 												<th class="min-w-150px mw-150px border-end">SR / WT / RT</th>
-												<th class="min-w-50px mw-50px border-end">CP</th>
+												<th class="min-w-150px mw-150px border-end">CP</th>
                                                 <th class="min-w-150px mw-150px border-end">Cost</th>
                                                 <th class="min-w-150px mw-150px border-end">Total</th>
 												<th class="min-w-200px mw-200px border-end nowrap">Remarks</th>
@@ -1134,11 +1140,11 @@
 			</div>
 		</div>
         
-		<div id="mdl0101SCM" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+		<div id="mdl0101SCMBatch" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
 	        <div class="modal-dialog modal-fullscreen">
 	            <div class="modal-content shadow-none">
 					<div class="modal-header">
-                        <h5 class="modal-title">Add Particular - SCM (Stock Request)</h5>
+                        <h5 class="modal-title">Add Particular - SCM (Advance PO)</h5>
                         <div class="d-flex align-items-center">
                             <div class="d-flex flex-stack">
                                 <div class="position-relative me-1">
@@ -1148,7 +1154,7 @@
 					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
 				                        </svg>
                                     </span>
-                                    <input id="tbx0101FindSCM" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid04Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindSCM').value);" />
+                                    <input id="tbx0101FindSCMBatch" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid04Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindSCMBatch').value);" />
                                 </div>
                             </div>
                             <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
@@ -1162,9 +1168,64 @@
                         </div>
 					</div>
 					<div class="modal-body">
-                        <div id="table0101SCM" style="height: 100%; border: none;"></div>
+                        <div id="table0101SCMBatch" style="height: 100%; border: none;"></div>
 					</div>
                     <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0102SaveSCMBatch_Ok(this); return false;">
+                            <span class="indicator-label">
+                                Save
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
+                         <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
+
+		<div id="mdl0101SCMEstimate" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+	        <div class="modal-dialog modal-fullscreen">
+	            <div class="modal-content shadow-none">
+					<div class="modal-header">
+                        <h5 class="modal-title">Add Particular - SCM (Advance PO)</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex flex-stack">
+                                <div class="position-relative me-1">
+                                    <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+				                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+					                        <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+				                        </svg>
+                                    </span>
+                                    <input id="tbx0101FindSCMEstimate" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid05Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindSCMEstimate').value);" />
+                                </div>
+                            </div>
+                            <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+				                <span class="svg-icon svg-icon-1">
+					                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+						                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+					                </svg>
+				                </span>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-body">
+                        <div id="table0101SCMEstimate" style="height: 100%; border: none;"></div>
+					</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0102SaveSCMEstimate_Ok(this); return false;">
+                            <span class="indicator-label">
+                                Save
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
                          <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
                              <span class="indicator-label">Cancel</span>
                          </a>
@@ -1187,7 +1248,7 @@
 					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
 				                        </svg>
                                     </span>
-                                    <input id="tbx0101FindOSMBatch" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid05Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindOSMBatch').value);" />
+                                    <input id="tbx0101FindOSMBatch" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid06Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindOSMBatch').value);" />
                                 </div>
                             </div>
                             <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
@@ -1226,7 +1287,7 @@
 					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
 				                        </svg>
                                     </span>
-                                    <input id="tbx0101FindOSMEstimate" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid06Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindOSMEstimate').value);" />
+                                    <input id="tbx0101FindOSMEstimate" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid07Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindOSMEstimate').value);" />
                                 </div>
                             </div>
                             <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
@@ -1367,7 +1428,7 @@
 					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
 				                        </svg>
                                     </span>
-                                    <input id="tbx0102FindTag" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid06Api.setGridOption('quickFilterText', document.getElementById('tbx0102FindTag').value);" />
+                                    <input id="tbx0102FindTag" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid08Api.setGridOption('quickFilterText', document.getElementById('tbx0102FindTag').value);" />
                                 </div>
                             </div>
                             <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">

@@ -4,17 +4,20 @@ let grid01Api;
 let grid02Api;
 let grid03Api;
 
-//Advance PO - AG Grid
+//SCM - Batch - AG Grid
 let grid04Api;
 
-//Batch - AG Grid
+//SCM - Estimate - AG Grid
 let grid05Api;
 
-//Estimate - AG Grid
+//OSM - Batch - AG Grid
 let grid06Api;
 
-//Tag - AG grid
+//OSM - Estimate - AG Grid
 let grid07Api;
+
+//Tag - AG grid
+let grid08Api;
 //form
 
 //attachment
@@ -1483,30 +1486,25 @@ function ddl0101PurchaseType_onchange(ddl0101PurchaseType) {
     };
 };
 function dd0101ProjectType_onchange(ddl0101ProjectType) {
-    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     document.getElementById("ddl0101Purpose").disabled = true;
     if (ddl0101ProjectType.value != "") {
         document.getElementById("ddl0101Purpose").disabled = false;
-        if (pMode == "ADD") fn0101Purpose('', ddl0101ProjectType.value);
+        fn0101Purpose('', ddl0101ProjectType.value);
         $('#ddl0101Category').val('').trigger('change');
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
 function ddl0101Purpose_onchange(ddl0101Purpose) {
-    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     if (ddl0101Purpose.value != "") {
         $('#ddl0101Category').val('').trigger('change');
-        if (pMode == "ADD") fn0101GLAccount(ddl0101Purpose.value);
+        fn0101GLAccount(ddl0101Purpose.value);
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
 function ddl0101Category_onchange(ddl0101Category) {
-    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     if (ddl0101Category.value != "") {
-        if (pMode == "ADD") {
-            document.getElementById("tbx0101Estimate").value = "";
-            document.getElementById("hf0101Estimate").value = "";
-        };
+        document.getElementById("tbx0101Estimate").value = "";
+        document.getElementById("hf0101Estimate").value = "";
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
@@ -1853,22 +1851,24 @@ function fn0101AddProject(pSubdCode, pPhase, pBlock, pLot, pDesc) {
 
 //particular
 function fn0102LoadParticular(pMode, pID) {
-    //Ajax
-    $.ajax({
-        type: "POST",
-        url: "Assets/Handler/FRM/FRM000010HND.ashx",
-        data: {
-            'pFormCode': 'FRM000010',
-            'pType': 'Get - Particular - OSM',
-            'pID': pID
-        },
-        success: function (response) {
-            try {
-                //display loader
-                document.getElementById("div0102LoaderParticular").style.display = "";
-                //display loader
-                const Category = document.getElementById("lbl0101Category").innerText;
-                if (Category.includes("House Construction")) {
+    //Variable
+    const Category = document.getElementById("lbl0101Category").innerText;
+    if (Category.includes("House Construction")) {
+
+        //Ajax - Batch
+        $.ajax({
+            type: "POST",
+            url: "Assets/Handler/FRM/FRM000010HND.ashx",
+            data: {
+                'pFormCode': 'FRM000010',
+                'pType': 'Get - Particular - OSM (Batch)',
+                'pID': pID
+            },
+            success: function (response) {
+                try {
+                    //display loader
+                    document.getElementById("div0102LoaderParticular").style.display = "";
+                    //display loader
 
                     if ($.fn.DataTable.isDataTable('#table12Record')) {
                         $('#table12Record').DataTable().clear().destroy();
@@ -1955,7 +1955,55 @@ function fn0102LoadParticular(pMode, pID) {
                     });
                     //search
 
-                } else {
+                    //hide loader
+                    document.getElementById("div0102LoaderParticular").style.display = "none";
+                    //hide loader
+
+                    //action button
+                    if (pMode == "ADD") {
+                        const button = document.querySelectorAll('.action-button');
+                        for (const btn of button) {
+                            btn.classList.remove("btn-active-light");
+                            btn.disabled = true;
+                        }
+                    } else if (pMode == "DTL") {
+                        const button = document.querySelectorAll('.action-button');
+                        for (const btn of button) {
+                            btn.classList.add("btn-active-light");
+                            btn.disabled = false;
+                        }
+                    } else if (pMode == "UPD") {
+                        const button = document.querySelectorAll('.action-button');
+                        for (const btn of button) {
+                            btn.classList.remove("btn-active-light");
+                            btn.disabled = true;
+                        }
+                    }
+                    //action button
+
+                } catch (err) {
+                    console.error('Error initializing DataTable:', err);
+                };
+            },
+        });
+
+    } else {
+
+        //Ajax - Estimate
+        $.ajax({
+            type: "POST",
+            url: "Assets/Handler/FRM/FRM000010HND.ashx",
+            data: {
+                'pFormCode': 'FRM000010',
+                'pType': 'Get - Particular - OSM (Estimate)',
+                'pID': pID
+            },
+            success: function (response) {
+                try {
+                    //display loader
+                    document.getElementById("div0102LoaderParticular").style.display = "";
+                    //display loader
+
                     if ($.fn.DataTable.isDataTable('#table11Record')) {
                         $('#table11Record').DataTable().clear().destroy();
                     };
@@ -1982,43 +2030,49 @@ function fn0102LoadParticular(pMode, pID) {
                         select: true,
                         data: response,
                         rowCallback: function (row, data, index) {
-                            if (index % 2 === 0) {
-                                $(row).css('background-color', '#f0f9ff');
-                            } else {
-                                $(row).css('background-color', '#ffffff');
-                            }
+                            if (data.Scope != '') {
+                                $(row).css({
+                                    'background-color': '#BFF5C0',
+                                    'font-weight': 'bold'
+                                });
+                            };
                         },
                         columns: [
-                            { data: 'Action' },
-                            { data: 'ChangeItem' },
-                            { data: 'ChangeQty' },
-                            { data: 'ItemName' },
+                            {
+                                data: 'Action',
+                                render: function (data, type, row) {
+                                    if (row.Scope != '') {
+                                        return '';
+                                    };
+                                    return data;
+                                }
+                            },
+                            { data: 'Type' },
+                            { data: 'Item' },
                             { data: 'Qty' },
-                            { data: 'UMName' },
-                            { data: 'Cost' },
-                            { data: 'Total' },
-                            { data: 'Classification' },
-                            { data: 'Commodity' },
-                            { data: 'Remarks' },
-                            { data: 'PRNo' },
-                            { data: 'PRSeqNo' },
-                            { data: 'PRItem' },
-                            { data: 'PRQty' },
-                            { data: 'PRUnit' }
+                            { data: 'Unit' },
+                            { data: 'BdgtAmt' },
+                            { data: 'Status' },
+                            { data: 'POQty' },
+                            { data: 'SRQty' },
+                            { data: 'CPQty' },
+                            { data: 'CPCost' },
+                            { data: 'CPTotal' },
+                            { data: 'Remarks' }
                         ],
                         rowId: 'rowId',
                         columnDefs: [
                             {
-                                targets: [0, 1, 2],
+                                targets: [0],
                                 orderable: false
                             },
                             {
-                                targets: [4, 6, 7, 14],
+                                targets: [3, 5, 7, 8, 9, 10, 11],
                                 className: 'dt-body-right',
                                 render: $.fn.dataTable.render.number(',', '.', 2)
                             },
                             {
-                                targets: [3, 8, 9, 10, 13],
+                                targets: [2, 12],
                                 className: 'tbody-nowrap-auto'
                             }
                         ],
@@ -2041,38 +2095,17 @@ function fn0102LoadParticular(pMode, pID) {
                     });
                     //search
 
-                }
+                    //hide loader
+                    document.getElementById("div0102LoaderParticular").style.display = "none";
+                    //hide loader
 
-                //hide loader
-                document.getElementById("div0102LoaderParticular").style.display = "none";
-                //hide loader
+                } catch (err) {
+                    console.error('Error initializing DataTable:', err);
+                };
+            },
+        });
 
-                //action button
-                if (pMode == "ADD") {
-                    const button = document.querySelectorAll('.action-button');
-                    for (const btn of button) {
-                        btn.classList.remove("btn-active-light");
-                        btn.disabled = true;
-                    }
-                } else if (pMode == "DTL") {
-                    const button = document.querySelectorAll('.action-button');
-                    for (const btn of button) {
-                        btn.classList.add("btn-active-light");
-                        btn.disabled = false;
-                    }
-                } else if (pMode == "UPD") {
-                    const button = document.querySelectorAll('.action-button');
-                    for (const btn of button) {
-                        btn.classList.remove("btn-active-light");
-                        btn.disabled = true;
-                    }
-                }
-                //action button
-            } catch (err) {
-                console.error('Error initializing DataTable:', err);
-            };
-        },
-    });
+    }
 };
 //delete - particular
 function fn0102Delete(pID, pSeqNo) {
@@ -2299,6 +2332,841 @@ function fn0102Update_Ok(Btn) {
         };
     };
 };
+function btn11SCM() {
+    //variable
+    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
+    const pCategory = document.getElementById("lbl0101Category").innerText;
+    const pProjType = document.getElementById("lbl0101ProjectType").innerText;
+    if (pMode == "DTL") {
+
+        if (pCategory.includes("House Construction") && pProjType.includes("(Advance PO)")) {
+
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Get - Particular - SCM (Batch)',
+                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
+                },
+                success: function (response) {
+                    grid04Api.setGridOption("rowData", response);
+                },
+                complete: function (response) {
+                    grid04Api.setGridOption("loading", false);
+                }
+            });
+
+            //AG Grid
+            let gridDiv = document.querySelector('#table0101SCMBatch');
+            let gridOptions;
+
+            //Destroy
+            if (grid04Api) {
+                grid04Api.destroy();
+                grid04Api = null;
+            };
+
+            // Destroy old grid if exists
+            gridDiv.innerHTML = "";
+
+            const gridTheme = agGrid.themeQuartz.withParams({
+                wrapperBorder: true,
+                headerRowBorder: false,
+            });
+
+            gridOptions = {
+                theme: gridTheme,
+                suppressCellFocus: true,
+                suppressDragLeaveHidesColumns: true,
+                enableCellTextSelection: true,
+                rowSelection: 'multiple',
+                suppressRowClickSelection: true,
+                loading: true,
+                getRowStyle: params => {
+                    if (params.data.WBSNo == '') {
+                        return { backgroundColor: '#BFF5C0' };
+                    }
+                    return null;
+                },
+                onRowSelected: params => {
+                    const node = params.node;
+                    if (params.node.isSelected()) {
+                        node.setDataValue('QtyReq', node.data.Qty3);
+                    } else {
+                        node.setDataValue('QtyReq', 0);
+                    }
+                },
+                columnDefs: [
+                    {
+                        headerName: "Action",
+                        field: "isChecked",
+                        resizable: false,
+                        sortable: false,
+                        width: 75,
+                        checkboxSelection: params => params.data.WBSNo != '',
+                        cellStyle: {
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }
+                    },
+                    {
+                        headerName: "Particular",
+                        field: "Particular",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Particular",
+                        flex: 1,
+                        minWidth: 350,
+                        cellStyle: params => {
+                            if (params.data.WBSNo == '') {
+                                return { fontWeight: 'bold' }
+                            }
+                            return null;
+                        }
+                    },
+                    {
+                        headerName: "Qty - Balance",
+                        field: "Qty1",
+                        tooltipField: "Qty1",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty1) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Approval",
+                        field: "Qty2",
+                        tooltipField: "Qty2",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty2) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Available",
+                        field: "Qty3",
+                        tooltipField: "Qty3",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty3) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Request",
+                        field: "QtyReq",
+                        width: 150,
+                        editable: params => params.data.WBSNo != '',
+                        cellEditor: 'agNumberCellEditor',
+                        cellClass: "text-end text-danger",
+                        cellEditorParams: {
+                            min: 0,
+                        },
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) value = 0;
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    },
+                    {
+                        headerName: "Unit",
+                        field: "Unit",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Unit",
+                        width: 100,
+                        cellRenderer: params => {
+                            if (params.data.ItmNo == '') {
+                                return '';
+                            };
+                            return params.value;
+                        }
+                    },
+                    {
+                        headerName: "Remarks",
+                        field: "Remarks",
+                        editable: params => params.data.WBSNo != '',
+                    }
+                ],
+                rowData: [],
+                pagination: false,
+            };
+
+            grid04Api = agGrid.createGrid(gridDiv, gridOptions);
+
+            //Modal
+            $("#mdl0101SCMBatch").modal("show");
+        } else if (!pCategory.includes("House Construction") && pProjType.includes("(Advance PO)")) {
+
+        };
+
+    };
+};
+function fn0102SaveSCMBatch_Ok(Btn) {
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = true;
+    // Show loading indicator
+    Btn.setAttribute('data-kt-indicator', 'on');
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        };
+    });
+    function Validate(pID) {
+        fnFRMValidateRecord("06PRDtl", "Add", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Add_Particular(pID);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            };
+        });
+    };
+    function Add_Particular(pID) {
+        const selectedRows = grid04Api.getSelectedRows();
+        let pItemSrs = selectedRows.map(i =>
+            `${i.Particular}©${(parseFloat(i.QtyReq) || 0).toFixed(2)}©${i.Unit}©${i.Remarks || ''}©${i.WBSNo}`
+        ).join('®');
+        //Condition
+        if (pItemSrs) {
+            Swal.fire({
+                text: 'Save record?',
+                icon: 'question',
+                iconColor: '#0095e8',
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-sm btn-info min-w-100px',
+                    cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
+                }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                        data: {
+                            'pFormCode': 'FRM000010',
+                            'pType': 'Add - Record (SCM Batch)',
+                            'pID': pID,
+                            'pItemSrs': pItemSrs
+                        },
+                        success: async function (response) {
+                            //modal
+                            $("#mdl0101SCMBatch").modal("hide");
+                            //alert
+                            fnAlertOnly('Record successfully tagged.', 'success', 'btn btn-success');
+                            //Bind
+                            fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                            // Disable the clicked button to avoid multiple clicks
+                            Btn.disabled = false;
+                            // Hide loading indication
+                            Btn.removeAttribute('data-kt-indicator');
+                        }
+                    });
+                } else {
+                    // Disable the clicked button to avoid multiple clicks
+                    Btn.disabled = false;
+                    // Hide loading indication
+                    Btn.removeAttribute('data-kt-indicator');
+                };
+            });
+        } else {
+            fnAlertOnly('No record selected.', 'error', 'btn btn-danger');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        }
+    };
+};
+function fn0101ReBindOSMBatch() {
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+        data: {
+            'pFormCode': 'FRM000010',
+            'pType': 'Get - OSM Record (Batch)',
+            'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
+        },
+        success: function (response) {
+            grid06Api.setGridOption("rowData", response);
+        }
+    });
+};
+function btn11OSM() {
+    //variable
+    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
+    const pCategory = document.getElementById("lbl0101Category").innerText;
+    const pProjType = document.getElementById("lbl0101ProjectType").innerText;
+    if (pMode == "DTL") {
+
+        if (pCategory.includes("House Construction") && pProjType.includes("(Stock Request)")) {
+
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Get - OSM Record (Batch)',
+                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
+                },
+                success: function (response) {
+                    grid06Api.setGridOption("rowData", response);
+                },
+                complete: function (response) {
+                    grid06Api.setGridOption("loading", false);
+                }
+            });
+
+            //AG Grid
+            let gridDiv = document.querySelector('#table0101OSMBatch');
+            let gridOptions;
+
+            //Destroy
+            if (grid06Api) {
+                grid06Api.destroy();
+                grid06Api = null;
+            };
+
+            // Destroy old grid if exists
+            gridDiv.innerHTML = "";
+
+            const gridTheme = agGrid.themeQuartz.withParams({
+                wrapperBorder: true,
+                headerRowBorder: false,
+            });
+
+            gridOptions = {
+                theme: gridTheme,
+                suppressCellFocus: true,
+                suppressDragLeaveHidesColumns: true,
+                enableCellTextSelection: true,
+                rowSelection: 'single',
+                loading: true,
+                getRowStyle: params => {
+                    if (params.data.WBSNo == '') {
+                        return { backgroundColor: '#BFF5C0' };
+                    }
+                    return null;
+                },
+                columnDefs: [
+                    {
+                        headerName: "Action",
+                        field: "Action",
+                        sortable: false,
+                        resizable: false,
+                        lockPosition: true,
+                        width: 75,
+                        cellRenderer: params => {
+                            if (params.data.WBSNo == '') {
+                                return '';
+                            };
+                            return params.value
+                        }
+                    },
+                    {
+                        headerName: "Particular",
+                        field: "Particular",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Particular",
+                        flex: 1,
+                        minWidth: 350,
+                        cellStyle: params => {
+                            if (params.data.WBSNo == '') {
+                                return { fontWeight: 'bold' }
+                            }
+                            return null;
+                        }
+                    },
+                    {
+                        headerName: "Unit",
+                        field: "Unit",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Unit",
+                        width: 100,
+                        cellRenderer: params => {
+                            if (params.data.WBSNo == '') {
+                                return '';
+                            };
+                            return params.value;
+                        }
+                    },
+                    {
+                        headerName: "Qty - Balance",
+                        field: "Qty1",
+                        tooltipField: "Qty1",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty1) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Approval",
+                        field: "Qty2",
+                        tooltipField: "Qty2",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty2) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Available",
+                        field: "Qty3",
+                        tooltipField: "Qty3",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty3) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Remarks",
+                        field: "Remarks",
+                        editable: true
+                    }
+                ],
+                rowData: [],
+                pagination: false,
+            };
+
+            grid06Api = agGrid.createGrid(gridDiv, gridOptions);
+
+            //Modal
+            $("#mdl0101OSMBatch").modal("show");
+
+        } else if (!pCategory.includes("House Construction") && pProjType.includes("(Stock Request)")) {
+
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Get - OSM Record (Estimate)',
+                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
+                },
+                success: function (response) {
+                    grid07Api.setGridOption("rowData", response);
+                },
+                complete: function (response) {
+                    grid07Api.setGridOption("loading", false);
+                }
+            });
+
+            //AG Grid
+            let gridDiv = document.querySelector('#table0101OSMEstimate');
+            let gridOptions;
+
+            //Destroy
+            if (grid07Api) {
+                grid07Api.destroy();
+                grid07Api = null;
+            };
+
+            // Destroy old grid if exists
+            gridDiv.innerHTML = "";
+
+            const gridTheme = agGrid.themeQuartz.withParams({
+                wrapperBorder: true,
+                headerRowBorder: false,
+            });
+
+            gridOptions = {
+                theme: gridTheme,
+                suppressCellFocus: true,
+                suppressDragLeaveHidesColumns: true,
+                enableCellTextSelection: true,
+                rowSelection: 'multiple',
+                suppressRowClickSelection: true, 
+                loading: true,
+                getRowStyle: params => {
+                    if (params.data.ItmNo == '') {
+                        return { backgroundColor: '#BFF5C0' };
+                    }
+                    return null;
+                },
+                onRowSelected: params => {
+                    const node = params.node;
+                    if (params.node.isSelected()) {
+                        node.setDataValue('QtyReq', node.data.Qty3);
+                    } else {
+                        node.setDataValue('QtyReq', 0);
+                    }
+                },
+                columnDefs: [
+                    {
+                        headerName: "Action",
+                        field: "isChecked",
+                        resizable: false,
+                        sortable: false,
+                        width: 75,
+                        checkboxSelection: params => params.data.ItmNo != '',
+                        cellStyle: {
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }
+                    },
+                    {
+                        headerName: "Particular",
+                        field: "Particular",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Particular",
+                        flex: 1,
+                        minWidth: 350,
+                        cellStyle: params => {
+                            if (params.data.ItmNo == '') {
+                                return { fontWeight: 'bold' }
+                            }
+                            return null;
+                        }
+                    },
+                    {
+                        headerName: "Qty - Balance",
+                        field: "Qty1",
+                        tooltipField: "Qty1",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.ItmNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty1) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Approval",
+                        field: "Qty2",
+                        tooltipField: "Qty2",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.ItmNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty2) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Available",
+                        field: "Qty3",
+                        tooltipField: "Qty3",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.ItmNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty3) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Request",
+                        field: "QtyReq",
+                        width: 150,
+                        editable: params => params.data.ItmNo != '',
+                        cellEditor: 'agNumberCellEditor',
+                        cellClass: "text-end text-danger",
+                        cellEditorParams: {
+                            min: 0,
+                        },
+                        cellStyle: { fontWeight: 'bold', },
+                        valueParser: params => {
+                            let newValue = parseFloat(params.newValue);
+                            const maxValue = parseFloat(params.data.Qty3) || 0;
+                            if (isNaN(newValue) || newValue < 0) {
+                                return 0;
+                            }
+                            if (newValue > maxValue) {
+                                return maxValue;
+                            }
+                            return newValue;
+                        },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.ItmNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) value = 0;
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    },
+                    {
+                        headerName: "Unit",
+                        field: "Unit",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Unit",
+                        width: 100,
+                        cellRenderer: params => {
+                            if (params.data.ItmNo == '') {
+                                return '';
+                            };
+                            return params.value;
+                        }
+                    },
+                    {
+                        headerName: "Remarks",
+                        field: "Remarks",
+                        editable: true
+                    }
+                ],
+                rowData: [],
+                pagination: false,
+            };
+
+            grid07Api = agGrid.createGrid(gridDiv, gridOptions);
+
+            //Modal
+            $("#mdl0101OSMEstimate").modal("show");
+        };
+    };
+};
+
+//Estimate - Function
+function fn0102SaveEstimate_Ok(Btn) {
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = true;
+    // Show loading indicator
+    Btn.setAttribute('data-kt-indicator', 'on');
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        };
+    });
+    function Validate(pID) {
+        fnFRMValidateRecord("06PRDtl", "Add", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Add_Particular(pID);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            };
+        });
+    };
+    function Add_Particular(pID) {
+        const selectedRows = grid07Api.getSelectedRows();
+        let pItemSrs = selectedRows.map(i =>
+            `${i.ItmNo}©${i.Particular}©${(parseFloat(i.QtyReq) || 0).toFixed(2)}©${i.Unit}©${i.Remarks || ''}`
+        ).join('®');
+        //Condition
+        if (pItemSrs) {
+            Swal.fire({
+                text: 'Save record?',
+                icon: 'question',
+                iconColor: '#0095e8',
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-sm btn-info min-w-100px',
+                    cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
+                }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                        data: {
+                            'pFormCode': 'FRM000010',
+                            'pType': 'Add - Record (OSM Estimate)',
+                            'pID': pID,
+                            'pItemSrs': pItemSrs
+                        },
+                        success: async function (response) {
+                            //modal
+                            $("#mdl0101OSMEstimate").modal("hide");
+                            //alert
+                            fnAlertOnly('Record successfully tagged.', 'success', 'btn btn-success');
+                            //Bind
+                            fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                            // Disable the clicked button to avoid multiple clicks
+                            Btn.disabled = false;
+                            // Hide loading indication
+                            Btn.removeAttribute('data-kt-indicator');
+                        }
+                    });
+                } else {
+                    // Disable the clicked button to avoid multiple clicks
+                    Btn.disabled = false;
+                    // Hide loading indication
+                    Btn.removeAttribute('data-kt-indicator');
+                };
+            });
+        } else {
+            fnAlertOnly('No record selected.', 'error', 'btn btn-danger');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        }
+    };
+};
+
+//Batch - Function
+function fn0101AddOSM(pWBSNo) {
+    let rowData = null;
+    grid06Api.forEachNode(node => {
+        if (node.data.WBSNo == pWBSNo) {
+            rowData = node.data;
+        };
+    });
+    if (rowData) {
+        let ItemSrs = '';
+        if (rowData.WBSNo != '') {
+            ItemSrs = `${rowData.WBSNo}©${rowData.Particular}©${(0).toFixed(2)}©${rowData.Unit}©${rowData.Remarks || ''}`;
+        };
+        //Add
+        if (ItemSrs != '') {
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Add - Record (OSM Batch)',
+                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value,
+                    'pItemSrs': ItemSrs
+                },
+                success: function (response) {
+                    fnAlertOnly('Record successfully saved.', 'success', 'btn btn-success');
+                    //Particular
+                    fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                    //ReBind
+                    fn0101ReBindOSMBatch();
+                }
+            });
+        };
+    };
+};
 function fn0102Tag(pID, pItemNo, pSeqNo) {
     //Ajax
     $.ajax({
@@ -2311,10 +3179,10 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
             'pItemNo': pItemNo
         },
         success: function (response) {
-            grid07Api.setGridOption("rowData", response);
+            grid08Api.setGridOption("rowData", response);
         },
         complete: function (response) {
-            grid07Api.setGridOption("loading", false);
+            grid08Api.setGridOption("loading", false);
         }
     });
 
@@ -2352,7 +3220,7 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
         suppressDragLeaveHidesColumns: true,
         enableCellTextSelection: true,
         rowSelection: 'multiple',
-        suppressRowClickSelection: true, 
+        suppressRowClickSelection: true,
         loading: true,
         onRowSelected: params => {
             const node = params.node;
@@ -2502,7 +3370,7 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
                 cellEditor: 'agNumberCellEditor',
                 cellClass: "text-end",
                 cellEditorParams: {
-                    min: 0, 
+                    min: 0,
                 },
                 cellStyle: { fontWeight: 'bold' },
                 valueParser: params => {
@@ -2529,7 +3397,7 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
         rowData: [],
         pagination: false,
     };
-    grid07Api = agGrid.createGrid(gridDiv, gridOptions);
+    grid08Api = agGrid.createGrid(gridDiv, gridOptions);
 
     $("#mdl0102Tag").modal("show");
 };
@@ -2564,7 +3432,7 @@ function fn0102Tag_Ok(Btn) {
         });
     };
     function Tag_Particular(pID) {
-        const selectedRows = grid07Api.getSelectedRows();
+        const selectedRows = grid08Api.getSelectedRows();
         let pItemSrs = selectedRows.map(i =>
             `${i.ItemNo}©${i.Particular}©${(i.QtyReq).toFixed(2)}©${i.LotCode}©${i.AcctCode}©${i.DivCode}©${i.DeptCode}©${i.Subsidiary}©${i.Code}`
         ).join('®');
@@ -2653,7 +3521,7 @@ function fn0102Return_Ok(Btn) {
         });
     };
     function Return_Particular(pID) {
-        const selectedRows = grid07Api.getSelectedRows();
+        const selectedRows = grid08Api.getSelectedRows();
         let pItemSrs = selectedRows.map(i =>
             `${i.ItemNo}©${i.Particular}©${(i.Qty4).toFixed(2)}©${i.LotCode}©${i.AcctCode}©${i.DivCode}©${i.DeptCode}©${i.Subsidiary}©${i.Code}`
         ).join('®');
@@ -2709,445 +3577,6 @@ function fn0102Return_Ok(Btn) {
             // Hide loading indication
             Btn.removeAttribute('data-kt-indicator');
         }
-    };
-};
-function btn11SCM() {
-
-};
-function fn0101ReBindOSMBatch() {
-    $.ajax({
-        type: "POST",
-        url: "Assets/Handler/FRM/FRM000010HND.ashx",
-        data: {
-            'pFormCode': 'FRM000010',
-            'pType': 'Get - OSM Record (Batch)',
-            'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
-        },
-        success: function (response) {
-            grid05Api.setGridOption("rowData", response);
-        }
-    });
-};
-function btn11OSM() {
-    //variable
-    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
-    const pCategory = document.getElementById("lbl0101Category").innerText;
-    const pProjType = document.getElementById("lbl0101ProjectType").innerText;
-    if (pMode == "DTL") {
-
-        if (pCategory.includes("House Construction") && pProjType.includes("(Stock Request)")) {
-
-            //Ajax
-            $.ajax({
-                type: "POST",
-                url: "Assets/Handler/FRM/FRM000010HND.ashx",
-                data: {
-                    'pFormCode': 'FRM000010',
-                    'pType': 'Get - OSM Record (Batch)',
-                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
-                },
-                success: function (response) {
-                    grid05Api.setGridOption("rowData", response);
-                },
-                complete: function (response) {
-                    grid05Api.setGridOption("loading", false);
-                }
-            });
-
-            //AG Grid
-            let gridDiv = document.querySelector('#table0101OSMBatch');
-            let gridOptions;
-
-            //Destroy
-            if (grid05Api) {
-                grid05Api.destroy();
-                grid05Api = null;
-            };
-
-            // Destroy old grid if exists
-            gridDiv.innerHTML = "";
-
-            const gridTheme = agGrid.themeQuartz.withParams({
-                wrapperBorder: true,
-                headerRowBorder: false,
-            });
-
-            gridOptions = {
-                theme: gridTheme,
-                suppressCellFocus: true,
-                suppressDragLeaveHidesColumns: true,
-                enableCellTextSelection: true,
-                rowSelection: 'single',
-                loading: true,
-                getRowStyle: params => {
-                    if (params.data.WBSNo == '') {
-                        return { backgroundColor: '#BFF5C0' };
-                    }
-                    return null;
-                },
-                columnDefs: [
-                    {
-                        headerName: "Action",
-                        field: "Action",
-                        sortable: false,
-                        resizable: false,
-                        lockPosition: true,
-                        width: 75,
-                        cellRenderer: params => {
-                            if (params.data.WBSNo == '') {
-                                return '';
-                            };
-                            return params.value
-                        }
-                    },
-                    {
-                        headerName: "Particular",
-                        field: "Particular",
-                        filter: 'agTextColumnFilter',
-                        tooltipField: "Particular",
-                        flex: 1,
-                        minWidth: 350,
-                        cellStyle: params => {
-                            if (params.data.WBSNo == '') {
-                                return { fontWeight: 'bold' }
-                            }
-                            return null;
-                        }
-                    },
-                    {
-                        headerName: "Unit",
-                        field: "Unit",
-                        filter: 'agTextColumnFilter',
-                        tooltipField: "Unit",
-                        width: 100,
-                        cellRenderer: params => {
-                            if (params.data.WBSNo == '') {
-                                return '';
-                            };
-                            return params.value;
-                        }
-                    },
-                    {
-                        headerName: "Qty - Balance",
-                        field: "Qty1",
-                        tooltipField: "Qty1",
-                        width: 150,
-                        cellClass: "text-end",
-                        cellStyle: { fontWeight: 'bold' },
-                        valueFormatter: params => {
-                            let value = parseFloat(params.value);
-                            if (params.data.WBSNo == '') {
-                                return ''
-                            }
-                            if (isNaN(value)) {
-                                value = parseFloat(params.data.Qty1) || 0;
-                            }
-                            return value.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-                        },
-                    },
-                    {
-                        headerName: "Qty - Approval",
-                        field: "Qty2",
-                        tooltipField: "Qty2",
-                        width: 150,
-                        cellClass: "text-end",
-                        cellStyle: { fontWeight: 'bold' },
-                        valueFormatter: params => {
-                            let value = parseFloat(params.value);
-                            if (params.data.WBSNo == '') {
-                                return ''
-                            }
-                            if (isNaN(value)) {
-                                value = parseFloat(params.data.Qty2) || 0;
-                            }
-                            return value.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-                        },
-                    },
-                    {
-                        headerName: "Qty - Available",
-                        field: "Qty3",
-                        tooltipField: "Qty3",
-                        width: 150,
-                        cellClass: "text-end",
-                        cellStyle: { fontWeight: 'bold' },
-                        valueFormatter: params => {
-                            let value = parseFloat(params.value);
-                            if (params.data.WBSNo == '') {
-                                return ''
-                            }
-                            if (isNaN(value)) {
-                                value = parseFloat(params.data.Qty3) || 0;
-                            }
-                            return value.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-                        },
-                    },
-                    {
-                        headerName: "Remarks",
-                        field: "Remarks",
-                        editable: true
-                    }
-                ],
-                rowData: [],
-                pagination: false,
-            };
-
-            grid05Api = agGrid.createGrid(gridDiv, gridOptions);
-
-            //Modal
-            $("#mdl0101OSMBatch").modal("show");
-        } else if (!pCategory.includes("House Construction") && pProjType.includes("(Stock Request)")) {
-
-            //Ajax
-            $.ajax({
-                type: "POST",
-                url: "Assets/Handler/FRM/FRM000010HND.ashx",
-                data: {
-                    'pFormCode': 'FRM000010',
-                    'pType': 'Get - OSM Record (Estimate)',
-                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
-                },
-                success: function (response) {
-                    grid06Api.setGridOption("rowData", response);
-                },
-                complete: function (response) {
-                    grid06Api.setGridOption("loading", false);
-                }
-            });
-
-            //AG Grid
-            let gridDiv = document.querySelector('#table0101OSMEstimate');
-            let gridOptions;
-
-            //Destroy
-            if (grid06Api) {
-                grid06Api.destroy();
-                grid06Api = null;
-            };
-
-            // Destroy old grid if exists
-            gridDiv.innerHTML = "";
-
-            const gridTheme = agGrid.themeQuartz.withParams({
-                wrapperBorder: true,
-                headerRowBorder: false,
-            });
-
-            gridOptions = {
-                theme: gridTheme,
-                suppressCellFocus: true,
-                suppressDragLeaveHidesColumns: true,
-                enableCellTextSelection: true,
-                rowSelection: 'multiple',
-                suppressRowClickSelection: true, 
-                loading: true,
-                getRowStyle: params => {
-                    if (params.data.ItmNo == '') {
-                        return { backgroundColor: '#BFF5C0' };
-                    }
-                    return null;
-                },
-                onRowSelected: params => {
-                    const node = params.node;
-                    if (params.node.isSelected()) {
-                        node.setDataValue('QtyReq', node.data.Qty3);
-                    } else {
-                        node.setDataValue('QtyReq', 0);
-                    }
-                },
-                columnDefs: [
-                    {
-                        headerName: "Action",
-                        field: "isChecked",
-                        resizable: false,
-                        sortable: false,
-                        width: 75,
-                        checkboxSelection: true,
-                        cellStyle: {
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }
-                    },
-                    {
-                        headerName: "Particular",
-                        field: "Particular",
-                        filter: 'agTextColumnFilter',
-                        tooltipField: "Particular",
-                        flex: 1,
-                        minWidth: 350,
-                        cellStyle: params => {
-                            if (params.data.ItmNo == '') {
-                                return { fontWeight: 'bold' }
-                            }
-                            return null;
-                        }
-                    },
-                    {
-                        headerName: "Qty - Balance",
-                        field: "Qty1",
-                        tooltipField: "Qty1",
-                        width: 150,
-                        cellClass: "text-end",
-                        cellStyle: { fontWeight: 'bold' },
-                        valueFormatter: params => {
-                            let value = parseFloat(params.value);
-                            if (params.data.ItmNo == '') {
-                                return ''
-                            }
-                            if (isNaN(value)) {
-                                value = parseFloat(params.data.Qty1) || 0;
-                            }
-                            return value.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-                        },
-                    },
-                    {
-                        headerName: "Qty - Approval",
-                        field: "Qty2",
-                        tooltipField: "Qty2",
-                        width: 150,
-                        cellClass: "text-end",
-                        cellStyle: { fontWeight: 'bold' },
-                        valueFormatter: params => {
-                            let value = parseFloat(params.value);
-                            if (params.data.ItmNo == '') {
-                                return ''
-                            }
-                            if (isNaN(value)) {
-                                value = parseFloat(params.data.Qty2) || 0;
-                            }
-                            return value.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-                        },
-                    },
-                    {
-                        headerName: "Qty - Available",
-                        field: "Qty3",
-                        tooltipField: "Qty3",
-                        width: 150,
-                        cellClass: "text-end",
-                        cellStyle: { fontWeight: 'bold' },
-                        valueFormatter: params => {
-                            let value = parseFloat(params.value);
-                            if (params.data.ItmNo == '') {
-                                return ''
-                            }
-                            if (isNaN(value)) {
-                                value = parseFloat(params.data.Qty3) || 0;
-                            }
-                            return value.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-                        },
-                    },
-                    {
-                        headerName: "Qty - Request",
-                        field: "QtyReq",
-                        width: 150,
-                        editable: true,
-                        cellEditor: 'agNumberCellEditor',
-                        cellClass: "text-end text-danger",
-                        cellEditorParams: {
-                            min: 0,
-                        },
-                        cellStyle: { fontWeight: 'bold', },
-                        valueParser: params => {
-                            let newValue = parseFloat(params.newValue);
-                            const maxValue = parseFloat(params.data.Qty3) || 0;
-                            if (isNaN(newValue) || newValue < 0) {
-                                return 0;
-                            }
-                            if (newValue > maxValue) {
-                                return maxValue;
-                            }
-                            return newValue;
-                        },
-                        valueFormatter: params => {
-                            let value = parseFloat(params.value);
-                            if (isNaN(value)) value = 0;
-                            return value.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-                        }
-                    },
-                    {
-                        headerName: "Unit",
-                        field: "Unit",
-                        filter: 'agTextColumnFilter',
-                        tooltipField: "Unit",
-                        width: 100,
-                        cellRenderer: params => {
-                            if (params.data.ItmNo == '') {
-                                return '';
-                            };
-                            return params.value;
-                        }
-                    },
-                    {
-                        headerName: "Remarks",
-                        field: "Remarks",
-                        editable: true
-                    }
-                ],
-                rowData: [],
-                pagination: false,
-            };
-
-            grid06Api = agGrid.createGrid(gridDiv, gridOptions);
-
-            //Modal
-            $("#mdl0101OSMEstimate").modal("show");
-        };
-    };
-};
-function fn0101AddOSM(pWBSNo) {
-    let rowData = null;
-    grid05Api.forEachNode(node => {
-        if (node.data.WBSNo == pWBSNo) {
-            rowData = node.data;
-        };
-    });
-    if (rowData) {
-        let ItemSrs = '';
-        if (rowData.WBSNo != '') {
-            ItemSrs = `${rowData.WBSNo}©${rowData.Particular}©${(0).toFixed(2)}©${rowData.Unit}©${rowData.Remarks || ''}`;
-        };
-        //Add
-        if (ItemSrs != '') {
-            //Ajax
-            $.ajax({
-                type: "POST",
-                url: "Assets/Handler/FRM/FRM000010HND.ashx",
-                data: {
-                    'pFormCode': 'FRM000010',
-                    'pType': 'Add - Record (OSM)',
-                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value,
-                    'pItemSrs': ItemSrs
-                },
-                success: function (response) {
-                    fnAlertOnly('Record successfully saved.', 'success', 'btn btn-success');
-                    //Particular
-                    fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
-                    //ReBind
-                    fn0101ReBindOSMBatch();
-                }
-            });
-        };
     };
 };
 

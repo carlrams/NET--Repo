@@ -3348,6 +3348,7 @@ Public Class FRM000010
                 Cmd.Connection = ConStr
                 ConStr.Open()
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
+
                 While DR.Read()
                     'add new row
                     Dim NewRowValues As Object() = {DR("Scope"), DR("Particular"), DR("Qty1"), DR("Qty2"), DR("Qty3"), DR("UOM"), DR("WBSNo")}
