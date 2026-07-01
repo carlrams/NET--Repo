@@ -204,6 +204,11 @@ Public Class FRM000010HND
                 Dim pEmpNo = CIIS_EmpCode
                 json = Me.View_PR_Printout(pID, pEmpNo, context)
 
+            ElseIf pFormCode = "FRM000010" And pType = "Get - Record (Return)" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_Record_Return(pID)
+
             ElseIf pFormCode = "FRM000010" And pType = "Add - Record" Then
 
                 Dim pDateRequired = context.Request("pDateRequired")
@@ -284,6 +289,13 @@ Public Class FRM000010HND
                 Dim pItemSrs = context.Request("pItemSrs")
                 Dim pCreatedBy = CIIS_EmpCode
                 json = Me.Add_Record_SCM_Estimate(pID, pItemSrs, pCreatedBy)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Add - Record (Return)" Then
+
+                Dim pID = context.Request("pID")
+                Dim pItemSrs = context.Request("pItemSrs")
+                Dim pCreatedBy = CIIS_EmpCode
+                json = Me.Add_Record_Return(pID, pItemSrs, pCreatedBy)
 
             ElseIf pFormCode = "FRM000010" And pType = "Delete - Particular" Then
 
@@ -2252,7 +2264,69 @@ Public Class FRM000010HND
         Query.Append("      [WNo] ")
         Query.Append("      ,[SeqNo] ")
         Query.Append("end ")
-        Query.Append("else if @ProjType in ('Non OSM Project', 'OSM Project') ")
+        Query.Append("else if @ProjType in ('OSM Project') and isnull((select Purpose from ogm_pr_hdr where form_no = @pID),'') LIKE '%Return%' ")
+        Query.Append("begin ")
+        Query.Append("  select distinct ")
+        Query.Append("      0 [SeqNo] ")
+        Query.Append("      ,'' [PRCode] ")
+        Query.Append("      ,@ProjType [ProjType] ")
+        Query.Append("      ,@Category [Category] ")
+        Query.Append("      ,'' [OSM] ")
+        Query.Append("      ,[D].Description [Item] ")
+        Query.Append("      ,NULL [Qty] ")
+        Query.Append("      ,NULL [Unit] ")
+        Query.Append("      ,NULL [BdgtAmt] ")
+        Query.Append("      ,NULL [Status] ")
+        Query.Append("      ,NULL [POQty] ")
+        Query.Append("      ,NULL [SRQty] ")
+        Query.Append("      ,NULL [CPQty] ")
+        Query.Append("      ,NULL [CPCost] ")
+        Query.Append("      ,NULL [CPTotal] ")
+        Query.Append("      ,NULL [Remarks] ")
+        Query.Append("      ,'' [ItemNo] ")
+        Query.Append("      ,[D].Description [Scope] ")
+        Query.Append("      ,[D].WNo ")
+        Query.Append("  from ")
+        Query.Append("      ogm_pr_dtl [A] ")
+        Query.Append("      left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
+        Query.Append("      left join Trxn_CEDtl [C] on [A].ItemNo = [C].ItemNo ")
+        Query.Append("      left join Mstr_Work [D] on [C].WCode = [D].WCode ")
+        Query.Append("  where ")
+        Query.Append("      [B].f_code = @pID ")
+        Query.Append("  group by ")
+        Query.Append("      [D].Description ")
+        Query.Append("      ,[D].WNo ")
+        Query.Append("  union ")
+        Query.Append("  select ")
+        Query.Append("      [A].seq_no [SeqNo] ")
+        Query.Append("      ,[A].pr_code [PRCode] ")
+        Query.Append("      ,@ProjType [ProjType] ")
+        Query.Append("      ,@Category [Category] ")
+        Query.Append("      ,(CASE WHEN [A].ItemNo != '' THEN 'OSM' ELSE '' END) [OSM] ")
+        Query.Append("      ,[A].item [Item] ")
+        Query.Append("      ,[A].qty [Qty] ")
+        Query.Append("      ,[A].unit [Unit] ")
+        Query.Append("      ,[A].BdgtAmt ")
+        Query.Append("      ,[A].status [Status] ")
+        Query.Append("      ,[A].ForPO [POQty] ")
+        Query.Append("      ,([A].for_sr + [A].ForWT + [A].ForIR) [SRQty] ")
+        Query.Append("      ,[A].ForCP [CPQty] ")
+        Query.Append("      ,[A].unit_cost [CPCost] ")
+        Query.Append("      ,[A].tot_cost [CPTotal] ")
+        Query.Append("      ,[A].remarks [Remarks] ")
+        Query.Append("      ,(case when [A].ItemNo = '' then [A].SCMNo else [A].ItemNo end) [ItemNo] ")
+        Query.Append("      ,'' [Scope] ")
+        Query.Append("      ,ISNULL((select [D].WNo from Trxn_CEDtl [C] left join Mstr_Work [D] on [C].WCode = [D].WCode where [C].ItemNo  = [A].ItemNo GROUP BY [D].WNo), '') [WNo] ")
+        Query.Append("   from ")
+        Query.Append("      ogm_pr_dtl [A] ")
+        Query.Append("      left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
+        Query.Append("   where ")
+        Query.Append("      [B].f_code = @pID ")
+        Query.Append("   order by ")
+        Query.Append("      [WNo] ")
+        Query.Append("      ,[SeqNo] ")
+        Query.Append("end ")
+        Query.Append("else if @ProjType in ('Non OSM Project') ")
         Query.Append("begin ")
         Query.Append("  select ")
         Query.Append("      [A].seq_no [SeqNo] ")
@@ -2390,6 +2464,8 @@ Public Class FRM000010HND
                         Type = "OSM"
                     ElseIf DR("ProjType").ToString.Contains("CCI Project") And DR("OSM") <> "" Then
                         Type = "CCI"
+                    ElseIf DR("ProjType") = "OSM Project" Then
+                        Type = DR("OSM")
                     Else
                         Type = ""
                     End If
@@ -2592,9 +2668,9 @@ Public Class FRM000010HND
         Query.Append("Select ")
         Query.Append("   [Particular] ")
         Query.Append("   ,[ItmNo] ")
-        Query.Append("   ,FORMAT([Qty1],'N2') [Qty1] ")
-        Query.Append("   ,FORMAT([Qty2],'N2') [Qty2] ")
-        Query.Append("   ,FORMAT([Qty1] - [Qty2],'N2') [Qty3] ")
+        Query.Append("   ,[Qty1] ")
+        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty1] - [Qty2]) [Qty3] ")
         Query.Append("   ,[UOM] ")
         Query.Append("from ")
         Query.Append("   (select ")
@@ -2679,15 +2755,15 @@ Public Class FRM000010HND
         Query.Append("select ")
         Query.Append("   [A].seq_no [SeqNo] ")
         Query.Append("   ,[A].item [Item] ")
-        Query.Append("   ,FORMAT([A].qty,'N2') [Qty] ")
+        Query.Append("   ,[A].qty [Qty] ")
         Query.Append("   ,[A].unit [Unit] ")
-        Query.Append("   ,FORMAT([A].BdgtAmt,'N2') [BdgtAmt] ")
+        Query.Append("   ,[A].BdgtAmt ")
         Query.Append("   ,[A].status [Status]  ")
-        Query.Append("   ,FORMAT([A].ForPO,'N2') [POQty] ")
-        Query.Append("   ,FORMAT([A].for_sr + [A].FOrWT + [A].ForIR,'N2') [SRQty] ")
-        Query.Append("   ,FORMAT([A].ForCP,'N2') [CPQty] ")
-        Query.Append("   ,FORMAT([A].unit_cost,'N2') [CPCost] ")
-        Query.Append("   ,FORMAT([A].tot_cost,'N2') [CPTotal] ")
+        Query.Append("   ,[A].ForPO [POQty] ")
+        Query.Append("   ,([A].for_sr + [A].FOrWT + [A].ForIR) [SRQty] ")
+        Query.Append("   ,[A].ForCP [CPQty] ")
+        Query.Append("   ,[A].unit_cost [CPCost] ")
+        Query.Append("   ,[A].tot_cost [CPTotal] ")
         Query.Append("   ,[A].remarks [Remarks] ")
         Query.Append("   ,@Category [Category] ")
         Query.Append("from ")
@@ -2975,6 +3051,145 @@ Public Class FRM000010HND
         Return New JavaScriptSerializer().Serialize(result)
 
     End Function
+    Function Get_Record_Return(pID)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("declare @CECode nvarchar(13) = isnull((select CECode from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("declare @SubdCode nvarchar(13) = isnull((select Subdivision from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("declare @Category nvarchar(180) = isnull((select Category from ogm_pr_hdr where form_no = @pID), '') ")
+        Query.Append("if @Category in ('House Construction', 'House Construction - CCI') ")
+        Query.Append("begin ")
+        Query.Append("Select ")
+        Query.Append("   [Particular] ")
+        Query.Append("   ,[ItmNo] ")
+        Query.Append("   ,[Qty1] ")
+        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty2] - [Qty1]) [Qty3] ")
+        Query.Append("   ,[UOM] ")
+        Query.Append("from ")
+        Query.Append("   (select ")
+        Query.Append("      0 [SeqNo] ")
+        Query.Append("      ,'' [ItmNo] ")
+        Query.Append("      ,[B].WNo [ItemNo] ")
+        Query.Append("      ,[B].WNo [No] ")
+        Query.Append("      ,[B].Description [Particular] ")
+        Query.Append("      ,NULL [Qty1] ")
+        Query.Append("      ,NULL [Qty2] ")
+        Query.Append("      ,NULL [UOM] ")
+        Query.Append("   from ")
+        Query.Append("      Trxn_CEDtl [A] ")
+        Query.Append("      left join Mstr_Work [B] on [A].WCode = [B].WCode ")
+        Query.Append("   where ")
+        Query.Append("      [A].CECode = @CECode ")
+        Query.Append("      and [A].TblFrom = 'ogm_item' ")
+        Query.Append("   union ")
+        Query.Append("   select ")
+        Query.Append("      [A].SeqNo ")
+        Query.Append("      ,[A].ItemNo [ItmNo] ")
+        Query.Append("      ,[C].WNo [ItemNo] ")
+        Query.Append("      ,'' [No] ")
+        Query.Append("      ,[A].Particular ")
+        Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
+        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [E].status in ('Accepted')),0) [Qty2] ")
+        Query.Append("      ,[B].abbr [UOM] ")
+        Query.Append("   FROM ")
+        Query.Append("      Trxn_CEDtl [A] ")
+        Query.Append("      left join sys_um [B] on [A].UMCode = [B].u_code ")
+        Query.Append("      left join Mstr_Work [C] on [A].WCode = [C].WCode ")
+        Query.Append("   where ")
+        Query.Append("      [A].CECode = @CECode ")
+        Query.Append("      and [A].TblFrom = 'ogm_item' ")
+        Query.Append("      and isnull([A].QtyReq,0) > 0 ) [A] ")
+        Query.Append("order by ")
+        Query.Append("   [ItemNo] ")
+        Query.Append("   ,[SeqNo] ")
+        Query.Append("end ")
+        Query.Append("else if @Category not in ('House Construction', 'House Construction - CCI') ")
+        Query.Append("begin ")
+        Query.Append("Select ")
+        Query.Append("   [Particular] ")
+        Query.Append("   ,[ItmNo] ")
+        Query.Append("   ,[Qty1] ")
+        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty1] - [Qty2]) [Qty3] ")
+        Query.Append("   ,[UOM] ")
+        Query.Append("from ")
+        Query.Append("   (select ")
+        Query.Append("      0 [SeqNo] ")
+        Query.Append("      ,'' [ItmNo] ")
+        Query.Append("      ,[B].WNo [ItemNo] ")
+        Query.Append("      ,[B].WNo [No] ")
+        Query.Append("      ,[B].Description [Particular] ")
+        Query.Append("      ,NULL [Qty1] ")
+        Query.Append("      ,NULL [Qty2] ")
+        Query.Append("      ,NULL [UOM] ")
+        Query.Append("   from ")
+        Query.Append("      Trxn_CEDtl [A] ")
+        Query.Append("      left join Mstr_Work [B] on [A].WCode = [B].WCode ")
+        Query.Append("   where ")
+        Query.Append("      [A].CECode = @CECode ")
+        Query.Append("      and [A].TblFrom = 'ogm_item' ")
+        Query.Append("      and isnull([A].QtyReq,0) > 0 ")
+        Query.Append("   union ")
+        Query.Append("   select ")
+        Query.Append("      [A].SeqNo ")
+        Query.Append("      ,[A].ItemNo [ItmNo] ")
+        Query.Append("      ,[C].WNo [ItemNo] ")
+        Query.Append("      ,'' [No] ")
+        Query.Append("      ,[A].Particular ")
+        Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
+        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status in ('Accepted')),0) [Qty2] ")
+        Query.Append("      ,[B].abbr [UOM] ")
+        Query.Append("   FROM ")
+        Query.Append("      Trxn_CEDtl [A] ")
+        Query.Append("      left join sys_um [B] on [A].UMCode = [B].u_code ")
+        Query.Append("      left join Mstr_Work [C] on [A].WCode = [C].WCode ")
+        Query.Append("   where ")
+        Query.Append("      [A].CECode = @CECode ")
+        Query.Append("      and [A].TblFrom = 'ogm_item' ")
+        Query.Append("      and isnull([A].QtyReq,0) > 0 ) [A] ")
+        Query.Append("order by ")
+        Query.Append("   [ItemNo] ")
+        Query.Append("   ,[SeqNo] ")
+        Query.Append("end ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pID", pID)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    RecordList.Add(New With {
+                        .Particular = DR("Particular"),
+                        .ItmNo = DR("ItmNo"),
+                        .Qty1 = DR("Qty1"),
+                        .Qty2 = DR("Qty2"),
+                        .Qty3 = DR("Qty3"),
+                        .Unit = DR("UOM")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'set to max
+        Return JsonConvert.SerializeObject(RecordList, Formatting.None)
+        'display 
+
+    End Function
 #End Region
 
 #Region "CRUD - Record"
@@ -3216,6 +3431,43 @@ Public Class FRM000010HND
         SqlCmd.Connection = SqlConn
         SqlCmd.CommandType = CommandType.StoredProcedure
         SqlCmd.CommandText = "New_FRM_FRM000010_PRDtl_SCM"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", "FRM000010")
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pItemSrs", pItemSrs)
+        SqlCmd.Parameters.AddWithValue("@pCreatedBy", pCreatedBy)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Add_Record_Return(pID, pItemSrs, pCreatedBy)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "New_FRM_FRM000010_PRDtl_Return"
         SqlCmd.Parameters.AddWithValue("@pFormCode", "FRM000010")
         SqlCmd.Parameters.AddWithValue("@pID", pID)
         SqlCmd.Parameters.AddWithValue("@pItemSrs", pItemSrs)
