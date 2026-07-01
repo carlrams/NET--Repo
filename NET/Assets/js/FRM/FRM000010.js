@@ -18,6 +18,9 @@ let grid07Api;
 
 //Tag - AG grid
 let grid08Api;
+
+//Return - Estimate
+let grid09Api;
 //form
 
 //attachment
@@ -153,6 +156,7 @@ function fn01DisableButtons(pValue) {
         document.getElementById("btn03010101Add").classList.remove("btn-add");
         document.getElementById("btn989Add").classList.remove("btn-add");
         document.getElementById("btn11Add").classList.remove("btn-add");
+        document.getElementById("btn11AddReturn").classList.remove("btn-add");
         document.getElementById("div11SCM").classList.remove("btn-add");
         document.getElementById("div11OSM").classList.remove("btn-add");
         const button = document.querySelectorAll('.action-button');
@@ -172,7 +176,7 @@ function fn01DisableButtons(pValue) {
         document.getElementById("btn0101ChangeStatus").classList.add("btn-secondary");
         document.getElementById("btn03010101Add").classList.add("btn-add");
         document.getElementById("btn989Add").classList.add("btn-add");
-        document.getElementById("btn11Add").classList.add("btn-add");
+        document.getElementById("btn11AddReturn").classList.add("btn-add");
         document.getElementById("div11SCM").classList.add("btn-add");
         document.getElementById("div11OSM").classList.add("btn-add");
         const button = document.querySelectorAll('.action-button');
@@ -193,6 +197,7 @@ function fn01DisableButtons(pValue) {
     document.getElementById("btn03010101Add").disabled = pValue;
     document.getElementById("btn989Add").disabled = pValue;
     document.getElementById("btn11Add").disabled = pValue;
+    document.getElementById("btn11AddReturn").disabled = pValue;
     document.getElementById("div11SCM").disabled = pValue;
     document.getElementById("div11OSM").disabled = pValue;
 };
@@ -445,7 +450,8 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("lbl0101ProjectType").innerText = response[0].ProjType;
                 document.getElementById("lbl0101Purpose").innerText = response[0].Purpose;
                 document.getElementById("lbl0101Vehicle").innerText = response[0].VehicleName;
-                document.getElementById("lbl0101Category").innerText = response[0].ProjType.includes("(Stock Request)") || response[0].ProjType.includes("Advance PO") ? response[0].Category : "";
+                //document.getElementById("lbl0101Category").innerText = response[0].ProjType.includes("(Stock Request)") || response[0].ProjType.includes("Advance PO") ? response[0].Category : "";
+                document.getElementById("lbl0101Category").innerText = response[0].Category;
                 document.getElementById("lbl0102Category").innerText = response[0].Purpose.includes("REPAIR AND MAINTENANCE") ? response[0].Category : "";
                 document.getElementById("lbl0101ActName").innerText = response[0].ActName;
                 document.getElementById("lbl0101ActLocation").innerText = response[0].ActLocation;
@@ -534,7 +540,7 @@ function fn0101LoadOverview(pMode, pID) {
                 $('#ddl0101ProjectType').val(response[0].ProjType).trigger('change');
                 fn0101Purpose(response[0].Purpose, response[0].ProjType);
                 fn0101Vehicle(response[0].VehicleCode);
-                fn0101Category(response[0].ProjType.includes("(Stock Request)") || response[0].ProjType.includes("Advance PO") ? response[0].Category : "");
+                fn0101Category(response[0].Category);
                 document.getElementById("tbx0202Category").value = response[0].Purpose.includes("REPAIR AND MAINTENANCE") ? response[0].Category : "";
                 document.getElementById("tbx0101ActName").value = response[0].ActName;
                 document.getElementById("tbx0101ActLocation").value = response[0].ActLocation;
@@ -1260,6 +1266,7 @@ function fn0101ShowFields(pMode) {
         //Particular
         //Button
         document.getElementById("btn11Add").style.display = "";
+        document.getElementById("btn11AddReturn").style.display = "none";
         document.getElementById("div11SCM").style.display = "none";
         document.getElementById("div11OSM").style.display = "none";
 
@@ -1267,6 +1274,14 @@ function fn0101ShowFields(pMode) {
         document.getElementById("table11Record").style.display = "none";
         document.getElementById("table12Record").style.display = "none";
         //Particular
+
+        //Purchase Type
+        if (document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value == "Return" && document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" && document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value.includes("Return")) {
+            document.getElementById("div0201Category").style.display = "";
+            document.getElementById("div0102Estimate").style.display = "";
+            document.getElementById("spn0102Estimate").innerText = "Estimate";
+            document.getElementById("tbx0101Estimate").placeholder = "Add estimate";
+        };
 
         //Project Type
         if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) {
@@ -1284,7 +1299,7 @@ function fn0101ShowFields(pMode) {
         };
 
         //Category - House Construction
-        if (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "House Construction" || document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "House Construction - CCI") {
+        if ( (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "House Construction" || document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "House Construction - CCI") && document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("(Advance PO)") && document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("(Stock Request)") ) {
             document.getElementById("div0102Estimate").style.display = "";
             document.getElementById("spn0102Estimate").innerText = "Batch";
             document.getElementById("tbx0101Estimate").placeholder = "Add batch";
@@ -1363,6 +1378,7 @@ function fn0101ShowFields(pMode) {
         //Particular
         //Button
         document.getElementById("btn11Add").style.display = "none";
+        document.getElementById("btn11AddReturn").style.display = "none";
         document.getElementById("div11SCM").style.display = "none";
         document.getElementById("div11OSM").style.display = "none";
 
@@ -1371,9 +1387,20 @@ function fn0101ShowFields(pMode) {
         document.getElementById("table12Record").style.display = "none";
         //Particular
 
+        //Purchase Type
+        if (document.getElementById("lbl0101PurchaseType").innerText == "Return" && document.getElementById("lbl0101ProjectType").innerText == "OSM Project" && document.getElementById("lbl0101Purpose").innerText.includes("Return")) {
+            document.getElementById("div0101Category").style.display = "";
+            document.getElementById("div0101Estimate").style.display = "";
+            document.getElementById("spn0101Estimate").innerText = "Estimate";
+
+            //Button
+            document.getElementById("btn11AddReturn").style.display = "";
+        };
+
         //Project Type
         if (document.getElementById("lbl0101ProjectType").innerText == "Non OSM Project" || document.getElementById("lbl0101ProjectType").innerText == "OSM Project") {
             document.getElementById("btn11Add").style.display = "";
+            document.getElementById("table11Record").style.display = "";
         };
         if (document.getElementById("lbl0101ProjectType").innerText == "Non OSM Project" || document.getElementById("lbl0101ProjectType").innerText == "OSM Project" || document.getElementById("lbl0101ProjectType").innerText.includes("Advance PO")) {
             document.getElementById("div0101ChargeTo").style.display = "";
@@ -1398,7 +1425,7 @@ function fn0101ShowFields(pMode) {
         };
 
         //Category - House Construction
-        if (document.getElementById("lbl0101Category").innerText == "House Construction" || document.getElementById("lbl0101Category").innerText == "House Construction - CCI") {
+        if ((document.getElementById("lbl0101Category").innerText == "House Construction" || document.getElementById("lbl0101Category").innerText == "House Construction - CCI") && document.getElementById("lbl0101ProjectType").innerText.includes("(Advance PO)") && document.getElementById("lbl0101ProjectType").innerText.includes("(Stock Request)") ) {
             document.getElementById("div0101Estimate").style.display = "";
             document.getElementById("spn0101Estimate").innerText = "Batch";
             document.getElementById("div0101Subdivision").style.display = "";
@@ -1495,16 +1522,20 @@ function dd0101ProjectType_onchange(ddl0101ProjectType) {
     };
 };
 function ddl0101Purpose_onchange(ddl0101Purpose) {
+    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     if (ddl0101Purpose.value != "") {
         $('#ddl0101Category').val('').trigger('change');
-        fn0101GLAccount(ddl0101Purpose.value);
+        if (pMode == "ADD") fn0101GLAccount(ddl0101Purpose.value);
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
 function ddl0101Category_onchange(ddl0101Category) {
+    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     if (ddl0101Category.value != "") {
-        document.getElementById("tbx0101Estimate").value = "";
-        document.getElementById("hf0101Estimate").value = "";
+        if (pMode == "ADD") {
+            document.getElementById("tbx0101Estimate").value = "";
+            document.getElementById("hf0101Estimate").value = "";
+        };
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
@@ -1516,7 +1547,7 @@ function fn0101Estimate() {
     const ddl0101ProjectType = document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value;
     if (ddl0101ProjectType != "") {
 
-        if (ddl0101Category == "House Construction" || ddl0101Category == "House Construction - CCI") {
+        if (ddl0101Category.includes("House Construction") && ddl0101ProjectType.includes("(Advance PO)") && ddl0101ProjectType.includes("(Stock Request)") ) {
             if (ddl0101Subdivision == "") {
                 fnAlertOnly('Please select a subdivision!', 'error', 'btn btn-danger');
             } else {
@@ -1586,7 +1617,7 @@ function fn0101Estimate() {
 
                 $("#mdl0101Estimate").modal("show");
             }
-        } else if (ddl0101Category != "" && (ddl0101Category != "House Construction" || ddl0101Category != "House Construction - CCI")) {
+        } else if (ddl0101Category != "" && !ddl0101ProjectType.includes("(Advance PO)") && !ddl0101ProjectType.includes("(Stock Request)") ) {
             //Ajax
             $.ajax({
                 type: "POST",
@@ -1847,6 +1878,34 @@ function fn0101AddProject(pSubdCode, pPhase, pBlock, pLot, pDesc) {
     $("#mdl0101Project").modal("hide");
 };
 
+//print
+function fn0101Print() {
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Print();
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+        };
+    });
+    function Print() {
+        $.ajax({
+            type: "POST",
+            url: "Assets/Handler/FRM/FRM000010HND.ashx",
+            data: {
+                'pFormCode': 'FRM000010',
+                'pType': 'View - PR Printout',
+                'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
+            },
+            success: function (response) {
+                if (response.status === "success") {
+                    window.open(response.viewUrl, '_blank');
+                } else {
+                    fnAlertOnly('Error generating report.', 'error', 'btn btn-danger');
+                };
+            }
+        });
+    };
+};
 //overview
 
 //particular
@@ -2107,6 +2166,155 @@ function fn0102LoadParticular(pMode, pID) {
 
     }
 };
+
+//add - particular
+function fn11Add() {
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+        };
+    });
+    function Validate(pID) {
+        fnFRMValidateRecord("06PRDtl", "Add", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Add_Particular(pID);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+            };
+        });
+    };
+    function Add_Particular() {
+        //Clear
+        document.getElementById("tbx0102AddParticular").value = "";
+        document.getElementById("tbx0102AddQty").value = "0.00";
+        document.getElementById("tbx0102AddUnit").value = "";
+        document.getElementById("tbx0102AddBudget").value = "0.00";
+        $('#ddl0102AddStatus').val('').trigger('change');
+        document.getElementById("tbx0102AddForPO").value = "0.00";
+        document.getElementById("tbx0102AddForSR").value = "0.00";
+        document.getElementById("tbx0102AddCPQty").value = "0.00";
+        document.getElementById("tbx0102AddCost").value = "0.00";
+        document.getElementById("tbx0102AddTotal").value = "0.00";
+        document.getElementById("tbx0102AddRemarks").value = "0.00";
+
+        //Modal
+        $("#mdl0102AddParticular").modal("show");
+    };
+};
+function fn0102Add_Ok(Btn) {
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = true;
+    // Show loading indicator
+    Btn.setAttribute('data-kt-indicator', 'on');
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        };
+    });
+    function Validate(ID) {
+        fnFRMValidateRecord("06PRDtl", "Add", ID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Validate_Record(ID);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            };
+        });
+    };
+    function Validate_Record(ID) {
+        if (document.getElementById("tbx0102AddParticular").value == "") {
+            fnAlertOnly('Some fields are missing!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        } else if (parseFloat(document.getElementById("tbx0102AddQty").value) <= 0) {
+            fnAlertOnly('Some fields are missing!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        } else if (document.getElementById("tbx0102AddUnit").value == "") {
+            fnAlertOnly('Some fields are missing!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        } else {
+            Add_Particular(ID);
+        };
+    };
+    function Add_Particular(pID) {
+        Swal.fire({
+            text: 'Add particular?',
+            icon: 'question',
+            iconColor: '#0095e8',
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'btn btn-sm btn-info min-w-100px',
+                cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Add_Ok(pID);
+            } else {
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            };
+        });
+        function Add_Ok(pID) {
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Add - Particular',
+                    'pID': pID,
+                    'pItem': document.getElementById("tbx0102AddParticular").value,
+                    'pQty': document.getElementById("tbx0102AddQty").value,
+                    'pUnit': document.getElementById("tbx0102AddUnit").value,
+                    'pBdgtAmt': document.getElementById("tbx0102AddBudget").value
+                },
+                success: function (response) {
+                    fnAlertOnly('Record successfully updated!', 'success', 'btn btn-success');
+                    //Bind
+                    fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                    // Disable the clicked button to avoid multiple clicks
+                    Btn.disabled = false;
+                    // Hide loading indication
+                    Btn.removeAttribute('data-kt-indicator');
+                    //Modal
+                    $('#mdl0102AddParticular').modal("hide");
+                }
+            });
+        };
+    };
+}
+
+//add - return
+function fn11AddReturn() {
+
+};
+
 //delete - particular
 function fn0102Delete(pID, pSeqNo) {
     //if exists
@@ -2260,7 +2468,7 @@ function fn0102Update_Ok(Btn) {
             Btn.disabled = false;
             // Hide loading indication
             Btn.removeAttribute('data-kt-indicator');
-        } else if (document.getElementById("tbx0102Qty").value <= 0) {
+        } else if (parseFloat(document.getElementById("tbx0102Qty").value) <= 0) {
             fnAlertOnly('Some fields are missing!', 'warning', 'btn btn-warning');
             // Disable the clicked button to avoid multiple clicks
             Btn.disabled = false;
@@ -2325,6 +2533,10 @@ function fn0102Update_Ok(Btn) {
                     fnAlertOnly('Record successfully updated!', 'success', 'btn btn-success');
                     //Bind
                     fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                    // Disable the clicked button to avoid multiple clicks
+                    Btn.disabled = false;
+                    // Hide loading indication
+                    Btn.removeAttribute('data-kt-indicator');
                     //Modal
                     $('#mdl0102Update').modal("hide");
                 }
@@ -2338,7 +2550,6 @@ function btn11SCM() {
     const pCategory = document.getElementById("lbl0101Category").innerText;
     const pProjType = document.getElementById("lbl0101ProjectType").innerText;
     if (pMode == "DTL") {
-
         if (pCategory.includes("House Construction") && pProjType.includes("(Advance PO)")) {
 
             //Ajax
@@ -2541,6 +2752,204 @@ function btn11SCM() {
             $("#mdl0101SCMBatch").modal("show");
         } else if (!pCategory.includes("House Construction") && pProjType.includes("(Advance PO)")) {
 
+            //Ajax
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                data: {
+                    'pFormCode': 'FRM000010',
+                    'pType': 'Get - Particular - SCM (Estimate)',
+                    'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
+                },
+                success: function (response) {
+                    grid05Api.setGridOption("rowData", response);
+                },
+                complete: function (response) {
+                    grid05Api.setGridOption("loading", false);
+                }
+            });
+
+            //AG Grid
+            let gridDiv = document.querySelector('#table0101SCMEstimate');
+            let gridOptions;
+
+            //Destroy
+            if (grid05Api) {
+                grid05Api.destroy();
+                grid05Api = null;
+            };
+
+            // Destroy old grid if exists
+            gridDiv.innerHTML = "";
+
+            const gridTheme = agGrid.themeQuartz.withParams({
+                wrapperBorder: true,
+                headerRowBorder: false,
+            });
+
+            gridOptions = {
+                theme: gridTheme,
+                suppressCellFocus: true,
+                suppressDragLeaveHidesColumns: true,
+                enableCellTextSelection: true,
+                rowSelection: 'multiple',
+                suppressRowClickSelection: true,
+                loading: true,
+                getRowStyle: params => {
+                    if (params.data.WBSNo == '') {
+                        return { backgroundColor: '#BFF5C0' };
+                    }
+                    return null;
+                },
+                onRowSelected: params => {
+                    const node = params.node;
+                    if (params.node.isSelected()) {
+                        node.setDataValue('QtyReq', node.data.Qty3);
+                    } else {
+                        node.setDataValue('QtyReq', 0);
+                    }
+                },
+                columnDefs: [
+                    {
+                        headerName: "Action",
+                        field: "isChecked",
+                        resizable: false,
+                        sortable: false,
+                        width: 75,
+                        checkboxSelection: params => params.data.WBSNo != '',
+                        cellStyle: {
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }
+                    },
+                    {
+                        headerName: "Particular",
+                        field: "Particular",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Particular",
+                        flex: 1,
+                        minWidth: 350,
+                        cellStyle: params => {
+                            if (params.data.WBSNo == '') {
+                                return { fontWeight: 'bold' }
+                            }
+                            return null;
+                        }
+                    },
+                    {
+                        headerName: "Qty - Balance",
+                        field: "Qty1",
+                        tooltipField: "Qty1",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty1) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Approval",
+                        field: "Qty2",
+                        tooltipField: "Qty2",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty2) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Available",
+                        field: "Qty3",
+                        tooltipField: "Qty3",
+                        width: 150,
+                        cellClass: "text-end",
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) {
+                                value = parseFloat(params.data.Qty3) || 0;
+                            }
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        },
+                    },
+                    {
+                        headerName: "Qty - Request",
+                        field: "QtyReq",
+                        width: 150,
+                        editable: params => params.data.WBSNo != '',
+                        cellEditor: 'agNumberCellEditor',
+                        cellClass: "text-end text-danger",
+                        cellEditorParams: {
+                            min: 0,
+                        },
+                        cellStyle: { fontWeight: 'bold' },
+                        valueFormatter: params => {
+                            let value = parseFloat(params.value);
+                            if (params.data.WBSNo == '') {
+                                return ''
+                            }
+                            if (isNaN(value)) value = 0;
+                            return value.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    },
+                    {
+                        headerName: "Unit",
+                        field: "Unit",
+                        filter: 'agTextColumnFilter',
+                        tooltipField: "Unit",
+                        width: 100,
+                        cellRenderer: params => {
+                            if (params.data.ItmNo == '') {
+                                return '';
+                            };
+                            return params.value;
+                        }
+                    },
+                    {
+                        headerName: "Remarks",
+                        field: "Remarks",
+                        editable: params => params.data.WBSNo != '',
+                    }
+                ],
+                rowData: [],
+                pagination: false,
+            };
+
+            grid05Api = agGrid.createGrid(gridDiv, gridOptions);
+
+            //Modal
+            $("#mdl0101SCMEstimate").modal("show");
         };
 
     };
@@ -2609,7 +3018,97 @@ function fn0102SaveSCMBatch_Ok(Btn) {
                             //modal
                             $("#mdl0101SCMBatch").modal("hide");
                             //alert
-                            fnAlertOnly('Record successfully tagged.', 'success', 'btn btn-success');
+                            fnAlertOnly('Record successfully added.', 'success', 'btn btn-success');
+                            //Bind
+                            fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
+                            // Disable the clicked button to avoid multiple clicks
+                            Btn.disabled = false;
+                            // Hide loading indication
+                            Btn.removeAttribute('data-kt-indicator');
+                        }
+                    });
+                } else {
+                    // Disable the clicked button to avoid multiple clicks
+                    Btn.disabled = false;
+                    // Hide loading indication
+                    Btn.removeAttribute('data-kt-indicator');
+                };
+            });
+        } else {
+            fnAlertOnly('No record selected.', 'error', 'btn btn-danger');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        }
+    };
+};
+function fn0102SaveSCMEstimate_Ok(Btn) {
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = true;
+    // Show loading indicator
+    Btn.setAttribute('data-kt-indicator', 'on');
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(document.getElementById('ContentPlaceHolder1_hdnID').value);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = false;
+            // Hide loading indication
+            Btn.removeAttribute('data-kt-indicator');
+        };
+    });
+    function Validate(pID) {
+        fnFRMValidateRecord("06PRDtl", "Add", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Add_Particular(pID);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+                // Disable the clicked button to avoid multiple clicks
+                Btn.disabled = false;
+                // Hide loading indication
+                Btn.removeAttribute('data-kt-indicator');
+            };
+        });
+    };
+    function Add_Particular(pID) {
+        const selectedRows = grid05Api.getSelectedRows();
+        let pItemSrs = selectedRows.map(i =>
+            `${i.Particular}©${(parseFloat(i.QtyReq) || 0).toFixed(2)}©${i.Unit}©${i.Remarks || ''}©${i.WBSNo}`
+        ).join('®');
+        console.log(pItemSrs);
+        //Condition
+        if (pItemSrs) {
+            Swal.fire({
+                text: 'Save record?',
+                icon: 'question',
+                iconColor: '#0095e8',
+                buttonsStyling: false,
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-sm btn-info min-w-100px',
+                    cancelButton: 'btn btn-sm btn-light-danger min-w-100px'
+                }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                        data: {
+                            'pFormCode': 'FRM000010',
+                            'pType': 'Add - Record (SCM Estimate)',
+                            'pID': pID,
+                            'pItemSrs': pItemSrs
+                        },
+                        success: async function (response) {
+                            //modal
+                            $("#mdl0101SCMEstimate").modal("hide");
+                            //alert
+                            fnAlertOnly('Record successfully added.', 'success', 'btn btn-success');
                             //Bind
                             fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
                             // Disable the clicked button to avoid multiple clicks
@@ -3582,6 +4081,11 @@ function fn0102Return_Ok(Btn) {
 
 //OSM - Upload
 function btn11UplOSM() {
+    fnAlertOnly('Feature temporarily unavailable.', 'warning', 'btn btn-warning');
+};
+
+//SCM - Upload
+function btn11UplSCM() {
     fnAlertOnly('Feature temporarily unavailable.', 'warning', 'btn btn-warning');
 };
 //particular

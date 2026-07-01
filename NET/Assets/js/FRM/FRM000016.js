@@ -163,6 +163,7 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("btn0101Edit").disabled = false;
                 document.getElementById("i0101Edit").classList.remove("la-pencil-alt");
                 document.getElementById("i0101Edit").classList.add("la-save");
+                document.getElementById("i0101Edit").title = "Save";
                 //toolbar
 
                 //content
@@ -171,6 +172,9 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("div0101EditPayment").style.display = "none";
                 document.getElementById("div0101EditPaymentAdd").style.display = "none";
                 document.getElementById("div0101Payee").style.display = "none";
+                document.getElementById("spn0101BankName").classList.remove("required");
+                document.getElementById("spn0101AcctName").classList.remove("required");
+                document.getElementById("spn0101AcctNo").classList.remove("required");
 
                 document.getElementById("tbx0101ID").value = "0000000000000";
                 document.getElementById("tbx0101FormType").value = "Petty Cash/Revolving Fund";
@@ -180,17 +184,33 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("tbx0101AssignedTo").value = response[0].fullname;
                 document.getElementById("tbx0101EndorsedTo").value = "-";
                 document.getElementById("tbx0101Status").value = "New";
+          
+                //ddl0101Branch
+                document.getElementById("ddl0101Branch").setAttribute("onchange", "");
+                $('#ddl0101Branch').val('').trigger('change');
+                document.getElementById("ddl0101Branch").setAttribute("onchange", "ddl0101Branch_onchange(this)");
                 ddl0101Branch('');
+                //ddl0101Branch
+
                 skipFundOnChange = true;
+                /* skipPayeeOnChange = true;*/
+
                 ddl0101Fund('', '');
                 $('#ddl0101Type').val('').trigger('change');
                 $('#ddl0101Type option[value="Cash Payment and Cash Liquidation"]').remove();
                 $('#ddl0101Type option[value="Cash Payment Only"]').remove();
                 ddl0101Department('');
+                //ddl0101PayeeType
                 document.getElementById("ddl0101PayeeType").setAttribute("onchange", "");
                 $('#ddl0101PayeeType').val('').trigger('change');
                 document.getElementById("ddl0101PayeeType").setAttribute("onchange", "ddl0101PayeeType_onchange(this)");
+                //ddl0101PayeeType
+                //ddl0101Payee
+                document.getElementById("ddl0101Payee").setAttribute("onchange", "");
+                $('#ddl0101Payee').val('').trigger('change');
+                document.getElementById("ddl0101Payee").setAttribute("onchange", "ddl0101Payee_onchange(this)");
                 ddl0101Payee('', '');
+                //ddl0101Payee
                 document.getElementById("tbx0101RefNo").value = "";
                 document.getElementById("tbx0101Remarks").value = "";
                 document.getElementById("tbx0101DueDate").value = "";
@@ -208,6 +228,7 @@ function fn0101LoadOverview(pMode, pID) {
             },
         });
     } else if (pMode == "DTL") {
+       
         $.ajax({
             type: "POST",
             url: "Assets/Handler/FRM/HNDFRM000016.ashx",
@@ -229,6 +250,7 @@ function fn0101LoadOverview(pMode, pID) {
                     document.getElementById("btn0101Delete").title = "Remove";
                     document.getElementById("i0101Edit").classList.add("la-pencil-alt");
                     document.getElementById("i0101Edit").classList.remove("la-save");
+                    document.getElementById("i0101Edit").title = "Edit";
 
                     document.getElementById("div0101Detail").style.display = "";
                     document.getElementById("div0101Update").style.display = "none";
@@ -361,12 +383,11 @@ function fn0101LoadOverview(pMode, pID) {
                     document.getElementById("div0101DetailPayment").style.display = "";
                     document.getElementById("div0101DetailPaymentAdd").style.display = "";
                     document.getElementById("div0101DetailPayee").style.display = "";
-
                 }
 
             },
         });
-    } else if (pMode == "UPD") {
+        } else if (pMode == "UPD") {
         $.ajax({
             type: "POST",
             url: "Assets/Handler/FRM/HNDFRM000016.ashx",
@@ -412,6 +433,7 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("btn0101Edit").disabled = false;
                 document.getElementById("i0101Edit").classList.remove("la-pencil-alt");
                 document.getElementById("i0101Edit").classList.add("la-save");
+                document.getElementById("i0101Edit").title = "Save";
                 //toolbar
 
                 //content
@@ -432,18 +454,18 @@ function fn0101LoadOverview(pMode, pID) {
                 ddl0101Branch(response[0].buss_code, false);
 
 
-               
-
-
                 ddl0101Fund(response[0].Fund, response[0].buss_code);
                 skipFundOnChange = true;
-
                 $('#ddl0101Type').val(response[0].Type).trigger('change');
                 ddl0101Department(response[0].dept_code);
+
                 document.getElementById("ddl0101PayeeType").setAttribute("onchange", "");
                 $('#ddl0101PayeeType').val(response[0].PayeeType).trigger('change');
                 document.getElementById("ddl0101PayeeType").setAttribute("onchange", "ddl0101PayeeType_onchange(this)");
 
+                document.getElementById("ddl0101Payee").setAttribute("onchange", "");
+                $('#ddl0101Payee').val('').trigger('change');
+                document.getElementById("ddl0101Payee").setAttribute("onchange", "ddl0101Payee_onchange(this)");
                 ddl0101Payee(response[0].PayorCode, response[0].PayeeType);
                 
                 document.getElementById("tbx0101RefNo").value = response[0].RefNo;
@@ -451,13 +473,27 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("tbx0101DueDate").value = response[0].DueDate;
                 if (response[0].IsPickUp == "1") {
                     document.getElementById("cbx0101EditIsPickUp").checked = true;
+                    document.getElementById("cbx0101EditIsDeposit").checked = false;
+                    document.getElementById("spn0101BankName").classList.remove("required");
+                    document.getElementById("spn0101AcctName").classList.remove("required");
+                    document.getElementById("spn0101AcctNo").classList.remove("required");
                 } else {
                     document.getElementById("cbx0101EditIsPickUp").checked = false;
+                    document.getElementById("cbx0101EditIsDeposit").checked = false;
+                    document.getElementById("spn0101BankName").classList.remove("required");
+                    document.getElementById("spn0101AcctName").classList.remove("required");
+                    document.getElementById("spn0101AcctNo").classList.remove("required");
                 };
                 if (response[0].IsDeposit == "1") {
                     document.getElementById("cbx0101EditIsDeposit").checked = true;
+                    document.getElementById("spn0101BankName").classList.add("required");
+                    document.getElementById("spn0101AcctName").classList.add("required");
+                    document.getElementById("spn0101AcctNo").classList.add("required");
                 } else {
                     document.getElementById("cbx0101EditIsDeposit").checked = false;
+                    document.getElementById("spn0101BankName").classList.remove("required");
+                    document.getElementById("spn0101AcctName").classList.remove("required");
+                    document.getElementById("spn0101AcctNo").classList.remove("required");
                 };
                 document.getElementById("tbx0101BankName").value = response[0].BankName;
                 document.getElementById("tbx0101AcctName").value = response[0].AcctName;
@@ -679,27 +715,132 @@ function ddl0101Fund_onchange(ddl0101Fund) {
     $('#ddl0101Type').trigger('change');
 }
 
-
 function ddl0101PayeeType_onchange(ddl0101PayeeType) {
-    const PayeeValue = ddl0101PayeeType.value;
+   /* const PayeeValue = ddl0101PayeeType.value;*/
     ddl0101Payee('', ddl0101PayeeType.value);
+    //document.getElementById("cbx0101EditIsPickUp").checked = false;
+    //document.getElementById("cbx0101EditIsDeposit").checked = false;
+    //document.getElementById("tbx0101BankName").value = "-";
+    //document.getElementById("tbx0101AcctName").value = "-";
+    //document.getElementById("tbx0101AcctNo").value = "-";
+    //document.getElementById("tbx0101BankName").readOnly = true;
+    //document.getElementById("tbx0101AcctName").readOnly = true;
+    //document.getElementById("tbx0101AcctNo").readOnly = true;
 };
 
-function cbx0101EditIsDeposit_onchange(cbx0101EditIsDeposit) {
-    document.getElementById("tbx0101BankName").value = "-";
-    document.getElementById("tbx0101AcctName").value = "-";
-    document.getElementById("tbx0101AcctNo").value = "-";
+function ddl0101Payee_onchange(ddl0101Payee) {
+    const IsDeposit = document.getElementById("cbx0101EditIsDeposit").checked;
+    const ddl0101PayeeType = document.getElementById("ddl0101PayeeType").options[document.getElementById("ddl0101PayeeType").selectedIndex].value;
+    const ddl0101Payeevalue = ddl0101Payee.value
+    if (IsDeposit == true) {
+        if (ddl0101PayeeType === "Vendor" && ddl0101Payeevalue !== '') {
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/HNDFRM000016.ashx",
+                data: {
+                    'pFormCode': 'FRM000016',
+                    'pType': 'Get - Dropdown - List',
+                    'pTblName': 'GetRecord_AcctName',
+                    'pPlaceHolder': '',
+                    'pVal': ddl0101Payeevalue,
+                    'pVal2': ''
+                },
+                success: function (response) {
+                    if (response[0].ID === 'MN2012060001' || response[0].ID === 'MN2012080004' || response[0].ID === '') {
+                        document.getElementById("tbx0101AcctName").value = '-';
+                        document.getElementById("tbx0101AcctName").readOnly = false;
 
-    if (cbx0101EditIsDeposit.checked == true) {
-        document.getElementById("tbx0101BankName").readOnly = false;
-        document.getElementById("tbx0101AcctName").readOnly = false;
-        document.getElementById("tbx0101AcctNo").readOnly = false;
-  
+                    } else {
+                        document.getElementById("tbx0101AcctName").value = response[0].Name;
+                        document.getElementById("tbx0101AcctName").readOnly = true;
+                    }
+                    document.getElementById("tbx0101BankName").readOnly = false;
+                    document.getElementById("tbx0101AcctNo").readOnly = false;
+                },
+            });
+
+
+        } else {
+            document.getElementById("tbx0101AcctName").value = '-';
+            document.getElementById("tbx0101BankName").readOnly = false;
+            document.getElementById("tbx0101AcctName").readOnly = false;
+            document.getElementById("tbx0101AcctNo").readOnly = false;
+        }
 
     } else {
         document.getElementById("tbx0101BankName").readOnly = true;
         document.getElementById("tbx0101AcctName").readOnly = true;
         document.getElementById("tbx0101AcctNo").readOnly = true;
+    }
+   
+}
+
+function cbx0101EditIsPickUp_onchange(cbx0101EditIsPickUp) {
+    document.getElementById("cbx0101EditIsDeposit").checked = false;
+    document.getElementById("tbx0101BankName").value = "-";
+    document.getElementById("tbx0101AcctName").value = "-";
+    document.getElementById("tbx0101AcctNo").value = "-";
+    document.getElementById("tbx0101BankName").readOnly = true;
+    document.getElementById("tbx0101AcctName").readOnly = true;
+    document.getElementById("tbx0101AcctNo").readOnly = true;
+    document.getElementById("spn0101BankName").classList.remove("required");
+    document.getElementById("spn0101AcctName").classList.remove("required");
+    document.getElementById("spn0101AcctNo").classList.remove("required");
+
+};
+
+function cbx0101EditIsDeposit_onchange(cbx0101EditIsDeposit) {
+    document.getElementById("cbx0101EditIsPickUp").checked = false;
+    document.getElementById("tbx0101BankName").value = "-";
+    document.getElementById("tbx0101AcctName").value = "-";
+    document.getElementById("tbx0101AcctNo").value = "-";
+    const ddl0101PayeeType = document.getElementById("ddl0101PayeeType").options[document.getElementById("ddl0101PayeeType").selectedIndex].value;
+    const ddl0101Payee = document.getElementById("ddl0101Payee").options[document.getElementById("ddl0101Payee").selectedIndex].value;
+    if (cbx0101EditIsDeposit.checked == true) {
+        if (ddl0101PayeeType === "Vendor" && ddl0101Payee !== '') {
+            $.ajax({
+                type: "POST",
+                url: "Assets/Handler/FRM/HNDFRM000016.ashx",
+                data: {
+                    'pFormCode': 'FRM000016',
+                    'pType': 'Get - Dropdown - List',
+                    'pTblName': 'GetRecord_AcctName',
+                    'pPlaceHolder': '',
+                    'pVal': ddl0101Payee,
+                    'pVal2': ''
+                },
+                success: function (response) {
+                    if (response[0].ID === 'MN2012060001' || response[0].ID === 'MN2012080004' || response[0].ID === '') {
+                        document.getElementById("tbx0101AcctName").value = '-';
+                        document.getElementById("tbx0101AcctName").readOnly = false;
+
+                    } else {
+                        document.getElementById("tbx0101AcctName").value = response[0].Name;
+                        document.getElementById("tbx0101AcctName").readOnly = true;
+                    }
+                    document.getElementById("tbx0101BankName").readOnly = false;
+                    document.getElementById("tbx0101AcctNo").readOnly = false;
+                    document.getElementById("spn0101BankName").classList.add("required");
+                    document.getElementById("spn0101AcctName").classList.add("required");
+                    document.getElementById("spn0101AcctNo").classList.add("required");
+                },
+            });
+        } else {
+            document.getElementById("tbx0101AcctName").value = '-';
+            document.getElementById("tbx0101BankName").readOnly = false;
+            document.getElementById("tbx0101AcctName").readOnly = false;
+            document.getElementById("tbx0101AcctNo").readOnly = false;
+            document.getElementById("spn0101BankName").classList.add("required");
+            document.getElementById("spn0101AcctName").classList.add("required");
+            document.getElementById("spn0101AcctNo").classList.add("required");
+        }
+    } else {
+        document.getElementById("tbx0101BankName").readOnly = true;
+        document.getElementById("tbx0101AcctName").readOnly = true;
+        document.getElementById("tbx0101AcctNo").readOnly = true;
+        document.getElementById("spn0101BankName").classList.remove("required");
+        document.getElementById("spn0101AcctName").classList.remove("required");
+        document.getElementById("spn0101AcctNo").classList.remove("required");
     }
 
 };
@@ -713,6 +854,7 @@ function cbx0101EditWithEWT_onchange(cbx0101EditWithEWT) {
 
     if (cbx0101EditWithEWT.checked == true) {
         document.getElementById("tbx0101EWT").readOnly = false;
+
     } else {
         document.getElementById("tbx0101EWT").readOnly = true;
     }
@@ -2347,6 +2489,8 @@ function fn0401LoadApprover(pID) {
         },
     });
 };
+//Approver
+
 function fn0401AddApproval() {
     //if exisit
     fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
@@ -2380,6 +2524,7 @@ function fn0401AddApproval() {
 
     }
 }
+
 function ddl0401Approver(pfID, pType) {
     // if both are empty → show only blank option
     if ((!pfID || pfID === '') && (!pType || pType === '')) {
@@ -2409,6 +2554,7 @@ function ddl0401Approver(pfID, pType) {
     });
 };
 function ddl0401Template() {
+    
     $.ajax({
         type: "POST",
         url: "Assets/Handler/FRM/HNDFRM000016.ashx",
@@ -2462,6 +2608,7 @@ function ddl0401AddFrom_onchange(ddl0401AddFrom) {
 function ddl0401Type_onchange(ddl0401Type) {
     ddl0401Approver('FRM000016', ddl0401Type.value);
 }
+
 function fn0401AddApprover_OK(Btn) {
     fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
         if (response[0].oReturn == "1") {
@@ -2521,6 +2668,7 @@ function fn0401AddApprover_OK(Btn) {
         });
     }
 }
+
 function fn0401Delete(pSeqNo) {
     //if exisit
     fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
@@ -2586,6 +2734,7 @@ function fn0401Delete(pSeqNo) {
 
     };
 };
+
 function fn0401Up(pSeqNo) {
     //if exisit
     fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
@@ -2660,6 +2809,8 @@ function fn0401Down(pSeqNo) {
 
     };
 };
+//asset
+
 function fn0402UpdateR4D(pSeqNo) {
     //if exisit
     fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
@@ -2803,64 +2954,64 @@ function Add() {
     $('#mdl0302Notes').modal('show');
             };
         };
-function fn0302Add_Ok(Btn) {
-    //if exisit
-    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
-        if (response[0].oReturn == "1") {
-            Add_Ok();
-        } else {
-            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
-        };
-    });
-    //add
-    async function Add_Ok() {
-        // Disable the clicked button to avoid multiple clicks
-        Btn.disabled = true;
-    // Show loading indicator
-    Btn.setAttribute('data-kt-indicator', 'on');
-    // Simulate form submission
-    await fn0302Add_Ok_Await(Btn);
-            }
-        };
-function fn0302Add_Ok_Await(Btn) {
-        // process
-        return new Promise(resolve => {
-            //Validate
-            if (document.getElementById("tbx0302Note").value == "") {
-    fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+    function fn0302Add_Ok(Btn) {
+        //if exisit
+        fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+            if (response[0].oReturn == "1") {
+                Add_Ok();
             } else {
-    Add_Ok_Await();
-            }
-//add
-function Add_Ok_Await() {
-    // Do Billing
-    $.ajax({
-        type: "POST",
-        url: "HNDGEN.ashx",
-        data: {
-            'pFormCode': 'FRM000016',
-            'pType': 'Notes - Add',
-            'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
-            'pNotes': document.getElementById("tbx0302Note").value,
-            'pMention': document.getElementById("hdnMention").value,
-        },
-        success: function (response) {
-            //message
-            fnAlertOnly('Note successfully added.', 'success', 'btn btn-success');
-            document.getElementById("tbx0302Note").value = "";
-            document.getElementById("hdnMention").value = "";
-            fn01Load();
+                fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+            };
+        });
+        //add
+        async function Add_Ok() {
+            // Disable the clicked button to avoid multiple clicks
+            Btn.disabled = true;
+        // Show loading indicator
+        Btn.setAttribute('data-kt-indicator', 'on');
+        // Simulate form submission
+        await fn0302Add_Ok_Await(Btn);
+                }
+            };
+        function fn0302Add_Ok_Await(Btn) {
+                // process
+                return new Promise(resolve => {
+                    //Validate
+                    if (document.getElementById("tbx0302Note").value == "") {
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+                    } else {
+            Add_Ok_Await();
+                    }
+        //add
+        function Add_Ok_Await() {
+            // Do Billing
+            $.ajax({
+                type: "POST",
+                url: "HNDGEN.ashx",
+                data: {
+                    'pFormCode': 'FRM000016',
+                    'pType': 'Notes - Add',
+                    'pID': document.getElementById('ContentPlaceHolder1_hdnID').value,
+                    'pNotes': document.getElementById("tbx0302Note").value,
+                    'pMention': document.getElementById("hdnMention").value,
+                },
+                success: function (response) {
+                    //message
+                    fnAlertOnly('Note successfully added.', 'success', 'btn btn-success');
+                    document.getElementById("tbx0302Note").value = "";
+                    document.getElementById("hdnMention").value = "";
+                    fn01Load();
 
-        },
-    });
-};
-// Disable the clicked button to avoid multiple clicks
-Btn.disabled = false;
-// Hide loading indication
-Btn.removeAttribute('data-kt-indicator');
-//resolve
-resolve();
-});
+                },
+            });
+    };
+    // Disable the clicked button to avoid multiple clicks
+    Btn.disabled = false;
+    // Hide loading indication
+    Btn.removeAttribute('data-kt-indicator');
+    //resolve
+    resolve();
+   });
 };
 //notes
 
@@ -2934,6 +3085,8 @@ function fn0502AddSbuscriber() {
         ddl0501Subscriber();
     }
 }
+
+
 function ddl0501Subscriber() {
 
     $.ajax({
@@ -3001,6 +3154,7 @@ function fn0502AddSubscriber_OK(Btn) {
         });
     }
 }
+
 function fn0501Delete(pMonitorBy) {
     //if exisit
     fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {

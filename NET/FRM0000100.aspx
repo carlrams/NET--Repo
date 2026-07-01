@@ -70,7 +70,6 @@
 									<button id="btn0101Edit" class="btn btn-sm btn-icon btn-edit align-self-center m-1" title="Edit" onclick="fn0101Edit();return false;"><i id="i0101Edit" class="las la-pencil-alt fs-2"></i></button>
                                     <button id="btn0101Print" class="btn btn-sm btn-icon btn-tools align-self-center m-1" title="Print" onclick="fn0101Print();return false;"><i class="las la-print fs-2"></i></button>
 									<button id="btn0101ChangeStatus" class="btn btn-sm btn-secondary align-self-center m-1" title="Change Status" onclick="fn0101ChangeStatus();return false;">Change Status</button>
-								
 								</div>
 							</div>
                             <!--begin:: Details -->
@@ -365,6 +364,7 @@
 								<div class="d-flex flex-stack">
 									<div class="d-flex ms-5">
 										<button id="btn11Add" class="btn btn-sm btn-icon btn-add align-self-center m-1 p-5" title="Add Particular" onclick="fn11Add();return false;" style="display: none;"><i class="las la-plus fs-2"></i></button>
+                                        <button id="btn11AddReturn" class="btn btn-sm btn-icon btn-add align-self-center m-1 p-5" title="Add Return" onclick="fn11AddReturn();return false;" style="display: none;"><i class="las la-plus fs-2"></i></button>
                                         
 										<div id="div11SCM" title="(SCM - Estimate - Purchase Request)" class="menu menu-l-rounded menu-column menu-lg-row menu-title-gray-700 menu-state-icon-primary menu-state-bullet-primary align-items-stretch btn-sm btn-add align-self-center m-1" data-kt-menu="true" style="display: none;">
 											<div data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" class="menu-item menu-lg-down-accordion">
@@ -1319,7 +1319,101 @@
 				</div>
 			</div>
 		</div>
+        
+		<div id="mdl0102AddParticular" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+	        <div class="modal-dialog mw-650px">
+	            <div class="modal-content shadow-none">
+					<div class="modal-header">
+                        <h5 class="modal-title">Add Particular</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+				                <span class="svg-icon svg-icon-1">
+					                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+						                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+					                </svg>
+				                </span>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-body">
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px required">Particular</span>
+                            <input id="tbx0102AddParticular" class='form-control' placeholder="Add particular" type="text" value="" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px required">Qty</span>
+                            <input id="tbx0102AddQty" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px required">Unit</span>
+                            <input id="tbx0102AddUnit" class='form-control' placeholder="Add unit" type="text" value="" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Budget</span>
+                            <input id="tbx0102AddBudget" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" />
+                        </div>
 
+						<div class="card-header">
+							<div class="card-title fs-3 fw-bolder">For Purchaser / Implementer</div>
+						</div>
+
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Status</span>
+                            <select id="ddl0102AddStatus" data-kt-repeater="select2" data-dropdown-parent="#mdl0102Add" class="form-select form-select-sm form-select-border min-h-38px" disabled>
+                                <option value="">Select Status</option>
+                                <option value="Not in BOQ">Not in BOQ</option>
+                                <option value="Over">Over</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">For P.O.</span>
+                            <input id="tbx0102AddForPO" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" readonly="readonly" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">For S.R.</span>
+                            <input id="tbx0102AddForSR" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" readonly="readonly" />
+                        </div>
+                        
+						<div class="card-header">
+							<div class="card-title fs-3 fw-bolder">For Cash Purchase</div>
+						</div>
+                        
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Qty</span>
+                            <input id="tbx0102AddCPQty" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" readonly="readonly" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Cost</span>
+                            <input id="tbx0102AddCost" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" readonly="readonly" />
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px">Total</span>
+                            <input id="tbx0102AddTotal" class='form-control' onblur="FormatNumeric(this.id); fnComputeVal();" type="text" value="0.00" readonly="readonly" />
+                        </div>
+                        <div class="input-group input-group-sm mt-2">
+                            <span class="input-group-text min-w-150px">Remarks</span>
+                            <textarea id="tbx0102AddRemarks" class="form-control" placeholder="Add remarks" maxlength="1000" rows="3" cols="" readonly="readonly"></textarea>
+                        </div>
+					</div>
+                    <div class="modal-footer">
+                        <button id="btn0102Add" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0102Add_Ok(this); return false;">
+                            <span class="indicator-label">
+                                Save
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
+                         <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
+        
 		<div id="mdl0102Update" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
 	        <div class="modal-dialog mw-650px">
 	            <div class="modal-content shadow-none">
@@ -1468,7 +1562,54 @@
 				</div>
 			</div>
 		</div>
-
+        
+		<div id="mdl0101Return" class="modal fade" tabindex="-999" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+	        <div class="modal-dialog modal-fullscreen">
+	            <div class="modal-content shadow-none">
+					<div class="modal-header">
+                        <h5 class="modal-title">Add Particular - Return</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex flex-stack">
+                                <div class="position-relative me-1">
+                                    <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+				                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+					                        <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+					                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+				                        </svg>
+                                    </span>
+                                    <input id="tbx0101FindReturn" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" oninput="grid09Api.setGridOption('quickFilterText', document.getElementById('tbx0101FindReturn').value);" />
+                                </div>
+                            </div>
+                            <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+				                <span class="svg-icon svg-icon-1">
+					                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+						                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+					                </svg>
+				                </span>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-body">
+                        <div id="table0101Return" style="height: 100%; border: none;"></div>
+					</div>
+                    <div class="modal-footer">
+                        <button id="btn0102AddReturn" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0102AddReturn_Ok(this); return false;">
+                            <span class="indicator-label">
+                                Save
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
+                         <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+				</div>
+			</div>
+		</div>
+        
     </div>
     
 	<input id="hdnPrevID" runat="server" type="hidden" value="" />

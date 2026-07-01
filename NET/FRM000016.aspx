@@ -4,10 +4,9 @@
 
     <!--begin::Content-->
 	<div class="content flex-row-fluid" id="kt_content">
-		
+	
 		<!--begin::breadcrumb bar-->
-		<asp:UpdatePanel ID="upnlBreadcrumbbar" runat="server" UpdateMode="Conditional" class="toolbar py-5">
-		<ContentTemplate>
+		<div class="toolbar py-5">
 			<!--begin::Container-->
 			<div class="container-xxl d-flex flex-stack flex-wrap p-0">
 				<!--begin::Page title-->
@@ -26,7 +25,7 @@
 						</li>
 						<!--end::Item-->
 						<!--begin::Item-->
-						<li class="breadcrumb-item text-white">Petty Cash</li>
+						<li class="breadcrumb-item text-white">Petty Cash/Revolving Fund</li>
 						<!--end::Item-->
 					</ul>
 					<!--end::Breadcrumb-->
@@ -34,16 +33,13 @@
 				<!--end::Page title-->
 			</div>
 			<!--begin::Container-->
-			<asp:Button ID="lbtn02UploadSave" runat="server" Text="Button" OnClick="lbtn02UploadSave_Click" ClientIDMode="Static" style="display:none;"/>
-		</ContentTemplate>
-		</asp:UpdatePanel>
-		<!--begin::breadcrumb bar-->
+		</div>
+		<!--end::breadcrumb bar-->
 
 		<!--begin::title-->
 		<div class="card card-flush">
 			<!--begin::title-->
-			<asp:UpdatePanel ID="upnlTitle" runat="server" UpdateMode="Conditional" class="card-header pt-5 border-bottom-0">
-			<ContentTemplate>
+			<div class="card-header pt-5 border-bottom-0">
 				<div class="d-flex align-items-center">
 					<!--begin::Icon-->
 					<div class="symbol me-5">
@@ -52,36 +48,35 @@
 					<!--end::Icon-->
 					<!--begin::Title-->
 					<div class="d-flex flex-column">
-						<h2 class="mb-1"><asp:Label id="lblTitle" runat="server"></asp:Label></h2>
+						<h2 class="mb-1"><span id="spn0101Title">-</span></h2>
 						<div class="text-muted fw-bolder">
-							<asp:Label ID="lblID" runat="server"></asp:Label>
+							<span id="spn0101ID">-</span>
 							<span class="mx-3">|</span>
-							<asp:Label ID="lblStatus" runat="server"></asp:Label>
+							<span id="spn0101Status">-</span>
 						</div>
 					</div>
 					<!--end::Title-->
 				</div>
-			</ContentTemplate>
-			</asp:UpdatePanel>
+			</div>
 			<!--begin::title-->
 			<div class="card-body pt-3 pb-0">
 				<div class="d-flex flex-stack">
 					<!--begin::Navs-->
 					<div class="d-flex overflow-auto">
-						<ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold flex-nowrap">
+						<ul id="ul0101Nav" class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold flex-nowrap">
 							<!--begin::Nav item-->
 							<li class="nav-item m-0">
-								<a class="nav-link text-active-primary active" title="Overview" data-bs-toggle="tab" href="#Menu01_TabContent"><i class="las la-file-alt fs-3x"></i></a>
+								<a class="nav-link text-active-primary active" title="Overview" data-bs-toggle="tab" href="#tab0101Overview"><i class="las la-file-alt fs-3x"></i></a>
 							</li>
 							<!--end::Nav item-->
 							<!--begin::Nav item-->
 							<li class="nav-item m-0">
-								<a class="nav-link text-active-primary" title="Subscribers" data-bs-toggle="tab" href="#Menu03_TabContent"><i class="las la-user-friends fs-3x"></i></a>
+								<a class="nav-link text-active-primary" title="Subscribers" data-bs-toggle="tab" href="#tab0101Subscriber"><i class="las la-user-friends fs-3x"></i></a>
 							</li>
 							<!--end::Nav item-->
 							<!--begin::Nav item-->
 							<li class="nav-item m-0">
-								<a class="nav-link text-active-primary" title="History" data-bs-toggle="tab" href="#Menu06_TabContent"><i class="las la-history fs-3x"></i></a>
+								<a class="nav-link text-active-primary" title="History" data-bs-toggle="tab" href="#tab0101History"><i class="las la-history fs-3x"></i></a>
 							</li>
 							<!--end::Nav item-->
 						</ul>
@@ -90,13 +85,12 @@
 				</div>
 			</div>
 			<!--begin::Content-->
-			<div class="card" >
+			<div class="card">
 				<!--begin::Content-->
 				<div class="tab-content" >
-					<div class="tab-pane fade show active" id="Menu01_TabContent">
+					<div class="tab-pane fade show active" id="tab0101Overview">
 						<!--begin::Menu Content-->
-						<asp:UpdatePanel ID="upnl01Overview" runat="server" UpdateMode="Conditional">
-						<ContentTemplate>
+						<div class="card card-xl-stretch">
 							<!--begin::Card header-->
 							<div class="card-header">
 								<!--begin::Card header-->
@@ -106,281 +100,301 @@
 							<!--end::Card header-->
 							<!--begin::Card header-->
 							<div class="card-header">
-								<div class="d-flex">
-									<asp:LinkButton ID="lbtn01Find" runat="server" ToolTip="Find record" class="btn btn-sm btn-icon btn-info align-self-center m-1"><i class="las la-search fs-2"></i></asp:LinkButton>
-									<asp:LinkButton ID="lbtn01Refresh" runat="server" ToolTip="Refresh record" class="btn btn-sm btn-icon btn-info align-self-center m-1"><i class="las la-redo-alt fs-2"></i></asp:LinkButton>
-									<span class="pt-8"><i class="las la-ellipsis-v fs-2"></i></span>
-									<asp:LinkButton ID="lbtn01Add" runat="server" ToolTip="Add record" class="btn btn-sm btn-icon btn-success align-self-center m-1"><i class="las la-plus fs-2"></i></asp:LinkButton>
-									<asp:LinkButton ID="lbtn01Delete" runat="server" ToolTip="Delete record" class="btn btn-sm btn-icon btn-danger align-self-center m-1"><i class="las la-trash fs-2"></i></asp:LinkButton>
-									<asp:LinkButton ID="lbtn01Edit" runat="server" ToolTip="Edit record" class="btn btn-sm btn-icon btn-warning btn align-self-center m-1"><i class="las la-pencil-alt fs-2"></i></asp:LinkButton>
-									<span class="pt-8"><i class="las la-ellipsis-v fs-2"></i></span>
-									<asp:LinkButton ID="lbtn01Status" runat="server" ToolTip="Change Status" class="btn btn-sm btn-icon btn-secondary align-self-center m-1"><i class="las la-flag fs-2"></i></asp:LinkButton>
-									<asp:LinkButton ID="lbtn01Print" runat="server" ToolTip="Print" class="btn btn-sm btn-icon btn-secondary align-self-center m-1"><i class="las la-print fs-2"></i></asp:LinkButton>
+								<div class="d-flex flex-wrap">
+									<button id="btn0101Find" class="btn btn-sm btn-icon btn-view align-self-center m-1" title="Find" onclick="fn0101Find();return false;"><i class="las la-search fs-2"></i></button>
+									<button id="btn0101Refresh" class="btn btn-sm btn-icon btn-view align-self-center m-1" title="Refresh" onclick="fn0101Refresh();return false;"><i class="las la-redo-alt fs-2"></i></button>
+									<button id="btn0101Add" class="btn btn-sm btn-icon btn-add align-self-center m-1" title="Add" onclick="fn0101Add();return false;"><i class="las la-plus fs-2"></i></button>
+									<button id="btn0101Delete" class="btn btn-sm btn-icon btn-delete align-self-center m-1" title="Remove" onclick="fn0101Delete();return false;"><i class="las la-trash fs-2"></i></button>
+									<button id="btn0101Edit" class="btn btn-sm btn-icon btn-edit align-self-center m-1" title="Edit" onclick="fn0101Edit();return false;"><i id="i0101Edit" class="las la-pencil-alt fs-2"></i></button>
+									<button id="btn0101Print" class="btn btn-sm btn-icon btn-tools align-self-center m-1" title="Print" onclick="fn0101Print();return false;"><i class="las la-print fs-2"></i></button>
+									<button id="btn0101ChangeStatus" class="btn btn-sm btn-secondary align-self-center m-1" title="Change Status" onclick="fn0101ChangeStatus();return false;">Change Status</button>
+								
 								</div>
 							</div>
 							<!--end::Card header-->
-							<div class="card-body">
-								<!--begin::Edit-->
-								<asp:Panel ID="pnl01Edit" runat="server" Visible="false">
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">ID</span>
-										<asp:TextBox ID="tbx01ID" runat="server" class="form-control" ReadOnly="true"></asp:TextBox>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Type</span>
-										<asp:TextBox ID="tbx01FormType" runat="server" class="form-control" ReadOnly="true">Petty Cash</asp:TextBox>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Date Requested</span>
-										<asp:TextBox ID="tbx01DateRequested" runat="server" class="form-control" ReadOnly="true"></asp:TextBox>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px required">Date Required</span>
-										<input id="tbx01DateRequired" runat="server" type="text" data-kt-repeater="datepicker" class="form-control" readonly Placeholder="Pick a date" />
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Requested By</span>
-										<asp:TextBox ID="tbx01RequestedBy" runat="server" class="form-control" ReadOnly="true"></asp:TextBox>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Assigned To</span>
-										<asp:TextBox ID="tbx01AssignedTo" runat="server" class="form-control" ReadOnly="true"></asp:TextBox>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Endorsed To</span>
-										<asp:TextBox ID="tbx01EndorsedTo" runat="server" class="form-control" ReadOnly="true"></asp:TextBox>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Status</span>
-										<asp:TextBox ID="tbx01Status" runat="server" class="form-control" ReadOnly="true"></asp:TextBox>
-									</div>
-									<!--end::separator-->
-									<div class="separator separator-dashed my-6"></div>
-									<!--begin::separator-->
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px required">Type</span>
-										<asp:DropDownList ID="ddl01Type" runat="server" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-35px">
-											<asp:ListItem Value="">Select type</asp:ListItem>
-											<asp:ListItem Value="Cash Advance">Cash Advance</asp:ListItem>
-											<asp:ListItem Value="Cash Payment Only">Cash Payment Only</asp:ListItem>
-											<asp:ListItem Value="Cash Payment and Cash Liquidation">Cash Payment and Cash Liquidation</asp:ListItem>
-										</asp:DropDownList>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px required">Branch</span>
-										<asp:DropDownList ID="ddl01Branch" runat="server" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-											<asp:ListItem Value="">Select branch</asp:ListItem>
-										</asp:DropDownList>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px required">Fund</span>
-										<asp:DropDownList ID="ddl01Fund" runat="server" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-											<asp:ListItem Value="">Select fund</asp:ListItem>
-										</asp:DropDownList>
-										<asp:HiddenField ID="hf01Fund" runat="server" />
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px required">Department</span>
-										<asp:DropDownList ID="ddl01Department" runat="server" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-35px">
-											<asp:ListItem Value="">Select department</asp:ListItem>
-										</asp:DropDownList>
-									</div>
-									<asp:Panel ID="pnl01Payee" runat="server" Visible="false">
+							<!--begin::Dtl-->
+							<div id="div0101Detail" class="card-body">
+
+								<div class="row g-2">
+									<div class="col-sm-12 col-md-12 col-lg-12">
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">ID</span>
+				                            <span id="lbl0101ID" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Type</span>
+				                            <span id="lbl0101FormType" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Date Requested</span>
+				                            <span id="lbl0101DateRequested" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Date Required</span>
+				                            <span id="lbl0101DateRequired" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Requested By</span>
+				                            <span id="lbl0101Requestedby" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Assigned To</span>
+				                            <span id="lbl0101AssignedTo" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Endorsed To</span>
+				                            <span id="lbl0101EndorsedTo" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Status</span>
+				                            <span id="lbl0101Status" class="form-control">-</span>
+                                        </div>
+										<div class="separator separator-dashed my-6"></div>
+                                        
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Branch</span>
+				                            <span id="lbl0101Branch" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Fund</span>
+				                            <span id="lbl0101Fund" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Type</span>
+				                            <span id="lbl0101Type" class="form-control">-</span>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Department</span>
+				                            <span id="lbl0101Department" class="form-control">-</span>
+                                        </div>
+										
+                                        <div id="div0101DetailPayee" <%--style="display:none"--%>>  <%--style="display:none"--%>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">Payee Type</span>
+                                                <span id="lbl0101PayeeType" class="form-control">-</span>
+                                            </div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">Payee</span>
+                                                <span id="lbl0101Payee" class="form-control">-</span>
+                                            </div>
+                                        </div>
+                                        <div class="input-group input-group-sm mb-2">
+				                            <span class="input-group-text input-group-text-top min-w-150px">Reference No.</span>
+				                            <span id="lbl0101RefNo" class="form-control">-</span>
+                                        </div>
 										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">Payee Type</span>
-											<asp:DropDownList ID="ddl01PayeeType" runat="server" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-												<asp:ListItem Value="">Select payee type</asp:ListItem>
-												<asp:ListItem Value="Employee">Employee</asp:ListItem>
-												<asp:ListItem Value="Vendor">Vendor</asp:ListItem>
-											</asp:DropDownList>
+											<span class="input-group-text input-group-text-top min-w-150px">Remarks</span>
+                                             <textarea id="lbl0101Remarks" class="form-control min-h-75px" readonly="readonly">-</textarea>
 										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">Payee</span>
-											<asp:DropDownList ID="ddl01Payee" runat="server" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-												<asp:ListItem Value="">Select payor</asp:ListItem>
-											</asp:DropDownList>
-										</div>
-									</asp:Panel>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px required">Reference No.</span>
-										<asp:TextBox ID="tbx01RefNo" runat="server" class="form-control" Placeholder="Add reference number"></asp:TextBox>
+                                        <div id="div0101DetailPayment" <%--style="display:none"--%>>  <%--style="display:none"--%>
+                                            <div class="card-title fs-5 fw-bolder">Payment Details</div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">Due Date</span>
+                                                <span id="lbl0101DueDate" class="form-control">-</span>
+                                            </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px">For Pick-Up</span>
+											    <div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
+												    <input id="cbx0101IsPickUp" class="form-check-input" type="checkbox" value="" onclick="return false"/>
+											    </div>
+										    </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px">For Deposit</span>
+											    <div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
+												    <input id="cbx0101IsDeposit" class="form-check-input" type="checkbox" value="" onclick="return false"/>
+											    </div>
+										    </div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">Bank Name</span>
+                                                <span id="lbl0101Bankname" class="form-control">-</span>
+                                            </div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">Account Name</span>
+                                                <span id="lbl0101AcctName" class="form-control">-</span>
+                                            </div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">Account No.</span>
+                                                <span id="lbl0101AcctNo" class="form-control">-</span>
+                                            </div>
+                                        </div>
+                                        <div id="div0101DetailPaymentAdd" style="display:none">  <%--style="display:none"--%>
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px">With EWT</span>
+											    <div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
+												    <input id="cbx0101WithEWT" class="form-check-input" type="checkbox" value="" onclick="return false"/>
+											    </div>
+										    </div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">Gross Amount</span>
+                                                <span id="lbl0101GrossAmt" class="form-control">-</span>
+                                            </div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">EWT</span>
+                                                <span id="lbl0101EWT" class="form-control">-</span>
+                                            </div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px">Net Amount</span>
+                                                <span id="lbl0101NetAmt" class="form-control">-</span>
+                                            </div>
+
+                                        </div>
 									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text input-group-text-top min-w-150px required">Remarks</span>
-										<asp:TextBox ID="tbx01Remarks" runat="server" class="form-control min-h-75px" Placeholder="Add remarks" TextMode="MultiLine"></asp:TextBox>
-									</div>
-									<asp:Panel ID="pnl01EditPayment" runat="server" Visible="false">
-										<div class="card-title fs-5 fw-bolder">Payment Details</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">Due Date</span>
-											<input id="tbx01DueDate" runat="server" type="text" data-kt-repeater="datepicker" class="form-control" readonly Placeholder="Pick a date" />
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">For Pick-Up</span>
-											<div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
-												<input id="cbx0101IsPickUp" runat="server" class="form-check-input" type="checkbox" value=""/>
-											</div>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">For Deposit</span>
-											<div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
-												<input id="cbx0101IsDeposit" runat="server" class="form-check-input cbx0101IsDeposit" type="checkbox" value=""/>
-											</div>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">Bank Name</span>
-											<input id="tbx01BankName" runat="server" type="text" class="form-control" readonly Placeholder="Add bank name" value="-" />
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">Account Name</span>
-											<input id="tbx01AcctName" runat="server" type="text" class="form-control" readonly Placeholder="Add account name" value="-" />
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">Account No.</span>
-											<input id="tbx01AcctNo" runat="server" type="text" class="form-control" readonly Placeholder="Add account no." value="-" />
-										</div>
-									</asp:Panel>
-									<asp:Panel ID="pnl01EditPaymentAdd" runat="server" Visible="false">
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">With EWT</span>
-											<div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
-												<input id="cbx0101WithEWT" runat="server" class="form-check-input cbx0101WithEWT" type="checkbox" value=""/>
-											</div>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">Gross Amount</span>
-											<input id="tbx01GrossAmt" runat="server" type="text" class="form-control" readonly Placeholder="0.00" value="0.00" />
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">EWT</span>
-											<input id="tbx01EWT" runat="server" type="text" class="form-control" onblur="FormatEWT(this.id);" readonly Placeholder="0.00" value="0.00" />
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px required">Net Amount</span>
-											<input id="tbx01NetAmt" runat="server" type="text" class="form-control" readonly Placeholder="0.00" value="0.00" />
-										</div>
-									</asp:Panel>
-								</asp:Panel>
-								<!--end::Edit-->
-								<!--begin::Dtl-->
-								<asp:Panel ID="pnl01Dtl" runat="server" Visible="false">
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">ID</span>
-										<asp:Label ID="lbl01ID" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Type</span>
-										<asp:Label ID="lbl01FormType" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Date Requested</span>
-										<asp:Label ID="lbl01DateRequested" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Date Required</span>
-										<asp:Label ID="lbl01DateRequired" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Requested By</span>
-										<asp:Label ID="lbl01RequestedBy" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Assigned To</span>
-										<asp:Label ID="lbl01AssignedTo" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Endorsed To</span>
-										<asp:Label ID="lbl01EndorsedTo" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Status</span>
-										<asp:Label ID="lbl01Status" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<!--begin::Separator-->
-									<div class="separator separator-dashed my-6"></div>
-									<!--end::Separator-->
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Type</span>
-										<asp:Label ID="lbl01Type" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Branch</span>
-										<asp:Label ID="lbl01Branch" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Fund</span>
-										<asp:Label ID="lbl01Fund" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Department</span>
-										<asp:Label ID="lbl01Department" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text min-w-150px">Reference No.</span>
-										<asp:Label ID="lbl01RefNo" runat="server" class="form-control">-</asp:Label>
-									</div>
-									<div class="input-group input-group-sm mb-2">
-										<span class="input-group-text input-group-text-top min-w-150px">Remarks</span>
-										<asp:TextBox ID="lbl01Remarks" runat="server" class="form-control min-h-75px" TextMode="MultiLine" ReadOnly="true"></asp:TextBox>
-									</div>
-									<asp:Panel ID="pnl01DtlPayment" runat="server" Visible="false">
-										<div class="card-title fs-5 fw-bolder">Payment Details</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">Due Date</span>
-											<asp:Label ID="lbl01DueDate" runat="server" class="form-control">-</asp:Label>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">For Pick-Up</span>
-											<div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
-												<input id="cbx0102IsPickUp" runat="server" class="form-check-input" type="checkbox" value="" onclick="return false"/>
-											</div>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">For Deposit</span>
-											<div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
-												<input id="cbx0102IsDeposit" runat="server" class="form-check-input" type="checkbox" value="" onclick="return false"/>
-											</div>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">Bank Name</span>
-											<asp:Label ID="lbl01BankName" runat="server" class="form-control">-</asp:Label>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">Account Name</span>
-											<asp:Label ID="lbl01AcctName" runat="server" class="form-control">-</asp:Label>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">Account No.</span>
-											<asp:Label ID="lbl01AcctNo" runat="server" class="form-control">-</asp:Label>
-										</div>
-									</asp:Panel>
-									<asp:Panel ID="pnl01DtlPaymentAdd" runat="server" Visible="false">
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">With EWT</span>
-											<div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
-												<input id="cbx0102WithEWT" runat="server" class="form-check-input" type="checkbox" value="" onclick="return false"/>
-											</div>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">Gross Amount</span>
-											<asp:Label ID="lbl01GrossAmt" runat="server" class="form-control">-</asp:Label>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">EWT</span>
-											<asp:Label ID="lbl01EWT" runat="server" class="form-control">-</asp:Label>
-										</div>
-										<div class="input-group input-group-sm mb-2">
-											<span class="input-group-text min-w-150px">Net Amount</span>
-											<asp:Label ID="lbl01NetAmt" runat="server" class="form-control">-</asp:Label>
-										</div>
-									</asp:Panel>
-								</asp:Panel>
-								<!--end::Dtl-->
+                                </div>
 							</div>
-						</ContentTemplate>
-						</asp:UpdatePanel>
-						<asp:UpdatePanel ID="upnl06PCDtl" runat="server" UpdateMode="Conditional">
-						<ContentTemplate>
+							<div id="div0101Update" class="card-body" style="display:none">
+								<div class="row g-2">
+									<div class="col-sm-12 col-md-12 col-lg-12">
+                                        
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px">ID</span>
+                                            <input id="tbx0101ID" type="text" class="form-control" readonly="readonly"/>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px">Type</span>
+                                            <input id="tbx0101FormType" type="text" class="form-control" readonly="readonly"/>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px">Date Requested</span>
+                                            <input id="tbx0101DateRequested" type="text" class="form-control" readonly="readonly"/>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px required">Date Required</span>
+                                            <input id="tbx0101DateRequired" type="text" data-kt-repeater="datepicker" class="form-control" Placeholder="Pick a date" readonly="readonly"/>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px">Requested By</span>
+                                            <input id="tbx0101Requestedby" type="text" class="form-control" readonly="readonly"/>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px">Assigned To</span>
+                                            <input id="tbx0101AssignedTo" type="text" class="form-control" readonly="readonly"/>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px">Endorsed To</span>
+                                            <input id="tbx0101EndorsedTo" type="text" class="form-control" readonly="readonly"/>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px">Status</span>
+                                            <input id="tbx0101Status" type="text" class="form-control" readonly="readonly"/>
+										</div>
+                                        <div class="separator separator-dashed my-6"></div>
+                                        
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px required">Branch</span>
+							                 <select id="ddl0101Branch" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                                 <option value="">Select branch</option>
+                                             </select>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px required">Fund</span>
+							                 <select id="ddl0101Fund" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px" onchange="ddl0101Fund_onchange(this)">
+                                                 <option value="">Select fund</option>
+                                             </select>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px required">Type</span>
+							                 <select id="ddl0101Type" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                                 <option value="">Select type</option>
+                                                 <option value="Cash Advance">Cash Advance</option>
+                                                 <option value="Cash Liquidation">Cash Liquidation</option>
+                                                 <option value="Cash Payment">Cash Payment</option>
+                                                 <option value="Cash Payment and Cash Liquidation">Cash Payment and Cash Liquidation</option>
+                                                 <option value="Cash Payment Only">Cash Payment Only</option>
+                                             </select>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px required">Department</span>
+							                 <select id="ddl0101Department" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                                 <option value="">Select department</option>
+                                             </select>
+										</div>
+                                        
+                                        <div id="div0101Payee" style="display:none"> 
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px required">Payee Type</span>
+							                     <select id="ddl0101PayeeType" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                                     <option value="">Select payee type</option>
+                                                     <option value="Employee">Employee</option>
+                                                     <option value="Vendor">Vendor</option>
+                                                 </select>
+										    </div>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <span class="input-group-text input-group-text-top min-w-150px required">Payee</span>
+							                     <select id="ddl0101Payee" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                                     <option value="">Select payee</option>
+                                                 </select>
+                                            </div>
+                                        </div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text min-w-150px required">Reference No.</span>
+                                            <input id="tbx0101RefNo" type="text" class="form-control" Placeholder="Add reference number" maxlength="13"/>
+										</div>
+										<div class="input-group input-group-sm mb-2">
+											<span class="input-group-text input-group-text-top min-w-150px required">Remarks</span>
+                                               <textarea id="tbx0101Remarks" class="form-control min-h-75px" Placeholder="Add remarks" maxlength="1000"></textarea>
+										</div>
+									      <div id="div0101EditPayment"<%-- style="display:none"--%>>
+										    <div class="card-title fs-5 fw-bolder">Payment Details</div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px required">Due Date</span>
+											    <input id="tbx0101DueDate" type="text" data-kt-repeater="datepicker" class="form-control" readonly="readonly" Placeholder="Pick a date" />
+										    </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px required">For Pick-Up</span>
+											    <div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
+												    <input id="cbx0101EditIsPickUp" class="form-check-input" type="checkbox" onchange="cbx0101EditIsPickUp_onchange(this)" value=""/>
+											    </div>
+										    </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px required">For Deposit</span>
+											    <div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
+												    <input id="cbx0101EditIsDeposit" class="form-check-input" type="checkbox" onchange="cbx0101EditIsDeposit_onchange(this)" value=""/>
+											    </div>
+										    </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span id="spn0101BankName" class="input-group-text min-w-150px required">Bank Name</span>
+											    <input id="tbx0101BankName" type="text" class="form-control" readonly="readonly" Placeholder="Add bank name" value="-" maxlength="180"/>
+										    </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span id="spn0101AcctName" class="input-group-text min-w-150px required">Account Name</span>
+											    <input id="tbx0101AcctName" type="text" class="form-control" readonly="readonly" Placeholder="Add account name" value="-" maxlength="180"/>
+										    </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span id="spn0101AcctNo" class="input-group-text min-w-150px required">Account No.</span>
+											    <input id="tbx0101AcctNo" type="text" class="form-control" readonly="readonly" Placeholder="Add account no." value="-" maxlength="180"/>
+										    </div>
+									    </div>
+                                        <div id="div0101EditPaymentAdd" style="display:none">
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px required">With EWT</span>
+											    <div class="form-control form-control-sm form-check form-check-custom form-check-solid form-check-sm" style="padding-left:5px">
+												    <input id="cbx0101EditWithEWT" class="form-check-input cbx0101EditWithEWT" type="checkbox" onchange="cbx0101EditWithEWT_onchange(this)" value=""/>
+											    </div>
+										    </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px required">Gross Amount</span>
+											    <input id="tbx0101GrossAmt" type="text" class="form-control" readonly Placeholder="0.00" value="0.00" maxlength="21" />
+										    </div>
+										    <div class="input-group input-group-sm mb-2">
+											    <span class="input-group-text min-w-150px required">EWT</span>
+											    <input id="tbx0101EWT" type="text" class="form-control" onblur="FormatEWT(this.id);" readonly Placeholder="0.00" value="0.00" maxlength="21" />
+										    </div>
+										    <div class="input-group input-group-sm mb-">
+											    <span class="input-group-text min-w-150px required">Net Amount</span>
+											    <input id="tbx0101NetAmt" type="text" class="form-control" readonly Placeholder="0.00" value="0.00" maxlength="21" />
+										    </div>
+									    </div>
+									</div>
+								</div>
+							</div>
+                                
+                                          
+							<!--end::Dtl-->
+						</div>
+						<!--end::Menu Content-->
+
+						<!--begin::movement-->
+						<div class="card card-xl-stretch">
 							<!--begin::Card header-->
 							<div class="card-header">
 								<!--begin::Card header-->
@@ -388,167 +402,131 @@
 								<!--end::Card header-->
 							</div>
 							<!--end::Card header-->
+                            <!--begin::Card header-->
+                            <div class="card-header">
+                                <div class="d-flex align-items-center">
+                                    <button id="btn0102Add" class="btn btn-sm btn-icon btn-add align-self-center m-1" title="Add" onclick="fn0102Add();return false;"><i class="las la-plus fs-2"></i></button>
+									<button id="btn0102Upload" class="btn btn-sm btn-icon btn-add align-self-center m-1" title="Upload" onclick="fn0102Upload();return false;"><i class="las la-cloud-upload-alt fs-2"></i></button>
+                                </div>
+                                <div class="card-toolbar">
+                                    <div class="d-flex flex-stack">
+                                        <!--begin::Search-->
+                                        <div class="position-relative me-2">
+                                            <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                                            <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                    <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+                                                    <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+                                                </svg>
+                                            </span>
+                                            <!--end::Svg Icon-->
+                                            <input id="tbx0102FindMovement" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-10" placeholder="Search" />
+                                        </div>
+                                        <!--end::Search-->
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Card header-->
+							<!--begin::Files-->
+							<div class="card-body">
+								<div class="table-loading">
+									<div id="div0102LoaderMovement" class="table-loading-message">
+										Loading...
+									</div>
+									<table id="table0102Movement" class="table table-row-bordered border rounded gy-2 gs-2 w-100 align-middle">
+										<thead>
+											<tr class="fw-bold fs-7 text-gray-800">
+												<th class="min-w-50px mw-50px fw-bold border-end" style="padding-left:15px"><span title="Action"><i class='las la-bars fs-3'></i></span></th>
+                                                <th class="min-w-200px mw-200px fw-bold border-end">Particular</th>
+                                                <th class="min-w-75px mw-75px fw-bold border-end">Qty.</th>
+                                                <th class="min-w-75px mw-75px fw-bold text-truncate border-end">Unit</th>
+                                                <th class="min-w-125px mw-125px fw-bold border-end">Amount</th>
+                                                <th class="min-w-125px mw-125px fw-bold border-end">Division</th>
+                                                <th class="min-w-125px mw-125px fw-bold border-end">Expense Type</th>
+                                                <th class="min-w-100px mw-100px fw-bold border-end">Subsidiary</th>
+                                                <th class="min-w-150px mw-100px fw-bold border-end"></th>
+											</tr>
+										</thead>
+										<tbody>
+										</tbody>
+                                         <tfoot>
+                                             <tr>
+                                                 <th></th>
+                                                 <th></th>
+                                                 <th></th>
+                                                 <th></th>
+                                                 <th class="text-end"></th>
+                                             </tr>
+                                             
+                                         </tfoot>
+									</table>
+								</div>
+							</div>
+							<!--end::Files-->
+						</div>
+						<!--end::movement-->
+
+						<!--begin::attachment-->
+						<div class="card card-xl-stretch">
 							<!--begin::Card header-->
 							<div class="card-header">
-								<div class="d-flex">
-									<asp:LinkButton ID="lbtn06PCDtlAdd" runat="server" ToolTip="Add particular" class="btn btn-sm btn-icon btn-success align-self-center m-1"><i class="las la-plus fs-2"></i></asp:LinkButton>
-								</div>
+								<!--begin::Card header-->
+								<div class="card-title fs-3 fw-bolder">Attachment</div>
+								<!--end::Card header-->
 							</div>
 							<!--end::Card header-->
-							<div class="card-body">
-								<!--begin::Transaction Log Details-->
-								<div class="table-responsive">
-									<asp:GridView ID="gv06PCDtl" runat="server" class="table table-no-border table-row-bordered table-hover align-middle" AutoGenerateColumns="False" ShowFooter="true">
-									<Columns>
-										<asp:TemplateField>
-											<ItemTemplate>
-												<span class="bullet bullet-margin bullet-vertical h-58px bg-secondary"></span>
-											</ItemTemplate>
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Action">
-											<ItemTemplate>
-												<div class="d-flex align-items-center">
-													<asp:LinkButton ID="lbtn06PCDtlDel" runat="server" class="btn btn-sm btn-icon btn-active-success mr-5" CommandArgument='<%# Bind("SeqNo") %>' ToolTip="Remove particular" OnClick="lbtn06PCDtlDel" ><i class="las la-trash fs-3"></i></asp:LinkButton>
-													<asp:LinkButton ID="lbtn06PCDtlUpd" runat="server" class="btn btn-sm btn-icon btn-active-success" CommandArgument='<%# Bind("SeqNo") %>' ToolTip="Update particular" OnClick="lbtn06PCDtlUpd"><i class="las la-pencil-alt fs-3"></i></asp:LinkButton>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark" />
-											<ItemStyle CssClass="align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Particular">
-											<ItemTemplate>
-												<div class="min-w-250px mw-250px">
-													<span><%# Eval("Item") %></span>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-250px mw-250px" />
-											<ItemStyle CssClass="align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Qty.">
-											<ItemTemplate>
-												<%# Eval("Qty") %>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-100px" />
-											<ItemStyle CssClass="align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Unit">
-											<ItemTemplate>
-												<%# Eval("Unit") %>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-100px" />
-											<ItemStyle CssClass="align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Amount">
-											<ItemTemplate>
-												<%# Eval("Amount") %>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-100px" />
-											<ItemStyle CssClass="align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Division">
-											<ItemTemplate>
-												<%# Eval("Division") %>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-150px" />
-											<ItemStyle CssClass="nowrap-auto align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Expense Type">
-											<ItemTemplate>
-												<div class="min-w-250px mw-250px">
-													<span class=" nowrap-240px"><%# Eval("Expense") %></span>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-250px mw-250px" />
-											<ItemStyle CssClass="align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Subsidiary">
-											<ItemTemplate>
-												<div class="min-w-250px mw-250px">
-													<span class=" nowrap-240px"><%# Eval("Code") %></span>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-250px mw-250px" />
-											<ItemStyle CssClass="align-middle" />
-										</asp:TemplateField>
-									</Columns>
-									</asp:GridView>
-								</div>
-								<!--end::Transaction Log Details-->
+							<!--begin::Card header-->
+							<div class="card-header">
+                                <div class="d-flex align-items-center">
+				                    <button id="btn0201Add" class="btn btn-sm btn-icon btn-add align-self-center m-1" title="Upload" onclick="return false;"><i class="las la-upload fs-2"></i></button>
+                                </div>
+                                <div class="card-toolbar">
+                                    <div class="d-flex flex-stack">
+                                        <!--begin::Search-->
+                                        <div class="position-relative me-2">
+                                            <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                                            <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                    <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+                                                    <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+                                                </svg>
+                                            </span>
+                                            <!--end::Svg Icon-->
+                                            <input id="tbx0201FindAttachment" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-10" placeholder="Search" />
+                                        </div>
+                                        <!--end::Search-->
+                                    </div>
+                                </div>
 							</div>
-						</ContentTemplate>
-						</asp:UpdatePanel>
-						<!--end::Menu Content-->
+							<!--end::Card header-->
+							<!--begin::Dtl-->
+							<div class="card-body table-loading table-responsive">
+								<div id="div0201LoaderAttachment" class="table-loading-message">
+									Loading...
+								</div>
+								<table id="table0201Attachment" class="table table-row-bordered border rounded gy-2 gs-2 w-100 align-middle">
+									<thead>
+										<tr class="fw-bold fs-7 text-gray-800">
+											<th class="min-w-50px mw-50px fw-bold border-end" style="padding-left:15px"><span title="Action"><i class='las la-bars fs-3'></i></span></th>
+											<th class="min-w-50px mw-50px fw-bold border-end">Type</th>
+											<th class="min-w-200px w-100 fw-bold">Name</th>
+											<th class="min-w-200px mw-200px fw-bold">By</th>
+											<th class="min-w-200px mw-200px fw-bold">Date</th>
+										</tr>
+									</thead>
+									<tbody>
+                                       
 
-						<!--begin::Menu Content-->
-						<asp:UpdatePanel ID="upnl02Files" runat="server" UpdateMode="Conditional" class="card card-xl-stretch">
-						<ContentTemplate>
-							<div class="card card-xl-stretch">
-								<!--begin::Card header-->
-								<div class="card-header">
-									<!--begin::Card header-->
-									<div class="card-title fs-3 fw-bolder">Attachment</div>
-									<!--end::Card header-->
-								</div>
-								<!--end::Card header-->
-								<!--begin::Card header-->
-								<div class="card-header">
-									<div class="d-flex">
-										<asp:LinkButton ID="lbtn02Upload" runat="server" ToolTip="Upload file" class="btn btn-sm btn-icon btn-success align-self-center m-1"><i class="las la-upload fs-2"></i></asp:LinkButton>
-									</div>
-								</div>
-								<!--end::Card header-->
-								<div class="card-body">
-									<!--begin::Files-->
-									<div class="table-responsive">
-										<asp:GridView ID="gv02Files" runat="server" class="table table-no-border table-row-bordered table-hover align-middle" AutoGenerateColumns="False">
-										<Columns>
-											<asp:TemplateField>
-												<ItemTemplate>
-													<span class="bullet bullet-margin bullet-vertical h-58px bg-secondary"></span>
-												</ItemTemplate>
-											</asp:TemplateField>
-											<asp:TemplateField HeaderText="Action">
-												<ItemTemplate>
-													<div class="d-flex ">
-														<asp:LinkButton ID="lbtn02Delete" runat="server" class="btn btn-sm btn-icon btn-active-success mr-5" CommandArgument='<%# Bind("Name") %>' ToolTip="Remove file" OnClick="lbtn02Delete"><i class="las la-trash fs-3"></i></asp:LinkButton>
-														<asp:LinkButton ID="lbtn02Download" runat="server" class="btn btn-sm btn-icon btn-active-success" CommandArgument='<%# Bind("Name") %>' ToolTip="Download file" OnClick="lbtn02Download"><i class="las la-download fs-3"></i></asp:LinkButton>
-													</div>
-												</ItemTemplate>
-												<HeaderStyle CssClass="fw-bold fs-6 text-dark" />
-												<ItemStyle CssClass=" align-middle" />
-											</asp:TemplateField>
-											<asp:TemplateField HeaderText="File">
-												<ItemTemplate>
-													<div class="d-flex align-items-center">
-														<!--begin:: Avatar -->
-														<div class="symbol symbol-30px overflow-hidden me-3">
-															<span class="w-100"><%# Eval("Icon") %></span>
-														</div>
-														<!--end::Avatar-->
-														<!--begin::User details-->
-														<div class="d-flex flex-column">
-															<span class="fw-bold text-dark"><%# Eval("Name") %></span>
-															<span class="text-muted"><%# Eval("CreationTime") %></span>
-														</div>
-														<!--begin::User details-->
-													</div>
-												</ItemTemplate>
-												<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-300px w-100" />
-												<ItemStyle CssClass="align-middle" />
-											</asp:TemplateField>
-										</Columns>
-										</asp:GridView>
-									</div>
-									<!--end::Files-->
-								</div>
+									</tbody>
+                                   
+								</table>
 							</div>
-						</ContentTemplate>
-						</asp:UpdatePanel>
-						<!--end::Menu Content-->
+							<!--end::Dtl-->
+						</div>
+						<!--begin::attachment-->
 
-						<!--begin::Menu Content-->
-						<asp:UpdatePanel ID="upnl04ApprovalPath" runat="server" UpdateMode="Conditional" class="card card-xl-stretch">
-						<ContentTemplate>
+						<!--begin::approver-->
+						<div class="card card-xl-stretch">
 							<!--begin::Card header-->
 							<div class="card-header">
 								<!--begin::Card header-->
@@ -558,112 +536,38 @@
 							<!--end::Card header-->
 							<!--begin::Card header-->
 							<div class="card-header">
-								<div class="d-flex">
-									<asp:LinkButton ID="lbtn04Add" runat="server" ToolTip="Add approver" class="btn btn-sm btn-icon btn-success align-self-center m-1"><i class="las la-user-plus fs-2"></i></asp:LinkButton>
-								</div>
+                                <div class="d-flex align-items-center">
+				                    <button id="btn0401Add" class="btn btn-sm btn-icon btn-add align-self-center m-1" title="Upload" onclick="fn0401AddApproval();return false;"><i class="las la-user-plus fs-2"></i></button>
+                                </div>
 							</div>
 							<!--end::Card header-->
-							<div class="card-body">
-								<!--begin::ID-->
-								<div class="table-responsive">
-									<asp:GridView ID="gv04ApprovalPath" runat="server" class="table table-no-border table-row-bordered table-hover align-middle" AutoGenerateColumns="False">
-									<Columns>
-										<asp:TemplateField>
-											<ItemTemplate>
-												<span class='<%# Eval("Bullet") %>'></span>
-											</ItemTemplate>
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Action">
-											<ItemTemplate>
-												<div class="d-flex ">
-													<asp:LinkButton ID="lbtn04Delete" runat="server" class="btn btn-sm btn-icon btn-active-success mr-5" CommandArgument='<%# Bind("SeqNo") %>' OnClick="lbtn04Delete" ToolTip="Remove user"><i class="las la-trash fs-3"></i></asp:LinkButton>
-													<asp:LinkButton ID="lbtn04Update" runat="server" class="btn btn-sm btn-icon btn-active-success" CommandArgument='<%# Bind("SeqNo") %>' OnClick="lbtn04Update" ToolTip="Update reason for delay"><i class="las la-pencil-alt fs-3"></i></asp:LinkButton>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark" />
-											<ItemStyle CssClass=" align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Move">
-											<ItemTemplate>
-												<div class="d-flex align-items-center">
-													<asp:LinkButton ID="lbtn04Up" runat="server" CssClass="btn btn-sm btn-icon btn-active-success mr-5" CommandArgument='<%# Bind("SeqNo") %>' OnClick="lbtn04up" ToolTip="Move user up"><i class="las la-angle-up"></i></asp:LinkButton>
-													<asp:LinkButton ID="lbtn04Down" runat="server" CssClass="btn btn-sm btn-icon btn-active-success" CommandArgument='<%# Bind("SeqNo") %>' OnClick="lbtn04Down" ToolTip="Move user down"><i class="las la-angle-down"></i></asp:LinkButton>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark" />
-											<ItemStyle CssClass=" align-middle " />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Type">
-											<ItemTemplate>
-												<%# Eval("Type") %>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-100px mw-100px" />
-											<ItemStyle CssClass=" align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="User">
-											<ItemTemplate>
-												<div class="d-flex align-items-center">
-													<!--begin:: Avatar -->
-													<div class="symbol symbol-30px overflow-hidden me-3">
-														<div class="symbol-label">
-															<img alt="" class="w-100" src="<%# Eval("Icon") %>" />
-														</div>
-													</div>
-													<!--end::Avatar-->
-													<!--begin::User details-->
-													<div class="d-flex flex-column">
-														<span class="fw-bold text-dark nowrap-240px"><%# Eval("ApprName") %></span>
-														<span class="text-muted nowrap-240px"><%# Eval("ApprJob") %></span>
-													</div>
-													<!--begin::User details-->
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-250px mw-250px" />
-											<ItemStyle CssClass=" align-middle " />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Status">
-											<ItemTemplate>
-												<div class="d-flex align-items-center">
-													<div class="d-flex flex-column">
-														<span class="fw-bold text-dark"><%# Eval("ApprStatus") %></span>
-														<span class="text-muted"><%# Eval("ApprDate") %></span>
-													</div>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-100px mw-100px" />
-											<ItemStyle CssClass=" align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Turn around time">
-											<ItemTemplate>
-												<div class="d-flex align-items-center">
-													<div class="d-flex flex-column">
-														<span class="fw-bold text-dark nowrap-240px"><%# Eval("Coverage") %></span>
-														<span class="text-muted nowrap-240px"><%# Eval("Duration") %> Day(s)</span>
-													</div>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-100px mw-100px" />
-											<ItemStyle CssClass=" align-middle" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Reason for delay">
-											<ItemTemplate>
-												<%# Eval("Reason") %>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-200px w-100" />
-											<ItemStyle CssClass=" align-middle" />
-										</asp:TemplateField>
-									</Columns>
-									</asp:GridView>
+							<!--begin::Dtl-->
+							<div class="card-body table-loading table-responsive">
+								<div id="div0401LoaderApprover" class="table-loading-message">
+									Loading...
 								</div>
-								<!--end::ID-->
+                                <table id="table0401Approver" class="table  table-row-bordered border table-hover rounded g-2 w-100 align-middle">
+                                    <thead class="fw-bold">
+                                        <tr class="fw-bold fs-7 text-gray-800">
+                                            <th class="mw-5px min-w-5px" style="color: transparent; font-size: 0; padding: 0;">Bullet</th>
+                                            <th class="min-w-50px mw-50px border-end" style="padding-left: 15px"><span title="Action"><i class='las la-bars fs-3'></i></span></th>
+                                            <th class="min-w-150px mw-150px border-end">Type</th>
+                                            <th class="min-w-300px w-100 border-end">User</th>
+                                            <th class="min-w-150px mw-150px border-end">Status</th>
+                                            <th class="min-w-150px mw-150px border-end">Turn Around Time</th>
+                                            <th class="min-w-300px mw-300px">Reason for delay</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
 							</div>
-						</ContentTemplate>
-						</asp:UpdatePanel>
-						<!--end::Menu Content-->
-						
-						<!--begin::Menu Content-->
-						<asp:UpdatePanel ID="upnl05Notes" runat="server" UpdateMode="Conditional" class="card card-xl-stretch">
-						<ContentTemplate>
+							<!--end::Dtl-->
+						</div>
+						<!--end::approver-->
+
+						<!--begin::notes-->
+						<div class="card card-xl-stretch">
 							<!--begin::Card header-->
 							<div class="card-header">
 								<!--begin::Card header-->
@@ -673,262 +577,190 @@
 							<!--end::Card header-->
 							<!--begin::Card header-->
 							<div class="card-header">
-								<div class="d-flex">
-									<asp:LinkButton ID="lbtn05Add" runat="server" ToolTip="Add note" class="btn btn-sm btn-icon btn-success align-self-center m-1"><i class="las la-comment fs-2"></i></asp:LinkButton>
-								</div>
+								<div class="d-flex align-items-center">
+									<button id="btn0301Add" class="btn btn-sm btn-icon btn-add align-self-center m-1" title="Add" onclick="fn0301Add();return false;"><i class="las la-comment fs-2"></i></button>
+                                </div>
+                                <div class="card-toolbar">
+                                    <div class="d-flex flex-stack">
+                                        <!--begin::Search-->
+                                        <div class="position-relative me-2">
+				                            <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+				                            <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+					                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+						                            <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+						                            <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+					                            </svg>
+				                            </span>
+				                            <!--end::Svg Icon-->
+				                            <input id="tbx0301FindNotes" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-10" placeholder="Search" />
+                                        </div>
+                                        <!--end::Search-->
+                                    </div>
+                                </div>
 							</div>
 							<!--end::Card header-->
+							<!--begin::Dtl-->
 							<div class="card-body">
-								<div class="table-responsive">
-									<asp:GridView ID="gv05Notes" runat="server" class="table table-no-border" AutoGenerateColumns="False" ShowHeader="False">
-									<Columns>
-										<asp:TemplateField>
-											<ItemTemplate>
-												<div class="d-flex align-items-center mb-5">
-													<!--begin:: Avatar -->
-													<div class="symbol symbol-30px overflow-hidden me-3">
-														<div class="symbol-label">
-															<img alt="" class="w-100" src="<%# Eval("Icon") %>" />
-														</div>
-													</div>
-													<!--end::Avatar-->
-													<!--begin::User details-->
-													<div class="d-flex flex-column">
-														<span class="fw-bold text-dark"><%# Eval("By") %></span>
-														<span class="text-muted"><%# Eval("Date") %></span>
-													</div>
-													<!--begin::User details-->
-												</div>
-												<!--begin::Desc-->
-												<p class="text-dark"><%# Eval("Notes") %></p>
-												<!--end::Desc-->
-											</ItemTemplate>
-										</asp:TemplateField>
-									</Columns>
-									</asp:GridView>
+								<div class="table-loading">
+									<div id="div0301LoaderNotes" class="table-loading-message">
+										Loading...
+									</div>
+									<table id="table0301Notes" class="table gy-2 gs-2 w-100 align-middle">
+										<thead style="display:none">
+											<tr class="fw-bold fs-7 text-gray-800">
+												<th class="min-w-100px w-100">Notes</th>
+											</tr>
+										</thead>
+										<tbody>
+
+										</tbody>
+									</table>
 								</div>
-								<!--end::ID-->
 							</div>
-						</ContentTemplate>
-						</asp:UpdatePanel>
-						<!--end::Menu Content-->
+							<!--end::Dtl-->
+						</div>
+						<!--end::notes-->
+
 					</div>
-					<div class="tab-pane fade" id="Menu03_TabContent">
-						<!--begin::Menu Content-->
-						<asp:UpdatePanel ID="upnl03Subscribers" runat="server" UpdateMode="Conditional" class="card card-xl-stretch">
-						<ContentTemplate>
-							<!--begin::Card header-->
-							<div class="card-header">
-								<!--begin::Card header-->
-								<div class="card-title fs-3 fw-bolder">Subscribers</div>
-								<!--end::Card header-->
-							</div>
-							<!--end::Card header-->
-							<!--begin::Card header-->
-							<div class="card-header">
-								<div class="d-flex">
-									<asp:LinkButton ID="lbtn03Add" runat="server" ToolTip="Add record" class="btn btn-sm btn-icon btn-success align-self-center m-1"><i class="las la-user-plus fs-2"></i></asp:LinkButton>
+                    <div class="tab-pane fade" id="tab0101Subscriber">
+                        <!--begin:: Subscriber -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title fs-3 fw-bolder">Subscribers</div>
+                            </div>
+                            <div class="border-bottom border-gray-200 px-4 py-3">
+                                <div class="d-flex flex-stack">
+                                    <div class="d-flex ms-5">
+                                        <button id="btn03010101Add" class="btn btn-sm btn-icon btn-add align-self-center m-1" title="Upload" onclick="fn0502AddSbuscriber();return false;"><i class="las la-user-plus fs-2"></i></button>
+                                    </div>
+                                    <div class="position-relative me-5">
+                                        <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+                                                <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+                                            </svg>
+                                        </span>
+                                        <input id="tbx03010101Find" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-10" placeholder="Search" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+								<div id="div0501LoaderSubscriber" class="table-loading-message">
+									Loading...
 								</div>
-							</div>
-							<!--end::Card header-->
-							<div class="card-body">
-								<!--begin::ID-->
-								<div class="table-responsive">
-									<asp:GridView ID="gv03Subscribers" runat="server" class="table table-no-border table-row-bordered table-hover align-middle" AutoGenerateColumns="False">
-									<Columns>
-										<asp:TemplateField>
-											<ItemTemplate>
-												<span class="bullet bullet-margin bullet-vertical h-58px bg-secondary"></span>
-											</ItemTemplate>
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="Action">
-											<ItemTemplate>
-												<div class="d-flex">
-													<asp:LinkButton ID="lbtn03Delete" runat="server" class="btn btn-sm btn-icon btn-active-success" CommandArgument='<%# Bind("Code") %>' OnClick="lbtn03Delete"><i class="las la-trash fs-3"></i></asp:LinkButton>
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark" />
-										</asp:TemplateField>
-										<asp:TemplateField HeaderText="User">
-											<ItemTemplate>
-												<div class="d-flex align-items-center">
-													<!--begin:: Avatar -->
-													<div class="symbol symbol-30px overflow-hidden me-3">
-														<div class="symbol-label">
-															<img alt="" class="w-100" src="<%# Eval("Icon") %>" />
-														</div>
-													</div>
-													<!--end::Avatar-->
-													<!--begin::User details-->
-													<div class="d-flex flex-column">
-														<span class="fw-bold text-dark"><%# Eval("Name") %></span>
-														<span class="text-muted"><%# Eval("JobDesc") %></span>
-													</div>
-													<!--begin::User details-->
-												</div>
-											</ItemTemplate>
-											<HeaderStyle CssClass="fw-bold fs-6 text-dark min-w-300px w-100" />
-										</asp:TemplateField>
-									</Columns>
-									</asp:GridView>
-								</div>
-								<!--end::ID-->
-							</div>
-						</ContentTemplate>
-						</asp:UpdatePanel>
-						<!--end::Menu Content-->
-					</div>
-					<div class="tab-pane fade" id="Menu06_TabContent">
-						<!--begin::Menu Content-->
-						<asp:UpdatePanel ID="upnl06History" runat="server" UpdateMode="Conditional" class="card card-xl-stretch">
-						<ContentTemplate>
-							<!--begin::Card header-->
-							<div class="card-header">
-								<!--begin::Card header-->
-								<div class="card-title fs-3 fw-bolder">History</div>
-								<!--end::Card header-->
-							</div>
-							<!--end::Card header-->
-							<div class="card-body">
-								<div class="table-responsive">
-									<asp:GridView ID="gv06History" runat="server" class="table table-no-border" AutoGenerateColumns="False" ShowHeader="False">
-									<Columns>
-										<asp:TemplateField>
-											<ItemTemplate>
-												<div class="d-flex align-items-center">
-													<!--begin:: Avatar -->
-													<div class="symbol symbol-30px overflow-hidden me-3">
-														<div class="symbol-label">
-															<img alt="" class="w-100" src="<%# Eval("Icon01") %>" />
-														</div>
-													</div>
-													<!--end::Avatar-->
-													<!--begin::User details-->
-													<div class="d-flex flex-column min-w-200px me-3">
-														<span class="fw-bold text-dark nowrap-200px"><%# Eval("Name") %></span>
-														<span class="text-muted nowrap-200px"><%# Eval("Date") %></span>
-													</div>
-													<!--begin:: Avatar -->
-													<div class="symbol symbol-30px overflow-hidden me-3">
-														<div class='<%# Eval("Class02") %>'>
-															<i class='<%# Eval("Icon02") %>'></i>
-														</div>
-													</div>
-													<!--end::Avatar-->
-													<div class="d-flex flex-column min-w-300px w-100">
-														<span class="fw-bold text-dark"><%# Eval("Type") %></span>
-														<span class="text-muted"><%# Eval("Description") %></span>
-													</div>
-													<!--begin::User details-->
-												</div>
-											</ItemTemplate>
-										</asp:TemplateField>
-									</Columns>
-									</asp:GridView>
-								</div>
-								<!--end::ID-->
-							</div>
-						</ContentTemplate>
-						</asp:UpdatePanel>
-						<!--end::Menu Content-->
-					</div>
+                                <table id="table0501Subscriber" class="table table-row-bordered border rounded g-2 w-100 align-middle">
+                                    <thead class="fw-bold">
+                                        <tr class="fw-bold fs-7 text-gray-800">
+                                            <th class="mw-5px min-w-5px" style="color: transparent; font-size: 0; padding: 0;">Bullet</th>
+                                            <th class="min-w-75px mw-75px">Action</th>
+                                            <th class="min-w-200px w-100">User</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!--End:: Subscriber -->
+                    </div>
+                    <div class="tab-pane fade" id="tab0101History">
+                        <!--begin:: History -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title fs-3 fw-bolder">History</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="table0601History" class="table table-row-bordered border rounded g-2 w-100 align-middle">
+                                        <thead class="fw-bold">
+                                            <tr class="d-none">
+                                                <th class="min-w-200px w-100">Data</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--End:: History -->
+                    </div>
+
 				</div>
 				<!--end:  Content-->
 			</div>
 			<!--end::Content-->
 		</div>
 		<!--end::title-->
-
-		<!--begin::Modal Find -->
-		<asp:UpdatePanel ID="mdl01Find" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
-			<div class="modal-dialog modal-fullscreen" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-				<div class="modal-content shadow-none">
-					<div class="modal-header">
-						<h5 class="modal-title">
-							Find record
-						</h5>
-						<!--begin::Close-->
-						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
-							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-							<span class="svg-icon svg-icon-1">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
-									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
-								</svg>
-							</span>
-							<!--end::Svg Icon-->
-						</div>
-						<!--end::Close-->
-					</div>
-					<div class="modal-body min-h-80px mh-80px overflow-hidden">
-						<!--begin::toolbar-->
-						<div class="d-flex align-items-center">
-							<!--begin::Search-->
-							<div class="position-relative">
-								<!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
-								<span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
-									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-										<rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
-										<path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
-									</svg>
-								</span>
-								<!--end::Svg Icon-->
-                                <input id="tbx01Find" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" />
-							</div>
-							<!--end::Search-->
-						</div>
-						<!--end::toolbar-->
-					</div>
-					<div class="modal-body pt-0">
-						<div style="overflow-x:auto; scrollbar-width: thin;">
-						<!--begin::list-->
-							<asp:GridView ID="gv01Find" runat="server" class="table table-no-border table-row-bordered table-hover align-middle w-100" AutoGenerateColumns="False" showheader="false" >
-								<Columns>
-									<asp:TemplateField HeaderText="">
-										<ItemTemplate>
-											<div class="h-100"><span class='<%# Eval("Bullet") %>'></span></div> 
-										</ItemTemplate>
-										<HeaderStyle CssClass="mw-5px min-w-5px" />
-										<ItemStyle CssClass="mw-5px min-w-5px" />
-									</asp:TemplateField>
-									<asp:TemplateField HeaderText="">
-										<ItemTemplate>
-											<a href='<%# Eval("Link") %>' class="d-flex align-items-center w-100">
-												<div class="d-flex flex-column min-w-30px mw-30px me-3"  >
-													<div class="symbol symbol-30px overflow-hidden">
-														<img alt='' class='w-100' src='<%# Eval("Icon") %>' />
-													</div>
-												</div>
-												<div class="d-flex flex-column min-w-400px w-100">
-													<span class="text-dark fw-bolder fs-6 nowrap-auto"> <%# Eval("Title") %></span>
-													<span class="text-muted fw-bold text-muted d-block fs-7 nowrap-auto"><%# Eval("ID") %> <%# Eval("Name") %> <%# Eval("Date") %></span>
-												</div>
-											</a>
-										</ItemTemplate>
-										<HeaderStyle CssClass="w-100" />
-										<ItemStyle CssClass="w-100" />
-									</asp:TemplateField>
-								</Columns>
-							</asp:GridView>
-						</div>
-						<!--end::list-->
-					</div>
-				</div>
-			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
-		<!--begin::Modal Find-->
+     <!--begin::Modal Request - Form-->
 		
-		<!--begin::Modal DialogBox-->
-		<asp:UpdatePanel ID="mdl01DialogBox" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
-			<div class="modal-dialog modal-dialog-centered" role="document">
+	
+
+        <!--begin::Modal Cancel-->
+        <div id="mdl01Find" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+            <div class="modal-dialog modal-fullscreen" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Find record</h5>
+                        <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                            <span class="svg-icon svg-icon-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+                                    <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="modal-body min-h-80px mh-80px overflow-hidden">
+                        <!--begin::toolbar-->
+                        <div class="d-flex align-items-center">
+                            <!--begin::Search-->
+                            <div class="position-relative">
+                                <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                                <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+                                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+                                    </svg>
+                                </span>
+                                <!--end::Svg Icon-->
+                                <input id="tbx01Find" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" />
+                            </div>
+                            <!--end::Search-->
+                        </div>
+                        <!--end::toolbar-->
+                    </div>
+                    <div class="modal-body">
+                        <div style="overflow-x: auto; scrollbar-width: thin;">
+                            <table id="table98Find" class="table table-no-border table-row-bordered table-hover align-middle w-100">
+                                <thead>
+                                    <tr class="d-none">
+                                        <th class="mw-5px min-w-5px">Bullet</th>
+                                        <th class="w-100">Data</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-sm btn-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                            <span class="indicator-label">Close</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+		<div id="mdl0102Add" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+			<div class="modal-dialog modal-dialog-centered mw-650px">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title">Message</h5>
+					   <h5 class="modal-title"><span id="spn0102parTitle">-</span></h5>
 						<!--begin::Close-->
-						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-warning" data-bs-dismiss="modal" aria-label="Close" title="Close" onclick ="updToDTL() ">
 							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
 							<span class="svg-icon svg-icon-1">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -941,24 +773,169 @@
 						<!--end::Close-->
 					</div>
 					<div class="modal-body">
-						<p><asp:Label ID="lbl01ConfirmMessageDialogBox" runat="server"></asp:Label></p>
+				
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text input-group-text-top  min-w-150px required">Particular</span>
+								<input id="tbx0102Particular" type="text" class="form-control" Placeholder="Add particular" maxlength="100"/>
+							</div>
+						</div>
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text input-group-text-top  min-w-150px required">Qty.</span>
+								<input id="tbx0102Qty" type="text" class="form-control" onblur="FormatNumeric(this.id);" onkeypress=" return isNumberKey(event,this)" maxlength="21" Placeholder="0.00"/>
+							</div>
+						</div>
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text input-group-text-top  min-w-150px required">Unit</span>
+								<input id="tbx0102Unit" type="text" class="form-control" Placeholder="Add unit" maxlength="100"/>
+							</div>
+						</div>
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text input-group-text-top  min-w-150px required">Amount</span>
+								<input id="tbx0102Amount" type="text" class="form-control" onblur="FormatNumeric(this.id);" onkeypress=" return isNumberKey(event,this)" maxlength="21" Placeholder="0.00"/>
+							</div>
+						</div>
+						<div id="divPaymentOnly" class="card-title fs-5 fw-bolder" style="display: none;">For Cash Payment Only</div>
+						<div id="divPaymentLiquidation" class="card-title fs-5 fw-bolder" style="display: none;">For Cash Payment and Cash Liquidation Only</div>
+						<div id ="divPaymentDtlAddCA">
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text input-group-text-top  min-w-150px">Division</span>
+								<input id="tbx0102CADivision" type="text" class="form-control" value="-" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text input-group-text-top  min-w-150px">Expense</span>
+								<input id="tbx0102CAExpense" type="text" class="form-control" value="-" readonly="readonly"/>
+							</div>
+						</div>
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text input-group-text-top  min-w-150px">Subsidiary</span>
+								<input id="tbx0102CASubsidiary" type="text" class="form-control mw-150px min-w-150px"" value="-" readonly="readonly"/>
+								<input id="tbx0102CASubsidiarycode" type="text" class="form-control" value="-" readonly="readonly"/>
+							</div>
+						</div>
+						</div>
+						<div id ="divPaymentDtlAddCL">
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text min-w-150px required">Division</span>
+								 <select id="ddl0102CLDivision" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px" ">
+										<option value="">Select division</option>
+									</select>
+							</div>
+						</div>
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text min-w-150px required">Expense</span>
+								 <select id="ddl0102CLExpense" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px" onchange="ddl0102CLExpense_onchange(this)">
+										<option value="">Select expense</option>
+									</select>
+							</div>
+						</div>
+						<div class="col-12 mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text min-w-150px required">Subsidiary</span>
+								 <select id="ddl0102CLSubsidiary" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+										 <option value="">Select description</option>
+									</select>
+							</div>
+						</div>
 					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-						<asp:LinkButton ID="lbtn01DeleteOk" runat="server" class="btn btn-primary" Visible="false">Ok</asp:LinkButton>
-						<asp:LinkButton ID="lbtn01SaveOk" runat="server" class="btn btn-primary" Visible="false">Ok</asp:LinkButton>
-						<asp:LinkButton ID="lbtn02DeleteOk" runat="server" class="btn btn-primary" Visible="false">Ok</asp:LinkButton>
-						<asp:HiddenField ID="hfFileName" runat="server" />
 					</div>
-				</div>
+					   <!--begin::Actions-->
+					   <div class="modal-footer">
+						   <button class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0102Edit_OK(this);return false;">
+							   <span class="indicator-label">
+								Save
+							   </span>
+							    <span class="indicator-progress">
+									Loading
+								</span>
+						   </button>
+							<a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close" onclick="updToDTL()"> 
+								<span class="indicator-label">Cancel</span>
+							</a>
+					   </div>
+					   <!--end::Actions-->
+				</div> 
 			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
-		<!--begin::Modal DialogBox-->
-		
-		<!--begin::Modal Status-->
-		<asp:UpdatePanel ID="mdl01Status" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
+		   </div>
+
+        <div id="mdl0102UploadExcel" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen" id="mdl0102Dialog">
+                <div class="modal-content shadow-lg">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Upload Excel – Journal Entry</h5>
+                        <div class="ms-auto d-flex align-items-center">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btnCloseModal"></button>
+                        </div>
+                    </div>
+
+                    <div class="modal-body position-relative">
+                        <!-- 🔄 Loading overlay -->
+                        <div id="loadingOverlay" class="position-absolute top-0 start-0 w-100 h-100 d-none"
+                            style="background: rgba(255,255,255,0.8); z-index: 1055;">
+                            <div class="d-flex flex-column justify-content-center align-items-center h-100">
+                                <div class="spinner-border text-info mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+                                <h6 class="fw-bold text-gray-400">Checking status, please wait...</h6>
+                            </div>
+                        </div>
+                        <!-- End loading overlay -->
+
+                        <div class="container-fluid">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="input-group">
+                                        <button class="btn btn-secondary" type="button" onclick="document.getElementById('excelFileInput').click();">
+                                            Choose File
+                                        </button>
+                                        <input type="file" id="excelFileInput" accept=".xlsx" class="d-none" />
+                                        <div class="position-relative flex-grow-1">
+                                            <input type="text" id="ExcelTextBoxX" readonly class="form-control pe-5"
+                                                placeholder="No file chosen..." />
+                                            <button type="button" class="btn-close position-absolute end-0 top-50 translate-middle-y me-2"
+                                                aria-label="Clear" onclick="fn0102UploadClear()">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive border rounded" style="max-height: 75vh; overflow-y: auto;">
+                                <table id="table03Record" class="table table-row-bordered border rounded gy-2 gs-2 w-100 align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="min-w-250px w-100 fw-bold border-end">Particular</th>
+                                            <th class="min-w-100px mw-100px fw-bold border-end text-center">Qty.</th>
+                                            <th class="min-w-150px mw-150px fw-bold border-end">Unit</th>
+                                            <th class="min-w-125px mw-125px fw-bold border-end">Amount</th>
+                                            <th class="min-w-100px mw-100px fw-bold border-end">Division</th>
+                                            <th class="min-w-175px mw-175px fw-bold border-end">Expense</th>
+                                            <th class="min-w-100px mw-100px fw-bold border-end">Subsidiary</th>
+                                            <th class="min-w-175px mw-175px fw-bold border-end">Code</th>
+                                            <th class="min-w-100px mw-100px fw-bold">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" id="btnOkModal" onclick="fn0102UploadExcelSave();return false;">Save</button>
+                        <button type="button" class="btn btn-sm btn-danger min-w-100px" id="btnCancelModal" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+		<div id="mdl0103Status" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
 			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -979,212 +956,40 @@
 					<div class="modal-body">
 						<div class="input-group input-group-sm mb-2">
 							<span class="input-group-text min-w-150px required">Change status to</span>
-							<asp:DropDownList ID="ddl01Status" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl01Status" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-								<asp:ListItem Value="">Select a category</asp:ListItem>
-							</asp:DropDownList>
+								 <select id="ddl0103ChangeStatus" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px" onchange="ddl0103ChangeStatus_onchange(this)">
+										<option value="">Select a category</option>
+								</select>
 						</div>
-						<asp:Panel ID="pnl01ClarifyTo" runat="server" class="input-group input-group-sm mb-2" Visible="false">
+						<div id="pnl01ClarifyTo" class="input-group input-group-sm mb-2" style="display:none;">
 							<span class="input-group-text min-w-150px required">Clarify to</span>
-							<asp:DropDownList ID="ddl01ClarifyTo" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl01Status" class="form-select form-select-sm form-select-border min-h-35px">
-								<asp:ListItem Value="">Select a category</asp:ListItem>
-							</asp:DropDownList>
-						</asp:Panel>
+								 <select id="ddl0103Clarifyto" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+										<option value="">Select a category</option>
+								</select>
+						</div>
 						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text input-group-text-top min-w-150px">Notes</span>
-							<asp:TextBox ID="tbx01Note" runat="server" class="form-control mention h-75px min-h-200px mh-200px" Placeholder="Add extra details" TextMode="MultiLine" style="height:200px"></asp:TextBox>
+							<span id="spn01Note" class="input-group-text input-group-text-top min-w-150px">Notes</span>
+								<textarea id="tbx0103Note" type="text" class="form-control mention h-75px min-h-200px mh-200px" Placeholder="Add extra details"></textarea>
 						</div>
 					</div>
 					<!--begin::Actions-->
-					<div class="modal-footer">
-						<button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-						<asp:LinkButton ID="lbtn01SaveStatus" runat="server" class="btn btn-primary">Save changes</asp:LinkButton>
-					</div>
+					   <div class="modal-footer">
+						   <button class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0101SaveChangeStatus(this);return false;">
+							   <span class="indicator-label">
+								Save changes
+							   </span>
+						   </button>
+							<a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close" onclick="updToDTL()"> 
+								<span class="indicator-label">Cancel</span>
+							</a>
+					   </div>
 					<!--end::Actions-->
 				</div>
 			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
-		<!--begin::Modal Status-->
-		
-		<!--begin::Petty Cash New Particular-->
-		<asp:UpdatePanel ID="mdl06PCDtlAdd" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
-			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Add Particular</h5>
-						<!--begin::Close-->
-						<a class="btn btn-sm btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
-							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-							<span class="svg-icon svg-icon-1">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
-									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
-								</svg>
-							</span>
-							<!--end::Svg Icon-->
-						</a>
-						<!--end::Close-->
-					</div>
-					<div class="modal-body">
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Particular</span>
-							<asp:TextBox ID="tbx06PCDtlAddItem" runat="server" class="form-control" Placeholder="Add particular"></asp:TextBox>
-						</div>
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Qty.</span>
-							<input id="tbx06PCDtlAddQty" runat="server" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" />
-						</div>
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Unit</span>
-							<asp:TextBox ID="tbx06PCDtlAddUnit" runat="server" class="form-control" Placeholder="Add unit"></asp:TextBox>
-						</div>
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Amount</span>
-							<input id="tbx06PCDtlAddAmt" runat="server" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" />
-						</div>
-						<div id="divPaymentOnly" runat="server" class="card-title fs-5 fw-bolder" style="display: none;">For Cash Payment Only</div>
-						<div id="divPaymentLiquidation" runat="server" class="card-title fs-5 fw-bolder" style="display: none;">For Cash Payment and Cash Liquidation Only</div>
-						<asp:Panel ID="pnl06PCDtlAddCA" runat="server" Visible="false">
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px">Division</span>
-								<asp:Label ID="lbl06PCDtlAddDivision" runat="server" class="form-control">-</asp:Label>
-							</div>
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px">Expense</span>
-								<asp:Label ID="lbl06PCDtlAddExpense" runat="server" class="form-control">-</asp:Label>
-							</div>
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px">Subsidiary</span>
-								<asp:Label ID="lbl06PCDtlAddSubsidiary" runat="server" class="form-control mw-150px min-w-150px">-</asp:Label>
-								<asp:Label ID="lbl06PCDtlAddCode" runat="server" class="form-control">-</asp:Label>
-							</div>
-						</asp:Panel>
-						<asp:Panel ID="pnl06PCDtlAddCL" runat="server" Visible="false">
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px required">Division</span>
-								<asp:DropDownList ID="ddl06PCDtlAddDivision" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl06PCDtlAdd" class="form-select form-select-sm form-select-border min-h-35px">
-									<asp:ListItem Value="">Select a division</asp:ListItem>
-								</asp:DropDownList>
-							</div>
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px required">Expense</span>
-								<asp:DropDownList ID="ddl06PCDtlAddExpense" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl06PCDtlAdd" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-									<asp:ListItem Value="">Select a expense</asp:ListItem>
-								</asp:DropDownList>
-								<asp:HiddenField ID="hf06PCDtlAddSubsidiary" runat="server" />
-							</div>
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px required">Subsidiary</span>
-								<asp:DropDownList ID="ddl06PCDtlAddCode" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl06PCDtlAdd" class="form-select form-select-sm form-select-border min-h-35px">
-									<asp:ListItem Value="">Select description</asp:ListItem>
-								</asp:DropDownList>
-							</div>
-						</asp:Panel>
-					</div>
-					<!--begin::Actions-->
-					<div class="modal-footer">
-						<button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-						<asp:LinkButton ID="lbtn06PCDtlAddOk" runat="server" class="btn btn-primary">Add</asp:LinkButton>
-					</div>
-					<!--end::Actions-->
-				</div>
-			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
-		<!--begin::Petty Cash New Particular-->
+		</div>
+        <!--begin::Modal Cancel-->
 
-		<!--begin::Petty Cash Update Particular-->
-		<asp:UpdatePanel ID="mdl06PCDtlUpd" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
-			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Update Particular</h5>
-						<!--begin::Close-->
-						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
-							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-							<span class="svg-icon svg-icon-1">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
-									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
-								</svg>
-							</span>
-							<!--end::Svg Icon-->
-						</div>
-						<!--end::Close-->
-					</div>
-					<div class="modal-body">
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Particular</span>
-							<asp:TextBox ID="tbx06PCDtlUpdItem" runat="server" class="form-control"></asp:TextBox>
-						</div>
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Qty.</span>
-							<input id="tbx06PCDtlUpdQty" runat="server" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" />
-						</div>
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Unit</span>
-							<asp:TextBox ID="tbx06PCDtlUpdUnit" runat="server" class="form-control"></asp:TextBox>
-						</div>
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Amount</span>
-							<input id="tbx06PCDtlUpdAmt" runat="server" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" />
-						</div>
-						<div id="tblPaymentOnly" runat="server" class="card-title fs-5 fw-bolder" style="display: none;">For Cash Payment Only</div>
-						<div id="tblPaymentLiquidation" runat="server" class="card-title fs-5 fw-bolder" style="display: none;">For Cash Payment and Cash Liquidation Only</div>
-						<asp:Panel ID="pnl06PCDtlUpdCA" runat="server" Visible="false">
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px">Division</span>
-								<asp:Label ID="lbl06PCDtlUpdDivision" runat="server" class="form-control">-</asp:Label>
-							</div>
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px">Expense</span>
-								<asp:Label ID="lbl06PCDtlUpdExpense" runat="server" class="form-control">-</asp:Label>
-							</div>
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px">Subsidiary</span>
-								<asp:Label ID="lbl06PCDtlUpdSubsidiary" runat="server" class="form-control mw-150px min-w-150px">-</asp:Label>
-								<asp:Label ID="lbl06PCDtlUpdCode" runat="server" class="form-control">-</asp:Label>
-							</div>
-						</asp:Panel>
-						<asp:Panel ID="pnl06PCDtlUpdCL" runat="server" Visible="false">
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px required">Division</span>
-								<asp:DropDownList ID="ddl06PCDtlUpdDivision" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl06PCDtlUpd" class="form-select form-select-sm min-h-34px rounded-start-0">
-									<asp:ListItem Value="">Select a division</asp:ListItem>
-								</asp:DropDownList>
-							</div>
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px required">Expense</span>
-								<asp:DropDownList ID="ddl06PCDtlUpdExpense" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl06PCDtlUpd" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-									<asp:ListItem Value="">Select a expense</asp:ListItem>
-								</asp:DropDownList>
-								<asp:HiddenField ID="hf06PCDtlUpdSubsidiary" runat="server" />
-							</div>
-							<div class="input-group input-group-sm mb-2">
-								<span class="input-group-text min-w-150px required">Subsidiary</span>
-								<asp:DropDownList ID="ddl06PCDtlUpdCode" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl06PCDtlUpd" class="form-select form-select-sm form-select-border min-h-35px">
-									<asp:ListItem Value="">Select description</asp:ListItem>
-								</asp:DropDownList>
-							</div>
-						</asp:Panel>
-					</div>
-					<!--begin::Actions-->
-					<div class="modal-footer">
-						<button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-						<asp:LinkButton ID="lbtn06PCDtlUpdOk" runat="server" class="btn btn-primary">Update</asp:LinkButton>
-					</div>
-					<!--end::Actions-->
-				</div>
-			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
-		<!--begin::Petty Cash Update Particular-->
-				
 		<!--begin::Modal Upload-->
-		<asp:UpdatePanel ID="mdl02Upload" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
+		<div id="mdl0202Upload" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
 			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1220,128 +1025,104 @@
 						</div>
 						<!--end::Dropzone-->
 					</div>
-					<!--begin::Actions-->
-					<div class="modal-footer">
-						<asp:LinkButton ID="lbtn02CancelUpload" runat="server" class="btn btn-light me-3">Cancel</asp:LinkButton>
-						<button id="lbtn02SaveUpload" type="button" class="btn btn-primary">Upload</button>
-					</div>
-					<!--end::Actions-->
+                    <!--begin::Actions-->
+                    <div class="modal-footer">
+                        <button id="btn0202Add_Ok" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="return false;">
+                            <span class="indicator-label">
+                                Upload
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
+                         <a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+                    <!--end::Actions-->
 				</div>
 			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
+		</div>
 		<!--begin::Modal Upload-->
-		
-		<!--begin::Modal Subscribers-->
-		<asp:UpdatePanel ID="mdl03User" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
-			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Subscribers - Add User</h5>
-						<!--begin::Close-->
-						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
-							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-							<span class="svg-icon svg-icon-1">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
-									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
-								</svg>
-							</span>
-							<!--end::Svg Icon-->
-						</div>
-						<!--end::Close-->
-					</div>
-					<div class="modal-body">
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">User</span>
-							<asp:DropDownList ID="ddl03User" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl03User" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-								<asp:ListItem Value="">Select a user</asp:ListItem>
-							</asp:DropDownList>
-						</div>
-					</div>
-					<!--begin::Actions-->
-					<div class="modal-footer">
-						<button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-						<asp:LinkButton ID="lbtn03AddUser" runat="server" class="btn btn-primary">Add</asp:LinkButton>
-					</div>
-					<!--end::Actions-->
-				</div>
-			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
-		<!--begin::Modal Subscribers-->
-		
-		<!--begin::Modal Approver-->
-		<asp:UpdatePanel ID="mdl04Approver" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
-			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Approval Path - Add User</h5>
-						<!--begin::Close-->
-						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
-							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-							<span class="svg-icon svg-icon-1">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
-									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
-								</svg>
-							</span>
-							<!--end::Svg Icon-->
-						</div>
-						<!--end::Close-->
-					</div>
-					<div class="modal-body">
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text min-w-150px required">Add from</span>
-							<asp:DropDownList ID="ddl04AddFrom" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl04Approver" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-								<asp:ListItem Value="">Select a type</asp:ListItem>
-                                <asp:ListItem Value="Manual">Manual</asp:ListItem>
-                                <asp:ListItem Value="Template">Template</asp:ListItem>
-							</asp:DropDownList>
-						</div>
-						<asp:Panel ID="pnl04Type" runat="server" class="input-group input-group-sm mb-2" Visible="false">
-							<span class="input-group-text min-w-150px required">Type</span>
-							<asp:DropDownList ID="ddl04Type" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl04Approver" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-								<asp:ListItem Value="">Select a type</asp:ListItem>
-                                <asp:ListItem Value="Endorsed By">Endorsed By</asp:ListItem>
-                                <asp:ListItem Value="Approved By">Approved By</asp:ListItem>
-                                <asp:ListItem Value="Implementer">Implementer</asp:ListItem>
-							</asp:DropDownList>
-						</asp:Panel>
-						<asp:Panel ID="pnl04AssignTo" runat="server" class="input-group input-group-sm mb-2" Visible="false">
-							<span class="input-group-text min-w-150px required">Approver</span>
-							<asp:DropDownList ID="ddl04Approver" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl04Approver" class="form-select form-select-sm form-select-border min-h-35px" AutoPostBack="true">
-								<asp:ListItem Value="">Select a user</asp:ListItem>
-							</asp:DropDownList>
-						</asp:Panel>
-						<asp:Panel ID="pnl04NoDays" runat="server" class="input-group input-group-sm mb-2" Visible="false">
-							<span class="input-group-text min-w-150px required">No. of days</span>
-							<input id="tbx04NoDays" runat="server" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" />
-						</asp:Panel>
-						<asp:Panel ID="pnl04Template" runat="server" class="input-group input-group-sm mb-2" Visible="false">
-							<span class="input-group-text min-w-150px required">Type</span>
-							<asp:DropDownList ID="ddl04Template" runat="server" data-kt-repeater="select2" data-dropdown-parent="#ContentPlaceHolder1_mdl04Approver" class="form-select form-select-sm form-select-border min-h-35px">
-								<asp:ListItem Value="">Select a template</asp:ListItem>
-							</asp:DropDownList>
-						</asp:Panel>
-					</div>
-					<!--begin::Actions-->
-					<div class="modal-footer">
-						<button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-						<asp:LinkButton ID="lbtn04AddApprover" runat="server" class="btn btn-primary">Add</asp:LinkButton>
-					</div>
-					<!--end::Actions-->
-				</div>
-			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
-		<!--begin::Modal Approver-->
-		
-		<!--begin::Modal Comment-->
-		<asp:UpdatePanel ID="mdl04ReasonForDelay" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
+
+		<div id="mdl0401Aprroval" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+            <div class="modal-dialog modal-dialog-centered mw-650px" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Approval Path - Add User</h5>
+                        <!--begin::Close-->
+                        <div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+                            <span class="svg-icon svg-icon-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+                                    <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->
+                        </div>
+                        <!--end::Close-->
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group input-group-sm mb-2">
+                            <span class="input-group-text min-w-150px required">Add from</span>
+                            <select id="ddl0401AddFrom" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px" onchange="ddl0401AddFrom_onchange(this)">
+                                <option value="">Select a type</option>
+                                <option value="Manual">Manual</option>
+                                <option value="Template">Template</option>
+                            </select>
+                        </div>
+                        <div id="pnl04Type" style="display:none;">
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text min-w-150px required">Type</span>
+                                <select id="ddl0401Type" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px" onchange="ddl0401Type_onchange(this)">
+                                    <option value="">Select a type</option>
+                                    <option value="Endorsed By">Endorsed By</option>
+                                    <option value="Approved By">Approved By</option>
+                                    <option value="Implementer">Implementer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="pnl04AssignTo" style="display:none;">
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text min-w-150px required">Approver</span>
+                                <select id="ddl0401Approver" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                    <option value="">Select a user</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="pnl04NoDays" style="display:none;">
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text min-w-150px required">No. of days</span>
+                                <input id="tbx04NoDays" class='form-control' onblur="FormatNumeric(this.id);" type="text" value="0.00" maxlength="21"/>
+                            </div>
+                        </div>
+                        <div id="pnl04Template" style="display:none;">
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text min-w-150px required">Type</span>
+                                <select id="ddl0401Template" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                    <option value="">Select a template</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--begin::Actions-->
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0401AddApprover_OK(this);return false;">
+                            <span class="indicator-label">Add
+                            </span>
+                        </button>
+                        <a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close" onclick="updToDTL()">
+                            <span class="indicator-label">Cancel</span>
+                        </a>
+                    </div>
+                    <!--end::Actions-->
+                </div>
+            </div>
+        </div>
+		  <!--begin::Modal Comment-->
+		<div id="mdl0402Reason4Delays" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
 			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1360,28 +1141,33 @@
 						<!--end::Close-->
 					</div>
 					<div class="modal-body">
-						<!--begin::note-->
 						<div class="input-group input-group-sm mb-2">
 							<span class="input-group-text input-group-text-top min-w-150px">Reason for delay</span>
-							<asp:TextBox ID="tbx04ReasonForDelay" runat="server" class="form-control mention h-75px min-h-200px mh-200px" Placeholder="Add reason" TextMode="MultiLine" style="height:200px"></asp:TextBox>
+							<textarea id="tbx0402ReasonForDelay" class="form-control form-control-sm mention h-75px min-h-200px mh-200px" Placeholder="Add reason" maxlength="1000"></textarea>
 						</div>
-						<!--end::note-->
 					</div>
-					<!--begin::Actions-->
+						<!--begin::Actions-->
 					<div class="modal-footer">
-						<button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-						<asp:LinkButton ID="lbtn04SaveReasonForDelay" runat="server" class="btn btn-primary">Save</asp:LinkButton>
+						<button id="btn0402Add_Ok" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0402AddReason_OK(this);return false;">
+							<span class="indicator-label">
+								Save
+							</span>
+							<span class="indicator-progress">
+								Saving
+							</span>
+						</button>
+						<a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+							<span class="indicator-label">Cancel</span>
+						</a>
 					</div>
 					<!--end::Actions-->
 				</div>
 			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
+		</div>
 		<!--begin::Modal Comment-->
 
-		<!--begin::Modal Comment-->
-		<asp:UpdatePanel ID="mdl05Comment" runat="server" UpdateMode="Conditional" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-		<ContentTemplate>
+        <!--begin::Modal Comment-->
+		<div id="mdl0302Notes" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
 			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1400,276 +1186,91 @@
 						<!--end::Close-->
 					</div>
 					<div class="modal-body">
-						<div class="input-group input-group-sm mb-2">
-							<span class="input-group-text input-group-text-top min-w-150px required">Notes</span>
-							<asp:TextBox ID="tbx05Note" runat="server" class="form-control mention h-75px min-h-200px mh-200px" Placeholder="Add note" TextMode="MultiLine" style="height:200px"></asp:TextBox>
-							<asp:HiddenField ID="hdnMention" runat="server" />
-						</div>
+						<textarea id="tbx0302Note" class="form-control form-control-sm mention h-75px min-h-200px mh-200px" Placeholder="Notes" maxlength="1000"></textarea>
 					</div>
-					<!--begin::Actions-->
-					<div class="modal-footer">
-						<button type="button" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-						<asp:LinkButton ID="lbtn05AddNote" runat="server" class="btn btn-primary lbtn05AddNote">Add</asp:LinkButton>
-					</div>
-					<!--end::Actions-->
+                    <!--begin::Actions-->
+                    <div class="modal-footer">
+                        <button id="btn0302Add_Ok" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0302Add_Ok(this);return false;">
+                            <span class="indicator-label">
+                                Add
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
+                         <a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+                    <!--end::Actions-->
 				</div>
 			</div>
-		</ContentTemplate>
-		</asp:UpdatePanel>
+		</div>
 		<!--begin::Modal Comment-->
 
+        <!--begin::Modal Comment-->
+		<div id="mdl0501AddSubscriber" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" data-bs-focus="false">
+			<div class="modal-dialog modal-dialog-centered mw-650px" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Subscribers - Add User</h5>
+						<!--begin::Close-->
+						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+							<span class="svg-icon svg-icon-1">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+								</svg>
+							</span>
+							<!--end::Svg Icon-->
+						</div>
+						<!--end::Close-->
+					</div>
+					<div class="modal-body">
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text min-w-150px required">User</span>
+                                <select id="ddl0501AddUser" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px">
+                                    <option value="">Select a user</option>
+                                </select>
+                            </div>
+					</div>
+                    <!--begin::Actions-->
+                    <div class="modal-footer">
+                        <button id="btn0501Add_Ok" class="btn btn-sm btn-primary fw-bolder min-w-100px m-1" onclick="fn0502AddSubscriber_OK(this);return false;">
+                            <span class="indicator-label">
+                                Add
+                            </span>
+                            <span class="indicator-progress">
+                                Saving
+                            </span>
+                        </button>
+                         <a href="#" class="btn btn-sm btn-light-danger fw-bolder min-w-100px" data-bs-dismiss="modal" aria-label="Close" title="Close">
+                             <span class="indicator-label">Cancel</span>
+                         </a>
+                    </div>
+                    <!--end::Actions-->
+				</div>
+			</div>
+		</div>
+		<!--begin::Modal Comment-->
+        
 	</div>
 	<!--end::Content-->
 
-	<!-- scripts related to this page -->
-    <script type="text/javascript">
-        //table search
-        var prm = Sys.WebForms.PageRequestManager.getInstance();
-        prm.add_endRequest(function () {
-            // re-bind your jQuery events here
-            loadscript();
-        });
-        $(document).ready(loadscript);
-        function loadscript() {
-            var $gv01Find = $('#ContentPlaceHolder1_gv01Find tbody tr');
-            $('#tbx01Find').keyup(function () {
-                var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
-                $gv01Find.show().filter(function () {
-                    var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
-                    return !~text.indexOf(val);
-                }).hide();
-            });
-        }
-        //table search
-
-        //numeric formating
-        function FormatNumeric(ID) {
-            var NumVal = document.getElementById(ID);
-            var RawValue = NumVal.value.replace(/,/g, "");
-            var Val = parseFloat(RawValue);
-
-            if (isNaN(Val)) {
-                NumVal.value = "0.00";
-                return;
-            }
-
-            var NewVal = Val.toFixed(2);
-            var Parts = NewVal.toString().split(".");
-            var Num = Parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (Parts[1] ? "." + Parts[1] : "");
-
-            NumVal.value = Num;
-        }
-		function FormatEWT(ID) {
-			var tbx01GrossAmt = document.getElementById("ContentPlaceHolder1_tbx01GrossAmt");
-			var tbx01NetAmt = document.getElementById("ContentPlaceHolder1_tbx01NetAmt");
-            var NumVal = document.getElementById(ID);
-            var Val = parseFloat(NumVal.value);
-            var NewVal = Val.toFixed(2);
-            var Parts = NewVal.toString().split(".");
-            var Num = Parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (Parts[1] ? "." + Parts[1] : "");
-            if (Num == "NaN") {
-                Num = "0.00";
-			}
-			if (tbx01GrossAmt.value == "0.00" || tbx01GrossAmt.value == "") {
-				tbx01NetAmt.value = "0.00";
-			} else {
-				var NetVal = parseFloat(tbx01GrossAmt.value.replace(/,/g, "") - Num);
-				var NewNet = NetVal.toFixed(2);
-                var NetParts = NewNet.toString().split(".");
-                var TotalNet = NetParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (NetParts[1] ? "." + NetParts[1] : "");
-                tbx01NetAmt.value = TotalNet;
-			}
-            NumVal.value = Num;
-		};
-        //numeric formating
-
-        //@mention
-        var mentionUser = [];
-        var initialMention = [];
-        var jq = jQuery.noConflict();
-        //@mention
-
-        //load page
-        function pageLoad(sender, args) { InitialiseSettings(); }
-        function InitialiseSettings() {
-            jQuery(function ($) {
-
-                //form variable
-                var ltrlFormCode = '<asp:Literal ID="ltrlFormCode" runat="server" />';
-				var ltrlID = '<asp:Literal ID="ltrlID" runat="server" />';
-				var ltrlMode = '<asp:Literal ID="ltrlMode" runat="server" />';
-                var ltrlDtlMode = '<asp:Literal ID="ltrlDtlMode" runat="server" />';
-                var ltrlSeqNo = '<asp:Literal ID="ltrlSeqNo" runat="server" />';
-                //form variable
-
-				//check box
-                $(".cbx0101IsDeposit").change(function () {
-                    var tbx01BankName = document.getElementById("ContentPlaceHolder1_tbx01BankName");
-                    var tbx01AcctName = document.getElementById("ContentPlaceHolder1_tbx01AcctName");
-                    var tbx01AcctNo = document.getElementById("ContentPlaceHolder1_tbx01AcctNo");
-                    if ($('.cbx0101IsDeposit:checked').length > 0) {
-                        tbx01BankName.readOnly = false;
-                        tbx01AcctName.readOnly = false;
-                        tbx01AcctNo.readOnly = false;
-                    } else {
-                        tbx01BankName.readOnly = true;
-                        tbx01BankName.value = "-";
-                        tbx01AcctName.readOnly = true;
-                        tbx01AcctName.value = "-";
-                        tbx01AcctNo.readOnly = true;
-                        tbx01AcctNo.value = "-";
-                    }
-				});
-                $(".cbx0101WithEWT").change(function () {
-                    var tbx01GrossAmt = document.getElementById("ContentPlaceHolder1_tbx01GrossAmt");
-                    var tbx01EWT = document.getElementById("ContentPlaceHolder1_tbx01EWT");
-                    var tbx01NetAmt = document.getElementById("ContentPlaceHolder1_tbx01NetAmt");
-					if ($('.cbx0101WithEWT:checked').length > 0) {
-						tbx01GrossAmt.readOnly = true;
-                        tbx01EWT.readOnly = false;
-                        tbx01NetAmt.readOnly = true;
-					} else {
-						tbx01GrossAmt.readOnly = true;
-						tbx01EWT.readOnly = true;
-						tbx01EWT.value = "0.00";
-						tbx01NetAmt.readOnly = true;
-                    }
-				});
-				//check box
-
-                //metion                jq.fn.atwho.debug = true;
-                var chatHub = jq.connection.chatHub;
-                jq.connection.hub.start().done(function () {
-                    // mention load
-                    loadFunction()
-                    //// mention save
-                    //jq('.lbtn05AddNote').click(function () {
-                    //    // Call the Send method on the hub.
-                    //    chatHub.server.send(ltrlFormCode, ltrlID, ltrlFormCode, initialMention.join(','), ltrlCreatedBy);
-                    //    // clear
-                    //    initialMention = [];
-                    //    mentionUser = [];
-                    //})
-                }).fail(function (error) {
-                    console.error("SignalR connection failed: " + error)
-                });
-                function loadFunction() {
-                    chatHub.server.getEmployeeData().then(function (data) {
-                        initAtWho(data);
-                    }).catch(function (error) {
-                        console.error("Error fetching data from SignalR:", error)
-                    });
-                    function initAtWho(data) {
-                        var at_config = {
-                            at: "@",
-                            data: data,
-                            insertTpl: '${fname}',
-                            displayTpl: "<li><div class='d-flex align-items-center'><div class='symbol symbol-30px overflow-hidden me-3'><div class='symbol-label'> <img src='Assets/media/avatars/${empPic}' class='w-100' alt='' />  </div></div><div class='d-flex flex-column '><span class='text-weight-500 text-gray-800 '>${name}</span><span class='text-weight-500'>${email}</span></div></div></li>",
-                            limit: 200,
-                            callbacks: {
-                                beforeInsert: function (value, jqli, e) {
-                                    var selectedUserData = jqli.data('item-data');
-                                    mentionUser.push({
-                                        name: selectedUserData.fname,
-                                        empCode: selectedUserData.empCode
-                                    })
-                                    var emp_no = mentionUser.map(function (employee) {
-                                        return employee.empCode
-                                    });
-                                    initialMention = emp_no;
-                                    $('#<%=hdnMention.ClientID %>').val(initialMention.join(','));
-                                    return '@' + value;
-                                },
-                            }
-                        }
-                        $inputor = jq('.mention').atwho(at_config);
-                        $inputor.caret('pos', 47);
-                        $inputor.focus().atwho('run');
-                        // for removing mention
-                        $inputor.on('keydown', function (e) {
-                            if (e.keyCode === 8) {
-                                handleBackspace();
-                            }
-                        })
-                        function handleBackspace() {
-                            var inputValue = $inputor.val();
-                            var cursorPosition = $inputor.caret('pos');
-                            var mentionStart = inputValue.lastIndexOf('@', cursorPosition - 1);
-
-                            if (mentionStart !== -1) {
-                                // Extract mention text to be removed
-                                var mentionText = inputValue.substring(mentionStart, cursorPosition);
-
-                                // Find and remove mention from mentionUser array
-                                mentionUser = mentionUser.filter(function (user) {
-                                    return `@${user.name}` !== mentionText;
-                                });
-
-                                var emp_no = mentionUser.map(function (employee) {
-                                    return employee.empCode
-                                });
-
-                                initialMention = emp_no;
-                            }
-                        }
-                    };
-                };                //metion
-
-                //combobox
-                $('[data-kt-repeater="select2"]').select2();
-                //combobox
-
-                //date
-                $('[data-kt-repeater="datepicker"]').flatpickr({
-                    dateFormat: "m/d/Y"
-                });
-                //date
-
-                //upload
-                Dropzone.autoDiscover = false;
-                var myDropzone = new Dropzone("#DropZone", {
-                    url: "HND000001.ashx?FormCode=" + ltrlFormCode + "&ID=" + ltrlID.replace("#", "No"),
-                    autoProcessQueue: false,
-                    //upload more than 2 files by Dropzone.js with button
-                    parallelUploads: 5,
-                    //File size
-                    maxFilesize: 10,
-                    //Number of files
-                    maxFiles: 5,
-                    acceptedFiles: ".png,.jpg,.jpeg,.jpe,.xlsx,.xls,.docx,.doc,.pdf,.PNG,.JPG,.JPEG,.JPE,.XLSX,.XLS,.DOCX,.DOC,.PDF",
-                    addRemoveLinks: true,
-                    success: function (file, response) {
-                        var imgName = response;
-                        file.previewElement.classList.add("dz-success");
-                        console.log("Successfully uploaded :" + imgName);
-                    },
-                    error: function (file, response) {
-                        file.previewElement.classList.add("dz-error");
-                    }
-                });
-                $('#lbtn02SaveUpload').on('click', function (e) {
-                    var lbl01ID = document.getElementById("ContentPlaceHolder1_lbl01ID");
-                    myDropzone.options.url = "HND000001.ashx?FormCode=" + ltrlFormCode + "&ID=" + lbl01ID.innerText.replace("#", "No");
-                    myDropzone.processQueue();
-                    // Perform button
-                    var Btn = document.getElementById('lbtn02SaveUpload');
-                    // Disable button to avoid multiple click
-                    Btn.disabled = true;
-                    // Show loading indication
-                    // Simulate form submission
-                    setTimeout(function () {
-                        // Perform button
-                        var clickButton = document.getElementById("<%= lbtn02UploadSave.ClientID %>");
-                        clickButton.click();
-                        // Enable button
-                        Btn.disabled = false;
-                    }, 3000);
-                });
-                //upload
-            });
-        }
-		//load page
-    </script>
-	<!-- scripts related to this page -->
+	<!--param-->
+	<input id="hdnPrevID" runat="server" type="hidden" value="" />
+    <input id="hdnID" runat="server" type="hidden" value="" />
+    <input id="hdnSeqNo" runat="server" type="hidden" value="" />
+	<input id="hdnMode" runat="server" type="hidden" value="" />
+	<input id="hdnTblName" runat="server" type="hidden" value="" />
+	<input id="hdnMention" type="hidden" value="" />
+    <input id="hdnTranNo" type="hidden" value="" />
+    <input id="hdncode" type="hidden" value="" />
+    <input id="hdnCLSub" type="hidden" value="" />
+	<!--param-->
+	<script type="text/javascript" src="Assets/js/FRM/FRM000016.js"></script>
+	<script type="text/javascript" src="Assets/js/MNU/MNU001000.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 </asp:Content>
