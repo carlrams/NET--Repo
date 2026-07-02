@@ -21,6 +21,9 @@ let grid08Api;
 
 //Return - Estimate
 let grid09Api;
+
+//Tagged - AG Grid
+let grid10Api;
 //form
 
 //attachment
@@ -176,6 +179,7 @@ function fn01DisableButtons(pValue) {
         document.getElementById("btn0101ChangeStatus").classList.add("btn-secondary");
         document.getElementById("btn03010101Add").classList.add("btn-add");
         document.getElementById("btn989Add").classList.add("btn-add");
+        document.getElementById("btn11Add").classList.add("btn-add");
         document.getElementById("btn11AddReturn").classList.add("btn-add");
         document.getElementById("div11SCM").classList.add("btn-add");
         document.getElementById("div11OSM").classList.add("btn-add");
@@ -780,6 +784,8 @@ function fn0101Edit() {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
+        } else if (document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value.includes("Return") && document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "" && document.getElementById("tbx0101Estimate").value == "" && document.getElementById("hf0101Estimate").value == "") { 
+            fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "") {
@@ -788,7 +794,7 @@ function fn0101Edit() {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Stock Request") && document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "" && document.getElementById("tbx0101Estimate").value == "" && document.getElementById("hf0101Estimate").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
-        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value.includes("House Construction") && document.getElementById("ddl0101Subdivision").options[document.getElementById("ddl0101Subdivision").selectedIndex].value == "") {
+        } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value.includes("House Construction") && document.getElementById("ddl0101Subdivision").options[document.getElementById("ddl0101Subdivision").selectedIndex].value == "" && (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("(Advance PO)") || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("(Stock Request)") ) ) {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value != "" && document.getElementById("tbx0101Estimate").value == "" && document.getElementById("hf0101Estimate").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
@@ -1299,7 +1305,7 @@ function fn0101ShowFields(pMode) {
         };
 
         //Category - House Construction
-        if ( (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "House Construction" || document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "House Construction - CCI") && document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("(Advance PO)") && document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("(Stock Request)") ) {
+        if ( (document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "House Construction" || document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value == "House Construction - CCI") && (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("(Advance PO)") || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("(Stock Request)") )) {
             document.getElementById("div0102Estimate").style.display = "";
             document.getElementById("spn0102Estimate").innerText = "Batch";
             document.getElementById("tbx0101Estimate").placeholder = "Add batch";
@@ -1425,11 +1431,11 @@ function fn0101ShowFields(pMode) {
         };
 
         //Category - House Construction
-        if ((document.getElementById("lbl0101Category").innerText == "House Construction" || document.getElementById("lbl0101Category").innerText == "House Construction - CCI") && document.getElementById("lbl0101ProjectType").innerText.includes("(Advance PO)") && document.getElementById("lbl0101ProjectType").innerText.includes("(Stock Request)") ) {
+        if ((document.getElementById("lbl0101Category").innerText == "House Construction" || document.getElementById("lbl0101Category").innerText == "House Construction - CCI") && (document.getElementById("lbl0101ProjectType").innerText.includes("(Advance PO)") || document.getElementById("lbl0101ProjectType").innerText.includes("(Stock Request)")) ) {
             document.getElementById("div0101Estimate").style.display = "";
             document.getElementById("spn0101Estimate").innerText = "Batch";
             document.getElementById("div0101Subdivision").style.display = "";
-
+            
             document.getElementById("btn11Add").style.display = "none";
             document.getElementById("table12Record").style.display = "";
         } else if (document.getElementById("lbl0101Category").innerText !== "" && (document.getElementById("lbl0101Category").innerText !== "House Construction" || document.getElementById("lbl0101Category").innerText !== "House Construction - CCI")) {
@@ -1522,10 +1528,9 @@ function dd0101ProjectType_onchange(ddl0101ProjectType) {
     };
 };
 function ddl0101Purpose_onchange(ddl0101Purpose) {
-    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     if (ddl0101Purpose.value != "") {
         $('#ddl0101Category').val('').trigger('change');
-        if (pMode == "ADD") fn0101GLAccount(ddl0101Purpose.value);
+        fn0101GLAccount(ddl0101Purpose.value);
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
@@ -1537,6 +1542,9 @@ function ddl0101Category_onchange(ddl0101Category) {
             document.getElementById("hf0101Estimate").value = "";
         };
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
+    } else {
+        document.getElementById("tbx0101Estimate").value = "";
+        document.getElementById("hf0101Estimate").value = "";
     };
 };
 
@@ -1545,9 +1553,10 @@ function fn0101Estimate() {
     const ddl0101Category = document.getElementById("ddl0101Category").options[document.getElementById("ddl0101Category").selectedIndex].value;
     const ddl0101Subdivision = document.getElementById("ddl0101Subdivision").options[document.getElementById("ddl0101Subdivision").selectedIndex].value;
     const ddl0101ProjectType = document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value;
+
     if (ddl0101ProjectType != "") {
 
-        if (ddl0101Category.includes("House Construction") && ddl0101ProjectType.includes("(Advance PO)") && ddl0101ProjectType.includes("(Stock Request)") ) {
+        if (ddl0101Category.includes("House Construction") && (ddl0101ProjectType.includes("(Advance PO)") || ddl0101ProjectType.includes("(Stock Request)")) ) {
             if (ddl0101Subdivision == "") {
                 fnAlertOnly('Please select a subdivision!', 'error', 'btn btn-danger');
             } else {
@@ -1617,7 +1626,7 @@ function fn0101Estimate() {
 
                 $("#mdl0101Estimate").modal("show");
             }
-        } else if (ddl0101Category != "" && !ddl0101ProjectType.includes("(Advance PO)") && !ddl0101ProjectType.includes("(Stock Request)") ) {
+        } else if (ddl0101Category != "" && (!ddl0101ProjectType.includes("(Advance PO)") || !ddl0101ProjectType.includes("(Stock Request)")) ) {
             //Ajax
             $.ajax({
                 type: "POST",
@@ -1689,6 +1698,13 @@ function fn0101Estimate() {
 
 };
 function fn0101AddEstimate(pCode, pTitle, pDivCode, pDivName) {
+    //variable
+    const ddl0101PurchaseType = document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value;
+    const ddl0101Purpose = document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value;
+    //condition
+    if (ddl0101PurchaseType.includes("Return") && ddl0101Purpose.includes("Return")) {
+        fn0102ChargeTo(pCode);
+    };
     //Estimate
     document.getElementById("tbx0101Estimate").value = pTitle;
     document.getElementById("hf0101Estimate").value = pCode;
@@ -1698,8 +1714,12 @@ function fn0101AddEstimate(pCode, pTitle, pDivCode, pDivName) {
     //Department
     document.getElementById("tbx0101Department").value = "INDIRECT DEPARTMENT";
     document.getElementById("hf0101DeptCode").value = "2012000000";
+
     //Modal
     $("#mdl0101Estimate").modal("hide");
+};
+function fn0102ChargeTo(pID) {
+    console.log(pID);
 };
 
 //charge to
@@ -1707,6 +1727,7 @@ function fn0101ChargeTo() {
     const hf0101AcctCode = document.getElementById("hf0101AcctCode").value;
     const hf0101Subsidiary = document.getElementById("hf0101Subsidiary").value;
     const ddl0101Purpose = document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value;
+
     if (ddl0101Purpose != "") {
         if (hf0101AcctCode != "" && hf0101Subsidiary != "NO SUBSIDIARY") {
             //AG Grid
@@ -1913,8 +1934,7 @@ function fn0102LoadParticular(pMode, pID) {
     //Variable
     const Category = document.getElementById("lbl0101Category").innerText;
     const ProjType = document.getElementById("lbl0101ProjectType").innerText;
-    if (Category.includes("House Construction") && (ProjType.includes("(Adance PO)") || ProjType.includes("(Stock Request)")) ) {
-
+    if ( (Category.includes("House Construction") || Category.includes("House Construction - CCI") ) && (ProjType.includes("(Advance PO)") || ProjType.includes("(Stock Request)")) ) {
         //Ajax - Batch
         $.ajax({
             type: "POST",
@@ -2048,7 +2068,6 @@ function fn0102LoadParticular(pMode, pID) {
         });
 
     } else {
-
         //Ajax - Estimate
         $.ajax({
             type: "POST",
@@ -4023,238 +4042,357 @@ function fn0101AddOSM(pWBSNo) {
     };
 };
 function fn0102Tag(pID, pItemNo, pSeqNo) {
-    //Ajax
-    $.ajax({
-        type: "POST",
-        url: "Assets/Handler/FRM/FRM000010HND.ashx",
-        data: {
-            'pFormCode': 'FRM000010',
-            'pType': 'Get - Tagging Units',
-            'pID': pID,
-            'pItemNo': pItemNo
-        },
-        success: function (response) {
-            grid08Api.setGridOption("rowData", response);
-        },
-        complete: function (response) {
-            grid08Api.setGridOption("loading", false);
-        }
+    //if exists
+    fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
+        if (response[0].oReturn == "1") {
+            Validate(pID, pItemNo);
+        } else {
+            fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
+        };
     });
-
-    //AG Grid
-    let gridDiv = document.querySelector('#table0102Tag');
-    let gridOptions;
-
-    // Destroy old grid if exists
-    gridDiv.innerHTML = "";
-
-    const gridTheme = agGrid.themeQuartz.withParams({
-        wrapperBorder: true,
-        headerRowBorder: false,
-    });
-
-    gridOptions = {
-        onGridSizeChanged: function (params) {
-            const isMobile = params.clientWidth < 768;
-
-            if (isMobile) {
-                params.api.applyColumnState({
-                    defaultState: { pinned: null }
-                });
+    function Validate(pID, pItemNo) {
+        fnFRMValidateRecord("06PRDtl", "Add", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                View_Tag(pID, pItemNo);
             } else {
-                params.api.applyColumnState({
-                    state: [
-                        { colId: 'Qty4', pinned: 'right' },
-                        { colId: 'QtyReq', pinned: 'right' }
-                    ]
-                });
-            }
-        },
-        theme: gridTheme,
-        suppressCellFocus: true,
-        suppressDragLeaveHidesColumns: true,
-        enableCellTextSelection: true,
-        rowSelection: 'multiple',
-        suppressRowClickSelection: true,
-        loading: true,
-        onRowSelected: params => {
-            const node = params.node;
-            if (params.node.isSelected()) {
-                node.setDataValue('QtyReq', node.data.Qty3);
-            } else {
-                node.setDataValue('QtyReq', 0);
-            }
-        },
-        columnDefs: [
-            {
-                headerName: "Action",
-                field: "isChecked",
-                resizable: false,
-                sortable: false,
-                width: 75,
-                checkboxSelection: true,
-                cellStyle: {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }
-            },
-            {
-                headerName: "Est. Title",
-                field: "Title",
-                filter: 'agTextColumnFilter',
-                tooltipField: "Title",
-                flex: 1,
-                minWidth: 280
-            },
-            {
-                headerName: "Project",
-                field: "Project",
-                filter: 'agTextColumnFilter',
-                tooltipField: "Project",
-                width: 250
-            },
-            {
-                headerName: "Unit",
-                field: "Unit",
-                filter: 'agTextColumnFilter',
-                tooltipField: "Unit",
-                width: 100,
-                cellRenderer: params => {
-                    if (params.data.WBSNo == '') {
-                        return '';
-                    };
-                    return params.value;
-                }
-            },
-            {
-                headerName: "Qty - Balance",
-                field: "Qty1",
-                tooltipField: "Qty1",
-                width: 150,
-                cellClass: "text-end",
-                cellStyle: { fontWeight: 'bold' },
-                valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Qty1) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                },
-            },
-            {
-                headerName: "Qty - Approval",
-                field: "Qty2",
-                tooltipField: "Qty2",
-                width: 150,
-                cellClass: "text-end",
-                cellStyle: { fontWeight: 'bold' },
-                valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Qty2) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                },
-            },
-            {
-                headerName: "Qty - Available",
-                field: "Qty3",
-                tooltipField: "Qty3",
-                width: 150,
-                cellClass: "text-end",
-                cellStyle: { fontWeight: 'bold' },
-                valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Qty3) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                },
-            },
-            {
-                headerName: "Qty - Tagged",
-                field: "Qty4",
-                tooltipField: "Qty4",
-                width: 150,
-                pinned: "right",
-                cellClass: "text-end",
-                editable: true,
-                cellEditor: 'agNumberCellEditor',
-                cellEditorParams: {
-                    min: 0,
-                },
-                cellStyle: { fontWeight: 'bold' },
-                valueParser: params => {
-                    let newValue = parseFloat(params.newValue);
-                    const maxValue = parseFloat(params.data.Qty4) || 0;
-                    if (isNaN(newValue) || newValue < 0) {
-                        return 0;
-                    }
-                    if (newValue > maxValue) {
-                        return maxValue;
-                    }
-                    return newValue;
-                },
-                valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Qty2) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                },
-            },
-            {
-                headerName: "Qty - Request",
-                field: "QtyReq",
-                width: 150,
-                pinned: "right",
-                editable: true,
-                cellEditor: 'agNumberCellEditor',
-                cellClass: "text-end",
-                cellEditorParams: {
-                    min: 0,
-                },
-                cellStyle: { fontWeight: 'bold' },
-                valueParser: params => {
-                    let newValue = parseFloat(params.newValue);
-                    const maxValue = parseFloat(params.data.Qty3) || 0;
-                    if (isNaN(newValue) || newValue < 0) {
-                        return 0;
-                    }
-                    if (newValue > maxValue) {
-                        return maxValue;
-                    }
-                    return newValue;
-                },
-                valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) value = 0;
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                }
-            }
-        ],
-        rowData: [],
-        pagination: false,
+                View_Tagged(pID, pItemNo);
+            };
+        });
     };
-    grid08Api = agGrid.createGrid(gridDiv, gridOptions);
+    function View_Tag(pID, pItemNo) {
+        //Ajax
+        $.ajax({
+            type: "POST",
+            url: "Assets/Handler/FRM/FRM000010HND.ashx",
+            data: {
+                'pFormCode': 'FRM000010',
+                'pType': 'Get - Tagging Units',
+                'pID': pID,
+                'pItemNo': pItemNo
+            },
+            success: function (response) {
+                grid08Api.setGridOption("rowData", response);
+            },
+            complete: function (response) {
+                grid08Api.setGridOption("loading", false);
+            }
+        });
 
-    $("#mdl0102Tag").modal("show");
+        //AG Grid
+        let gridDiv = document.querySelector('#table0102Tag');
+        let gridOptions;
+
+        // Destroy old grid if exists
+        gridDiv.innerHTML = "";
+
+        const gridTheme = agGrid.themeQuartz.withParams({
+            wrapperBorder: true,
+            headerRowBorder: false,
+        });
+
+        gridOptions = {
+            onGridSizeChanged: function (params) {
+                const isMobile = params.clientWidth < 768;
+
+                if (isMobile) {
+                    params.api.applyColumnState({
+                        defaultState: { pinned: null }
+                    });
+                } else {
+                    params.api.applyColumnState({
+                        state: [
+                            { colId: 'Qty4', pinned: 'right' },
+                            { colId: 'QtyReq', pinned: 'right' }
+                        ]
+                    });
+                }
+            },
+            theme: gridTheme,
+            suppressCellFocus: true,
+            suppressDragLeaveHidesColumns: true,
+            enableCellTextSelection: true,
+            rowSelection: 'multiple',
+            suppressRowClickSelection: true,
+            loading: true,
+            onRowSelected: params => {
+                const node = params.node;
+                if (params.node.isSelected()) {
+                    node.setDataValue('QtyReq', node.data.Qty3);
+                } else {
+                    node.setDataValue('QtyReq', 0);
+                }
+            },
+            columnDefs: [
+                {
+                    headerName: "Action",
+                    field: "isChecked",
+                    resizable: false,
+                    sortable: false,
+                    width: 75,
+                    checkboxSelection: true,
+                    cellStyle: {
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }
+                },
+                {
+                    headerName: "Est. Title",
+                    field: "Title",
+                    filter: 'agTextColumnFilter',
+                    tooltipField: "Title",
+                    flex: 1,
+                    minWidth: 280
+                },
+                {
+                    headerName: "Project",
+                    field: "Project",
+                    filter: 'agTextColumnFilter',
+                    tooltipField: "Project",
+                    width: 250
+                },
+                {
+                    headerName: "Unit",
+                    field: "Unit",
+                    filter: 'agTextColumnFilter',
+                    tooltipField: "Unit",
+                    width: 100,
+                    cellRenderer: params => {
+                        if (params.data.WBSNo == '') {
+                            return '';
+                        };
+                        return params.value;
+                    }
+                },
+                {
+                    headerName: "Qty - Balance",
+                    field: "Qty1",
+                    tooltipField: "Qty1",
+                    width: 150,
+                    cellClass: "text-end",
+                    cellStyle: { fontWeight: 'bold' },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (isNaN(value)) {
+                            value = parseFloat(params.data.Qty1) || 0;
+                        }
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    },
+                },
+                {
+                    headerName: "Qty - Approval",
+                    field: "Qty2",
+                    tooltipField: "Qty2",
+                    width: 150,
+                    cellClass: "text-end",
+                    cellStyle: { fontWeight: 'bold' },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (isNaN(value)) {
+                            value = parseFloat(params.data.Qty2) || 0;
+                        }
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    },
+                },
+                {
+                    headerName: "Qty - Available",
+                    field: "Qty3",
+                    tooltipField: "Qty3",
+                    width: 150,
+                    cellClass: "text-end",
+                    cellStyle: { fontWeight: 'bold' },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (isNaN(value)) {
+                            value = parseFloat(params.data.Qty3) || 0;
+                        }
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    },
+                },
+                {
+                    headerName: "Qty - Tagged",
+                    field: "Qty4",
+                    tooltipField: "Qty4",
+                    width: 150,
+                    pinned: "right",
+                    cellClass: "text-end text-danger",
+                    editable: true,
+                    cellEditor: 'agNumberCellEditor',
+                    cellEditorParams: {
+                        min: 0,
+                    },
+                    cellStyle: { fontWeight: 'bold' },
+                    valueParser: params => {
+                        let newValue = parseFloat(params.newValue);
+                        const maxValue = parseFloat(params.data.Qty4) || 0;
+                        if (isNaN(newValue) || newValue < 0) {
+                            return 0;
+                        }
+                        if (newValue > maxValue) {
+                            return maxValue;
+                        }
+                        return newValue;
+                    },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (isNaN(value)) {
+                            value = parseFloat(params.data.Qty2) || 0;
+                        }
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    },
+                },
+                {
+                    headerName: "Qty - Request",
+                    field: "QtyReq",
+                    width: 150,
+                    pinned: "right",
+                    editable: true,
+                    cellEditor: 'agNumberCellEditor',
+                    cellClass: "text-end text-danger",
+                    cellEditorParams: {
+                        min: 0,
+                    },
+                    cellStyle: { fontWeight: 'bold' },
+                    valueParser: params => {
+                        let newValue = parseFloat(params.newValue);
+                        const maxValue = parseFloat(params.data.Qty3) || 0;
+                        if (isNaN(newValue) || newValue < 0) {
+                            return 0;
+                        }
+                        if (newValue > maxValue) {
+                            return maxValue;
+                        }
+                        return newValue;
+                    },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (isNaN(value)) value = 0;
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    }
+                }
+            ],
+            rowData: [],
+            pagination: false,
+        };
+        grid08Api = agGrid.createGrid(gridDiv, gridOptions);
+
+        $("#mdl0102Tag").modal("show");
+    };
+    function View_Tagged(pID, pItemNo) {
+        //Ajax
+        $.ajax({
+            type: "POST",
+            url: "Assets/Handler/FRM/FRM000010HND.ashx",
+            data: {
+                'pFormCode': 'FRM000010',
+                'pType': 'Get - Tagged Units',
+                'pID': pID,
+                'pItemNo': pItemNo
+            },
+            success: function (response) {
+                console.log(response);
+                grid10Api.setGridOption("rowData", response);
+            },
+            complete: function (response) {
+                grid10Api.setGridOption("loading", false);
+            }
+        });
+
+        //AG Grid
+        let gridDiv = document.querySelector('#table0102Tagged');
+        let gridOptions;
+
+        // Destroy old grid if exists
+        gridDiv.innerHTML = "";
+
+        const gridTheme = agGrid.themeQuartz.withParams({
+            wrapperBorder: true,
+            headerRowBorder: false,
+        });
+
+        gridOptions = {
+            theme: gridTheme,
+            suppressCellFocus: true,
+            suppressDragLeaveHidesColumns: true,
+            enableCellTextSelection: true,
+            rowSelection: 'single',
+            loading: true,
+            onFilterChanged: updFooter,
+            onFirstDataRendered: updFooter,
+            columnDefs: [
+                {
+                    headerName: "Project",
+                    field: "Project",
+                    filter: 'agTextColumnFilter',
+                    tooltipField: "Project",
+                    flex: 1,
+                    minWidth: 280
+                },
+                {
+                    headerName: "Unit",
+                    field: "Unit",
+                    filter: 'agTextColumnFilter',
+                    tooltipField: "Unit",
+                    width: 100,
+                    cellRenderer: params => {
+                        if (params.data.WBSNo == '') {
+                            return '';
+                        };
+                        return params.value;
+                    }
+                },
+                {
+                    headerName: "Qty Tagged",
+                    field: "Qty",
+                    tooltipField: "Qty",
+                    width: 150,
+                    cellClass: "text-end",
+                    cellStyle: { fontWeight: 'bold' },
+                    valueFormatter: params => {
+                        let value = parseFloat(params.value);
+                        if (isNaN(value)) {
+                            value = parseFloat(params.data.Qty) || 0;
+                        }
+                        return value.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                    },
+                }
+            ],
+            rowData: [],
+            pagination: false,
+        };
+        grid10Api = agGrid.createGrid(gridDiv, gridOptions);
+
+        function updFooter() {
+            let Qty = 0;
+
+            grid10Api.forEachNodeAfterFilter(function (node) {
+                Qty += Number(node.data.Qty) || 0;
+            });
+
+            grid10Api.setGridOption('pinnedBottomRowData', [
+                { Project: 'TOTAL', Qty: Qty }
+            ]);
+        }
+        $("#mdl0102Tagged").modal("show");
+    };
 };
 function fn0102Tag_Ok(Btn) {
     // Disable the clicked button to avoid multiple clicks
