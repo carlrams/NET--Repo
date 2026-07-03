@@ -1702,9 +1702,7 @@ function fn0101AddEstimate(pCode, pTitle, pDivCode, pDivName) {
     const ddl0101PurchaseType = document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value;
     const ddl0101Purpose = document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value;
     //condition
-    if (ddl0101PurchaseType.includes("Return") && ddl0101Purpose.includes("Return")) {
-        fn0102ChargeTo(pCode);
-    };
+    if (ddl0101PurchaseType.includes("Return") && ddl0101Purpose.includes("Return")) fn0102ChargeTo(pCode);
     //Estimate
     document.getElementById("tbx0101Estimate").value = pTitle;
     document.getElementById("hf0101Estimate").value = pCode;
