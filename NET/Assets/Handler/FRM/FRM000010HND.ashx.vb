@@ -13,6 +13,7 @@ Imports System.Reflection.Emit
 Imports System.Runtime.ConstrainedExecution
 Imports System.Runtime.InteropServices
 Imports System.Runtime.InteropServices.ComTypes
+Imports System.Runtime.Remoting.Contexts
 Imports System.Security.AccessControl
 Imports System.Security.Cryptography
 Imports System.Security.Cryptography.Xml
@@ -86,6 +87,15 @@ Public Class FRM000010HND
                 Dim pPlaceHolder = context.Request("pPlaceHolder")
                 json = Me.Get_Dropdown_Filter(pFilter, pTblName, pPlaceHolder)
 
+            ElseIf pFunction = "Dropdown" And pType = "Get - Dropdown - List" Then
+
+                Dim pTblName = context.Request("pTblName")
+                Dim pPlaceHolder = context.Request("pPlaceHolder")
+                Dim pVal01 = context.Request("pVal01")
+                Dim pVal02 = context.Request("pVal02")
+                json = Me.Get_Dropdown_List(pTblName, pPlaceHolder, pVal01, pVal02)
+
+
             End If
 
             If pFormCode = "FRM000010" And pType = "Validate - Record" Then
@@ -126,6 +136,11 @@ Public Class FRM000010HND
                 Dim pPurpose = context.Request("pPurpose")
                 Dim pEmpCode = CIIS_EmpCode
                 json = Me.Get_GLAccount(pPurpose, pEmpCode)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - Estimate Charging" Then
+
+                Dim pCode = context.Request("pCode")
+                json = Me.Get_EstimateCode(pCode)
 
             ElseIf pFormCode = "FRM000010" And pType = "Get - Batch" Then
 
@@ -214,6 +229,83 @@ Public Class FRM000010HND
 
                 Dim pID = context.Request("pID")
                 json = Me.Get_Record_Return(pID)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - Approval Path" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_Approval_Path(pID)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Update - Record Approver" Then
+
+                Dim pID = context.Request("pID")
+                Dim pStatus = context.Request("pStatus")
+                Dim pAssignTo = context.Request("pAssignTo")
+                Dim pRemarks = context.Request("pRemarks")
+                Dim pMention = context.Request("pMention")
+                json = Me.Update_Record_Approver(pFormCode, pID, pStatus, pAssignTo, pRemarks, pMention)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Delete - Record Approver" Then
+
+                Dim pID = context.Request("pID")
+                Dim pSeqNo = context.Request("pSeqNo")
+                json = Me.Delete_Record_Approver(pFormCode, pID, pSeqNo)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Move - Up Record Approver" Then
+
+                Dim pID = context.Request("pID")
+                Dim pSeqNo = context.Request("pSeqNo")
+                json = Me.Move_Up_Record_Approver(pFormCode, pID, pSeqNo)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Move - Down Record Approver" Then
+
+                Dim pID = context.Request("pID")
+                Dim pSeqNo = context.Request("pSeqNo")
+                json = Me.Move_Down_Record_Approver(pFormCode, pID, pSeqNo)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Add - Approver" Then
+
+                Dim pID = context.Request("pID")
+                Dim pAddForm = context.Request("pAddForm")
+                Dim pApproverType = context.Request("pApproverType")
+                Dim pApprover = context.Request("pApprover")
+                Dim pNoDays = context.Request("pNoDays")
+                Dim pTemplate = context.Request("pTemplate")
+                json = Me.Add_Approver(pFormCode, pID, pAddForm, pApproverType, pApprover, pNoDays, pTemplate)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Delete - Approver" Then
+
+                Dim pID = context.Request("pID")
+                Dim pSeqNo = context.Request("pSeqNo")
+                json = Me.Delete_Approver(pFormCode, pID, pSeqNo)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Update - Reason" Then
+
+                Dim pID = context.Request("pID")
+                Dim pSeqNo = context.Request("pSeqNo")
+                Dim pReason = context.Request("pReason")
+                json = Me.Update_Reason(pFormCode, pID, pSeqNo, pReason)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - Subscriber" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_Subscriber(pID)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Add - Subscriber" Then
+
+                Dim pID = context.Request("pID")
+                Dim pMonitorBy = context.Request("pMonitorBy")
+                json = Me.Add_Subscriber(pFormCode, pID, pMonitorBy)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Delete - Subscriber" Then
+
+                Dim pID = context.Request("pID")
+                Dim pMonitorBy = context.Request("pMonitorBy")
+                json = Me.Delete_Subscriber(pFormCode, pID, pMonitorBy)
+
+            ElseIf pFormCode = "FRM000010" And pType = "Get - History" Then
+
+                Dim pID = context.Request("pID")
+                json = Me.Get_History(pFormCode, pID)
 
             ElseIf pFormCode = "FRM000010" And pType = "Add - Record" Then
 
@@ -631,7 +723,9 @@ Public Class FRM000010HND
         'variable
         Dim RecordList As New List(Of Object)()
         'variable
+
         Dim rowIndex As Integer = 0
+
         'read record
         Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
             Using Cmd As New SqlCommand(Query.ToString)
@@ -831,6 +925,254 @@ Public Class FRM000010HND
             Using Cmd As New SqlCommand(Query.ToString)
                 Cmd.CommandType = CommandType.Text
                 Cmd.Parameters.AddWithValue("@pFilter", pFilter)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    RecordList.Add(New With {
+                        .ID = DR("ID"),
+                        .Name = DR("Name")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display
+
+    End Function
+    Function Get_Dropdown_List(pTblName, pPlaceHolder, pVal01, pVal02)
+
+        'query
+        Dim Query As New StringBuilder
+        If pTblName = "Branch_List" Then
+            Query.Append("select ")
+            Query.Append("   '' [ID] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
+            Query.Append("   ,0 [Order1] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
+            Query.Append("union ")
+            Query.Append("select ")
+            Query.Append("   [A].buss_code [ID] ")
+            Query.Append("   ,[A].description [Name] ")
+            Query.Append("   ,2 [Order1] ")
+            Query.Append("   ,[A].description [Order2] ")
+            Query.Append("from ")
+            Query.Append("   business [A] ")
+            Query.Append("where ")
+            Query.Append("   [A].lock = 1 ")
+            Query.Append("order by ")
+            Query.Append("   [Order1] ")
+            Query.Append("   ,[Order2] ")
+        ElseIf pTblName = "Change_Status" Then
+            Query.Append("if (select top 1 created_by from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '') in ('Endorsed By','Approved By','Implementer') and (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') not in ('For Cancellation')")
+            Query.Append("begin ")
+            Query.Append("   select ")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a status' [Name] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      'Approved' [ID] ")
+            Query.Append("      ,'Approve' [Name] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      'Clarify' [ID] ")
+            Query.Append("      ,'Clarify' [Name] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      'Cancelled' [ID] ")
+            Query.Append("      ,'Cancel' [Name] ")
+            Query.Append("end ")
+            Query.Append("else if (select top 1 created_by from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '') in ('Clarification') ")
+            Query.Append("begin ")
+            Query.Append("   select ")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a status' [Name] ")
+            Query.Append("   union")
+            Query.Append("   select")
+            Query.Append("      'Reply' [ID] ")
+            Query.Append("      ,'Reply' [Name] ")
+            Query.Append("end ")
+            Query.Append("else if (select top 1 created_by from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') ")
+            Query.Append("begin ")
+            Query.Append("   select ")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a status' [Name] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      'Cancelled' [ID] ")
+            Query.Append("      ,'Cancel' [Name] ")
+            Query.Append("end ")
+            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '') in ('Endorsed By','Approved By','Implementer') and (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') not in ('For Cancellation') ")
+            Query.Append("begin ")
+            Query.Append("   select ")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a status' [Name] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      'Approved' [ID] ")
+            Query.Append("      ,'Approve' [Name] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      'Clarify' [ID] ")
+            Query.Append("      ,'Clarify' [Name] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      'Declined' [ID] ")
+            Query.Append("      ,'Decline' [Name] ")
+            Query.Append("end ")
+            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '') in ('Clarification') ")
+            Query.Append("begin ")
+            Query.Append("   select ")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a status' [Name] ")
+            Query.Append("   union")
+            Query.Append("   select")
+            Query.Append("      'Reply' [ID] ")
+            Query.Append("      ,'Reply' [Name] ")
+            Query.Append("end ")
+            Query.Append("else if (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') in ('For Cancellation') ")
+            Query.Append("begin ")
+            Query.Append("   select ")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a status' [Name] ")
+            Query.Append("   union")
+            Query.Append("   select")
+            Query.Append("      'Cancelled' [ID] ")
+            Query.Append("      ,'Cancel' [Name] ")
+            Query.Append("end ")
+            Query.Append("else ")
+            Query.Append("begin ")
+            Query.Append("   select ")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a status' [Name] ")
+            Query.Append("end ")
+        ElseIf pTblName = "Clarify_To" Then
+            Query.Append("select")
+            Query.Append("   '' [ID] ")
+            Query.Append("   ,'Select a user' [Name] ")
+            Query.Append("   ,'' [Order] ")
+            Query.Append("union ")
+            Query.Append("select ")
+            Query.Append("   [A].created_by [ID] ")
+            Query.Append("   ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
+            Query.Append("   ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Order] ")
+            Query.Append("from ")
+            Query.Append("   oop_form_hdr [A] ")
+            Query.Append("   left join employee [B] on [A].created_by = [B].emp_no ")
+            Query.Append("where ")
+            Query.Append("   [A].f_code = '" & pVal01 & "' ")
+            Query.Append("   and [A].created_by not in ('" & CIIS_EmpCode & "') ")
+            Query.Append("union ")
+            Query.Append("select ")
+            Query.Append("   [A].approver [ID] ")
+            Query.Append("   ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
+            Query.Append("   ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Order] ")
+            Query.Append("from ")
+            Query.Append("   oop_form_dtl_appr [A] ")
+            Query.Append("   left join employee [B] on [A].approver = [B].emp_no ")
+            Query.Append("where ")
+            Query.Append("   [A].f_code = '" & pVal01 & "' ")
+            Query.Append("   and [A].approver not in ('" & CIIS_EmpCode & "') ")
+            Query.Append("order by ")
+            Query.Append("   [Order] ")
+        ElseIf pTblName = "Approver_List" Then
+            Query.Append("if '" & pVal01 & "' not in (select oop_form_type.FormCode from oop_form_appr left join oop_form_type on oop_form_appr.form_type = oop_form_type.t_code where oop_form_type.FormCode = '" & pVal01 & "' and oop_form_appr.type = '" & pVal02 & "') ")
+            Query.Append("begin ")
+            Query.Append("   select")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a user' [Name] ")
+            Query.Append("      ,'' [Order] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      [A].emp_no [ID] ")
+            Query.Append("      ,dbo.ProperCase([A].first_name) + ' ' + dbo.ProperCase([A].last_name) [Name] ")
+            Query.Append("      ,dbo.ProperCase([A].first_name) + ' ' + dbo.ProperCase([A].last_name) [Order] ")
+            Query.Append("   from ")
+            Query.Append("      employee [A] ")
+            Query.Append("   where ")
+            Query.Append("      [A].emp_status in ('Contractual','Probationary','Regular') ")
+            Query.Append("      and [A].lock = 1 ")
+            Query.Append("   order by ")
+            Query.Append("      [Order] ")
+            Query.Append("end ")
+            Query.Append("else ")
+            Query.Append("begin ")
+            Query.Append("   select")
+            Query.Append("      '' [ID] ")
+            Query.Append("      ,'Select a user' [Name] ")
+            Query.Append("      ,'' [Order] ")
+            Query.Append("   union ")
+            Query.Append("   select ")
+            Query.Append("      [A].approver [ID] ")
+            Query.Append("      ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
+            Query.Append("      ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Order] ")
+            Query.Append("   from ")
+            Query.Append("      oop_form_appr [A] ")
+            Query.Append("      left join employee [B] on [A].approver = [B].emp_no ")
+            Query.Append("      left join oop_form_type [C] on [A].form_type = [C].t_code ")
+            Query.Append("   where ")
+            Query.Append("      [C].FormCode = '" & pVal01 & "' ")
+            Query.Append("      and [A].type = '" & pVal02 & "' ")
+            Query.Append("      and [B].emp_status in ('Contractual','Probationary','Regular') ")
+            Query.Append("      and [B].lock = 1 ")
+            Query.Append("   order by ")
+            Query.Append("      [Order] ")
+            Query.Append("end")
+        ElseIf pTblName = "Template_List" Then
+            Query.Append("select ")
+            Query.Append("   '' [ID] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
+            Query.Append("   ,0 [Order1] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
+            Query.Append("union ")
+            Query.Append("select ")
+            Query.Append("   [A].Code [ID] ")
+            Query.Append("   ,[A].Title [Name] ")
+            Query.Append("   ,2 [Order1] ")
+            Query.Append("   ,[A].Title [Order2] ")
+            Query.Append("from ")
+            Query.Append("   Mstr_AppPathTempHdr [A] ")
+            Query.Append("where ")
+            Query.Append("   [A].FormCode = '" & pVal01 & "' ")
+            Query.Append("order by ")
+            Query.Append("   [Order1] ")
+            Query.Append("   ,[Order2] ")
+        ElseIf pTblName = "Subscriber_List" Then
+            Query.Append("select")
+            Query.Append("   '' [ID] ")
+            Query.Append("   ,'Select a user' [Name] ")
+            Query.Append("   ,'' [Order] ")
+            Query.Append("union ")
+            Query.Append("select ")
+            Query.Append("   [A].emp_no [ID] ")
+            Query.Append("   ,dbo.ProperCase([A].first_name) + ' ' + dbo.ProperCase([A].last_name) [Name] ")
+            Query.Append("   ,dbo.ProperCase([A].first_name) + ' ' + dbo.ProperCase([A].last_name) [Order] ")
+            Query.Append("from ")
+            Query.Append("   employee [A] ")
+            Query.Append("where ")
+            Query.Append("   [A].emp_status in ('Contractual','Probationary','Regular') ")
+            Query.Append("   and [A].lock = 1 ")
+            Query.Append("order by ")
+            Query.Append("   [Order] ")
+        End If
+
+        'query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
                 Cmd.Connection = ConStr
                 ConStr.Open()
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
@@ -1307,6 +1649,68 @@ Public Class FRM000010HND
                         .Subsidiary = DR("Subsidiary"),
                         .ChargeCode = DR("ChargeCode"),
                         .Description = DR("Description")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display
+
+    End Function
+    Function Get_EstimateCode(pCode)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("select ")
+        Query.Append("  [a].AcctCode ")
+        Query.Append("  ,[a].DivCode ")
+        Query.Append("  ,[b].description [DivName] ")
+        Query.Append("  ,[a].DeptCode ")
+        Query.Append("  ,[c].description [DeptName] ")
+        Query.Append("  ,(CASE WHEN [a].Subsidiary = 'NO SUBSIDIARY' THEN 'NO SUBSIDIARY' ")
+        Query.Append("         WHEN [a].Subsidiary = 'MODEL HOUSE' THEN ISNULL((select description from sub_house where code = [a].ChargeCode),'') ")
+        Query.Append("         WHEN [a].Subsidiary = 'PHASE' THEN ISNULL((select description from sub_phase where code = [a].ChargeCode),'') ")
+        Query.Append("         WHEN [a].Subsidiary = 'SUBDIVISION' THEN ISNULL((select description from subdivision where code = [a].ChargeCode),'') ")
+        Query.Append("  END) [ChargeName] ")
+        Query.Append("  ,[a].ChargeCode ")
+        Query.Append("  ,[a].Subsidiary ")
+        Query.Append("from ")
+        Query.Append("  Trxn_CEHdr [a] ")
+        Query.Append("  left join division [b] on [a].DivCode = [b].div_code ")
+        Query.Append("  left join department [c] on [a].DeptCode = [c].dept_code ")
+        Query.Append("where ")
+        Query.Append("  [a].CECode = @pCode ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pCode", pCode)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    RecordList.Add(New With {
+                        .AcctCode = DR("AcctCode"),
+                        .DivCode = DR("DivCode"),
+                        .DivName = DR("DivName"),
+                        .DeptCode = DR("DeptCode"),
+                        .DeptName = DR("DeptName"),
+                        .ChargeName = DR("ChargeName"),
+                        .ChargeCode = DR("ChargeCode"),
+                        .Subsidiary = DR("Subsidiary")
                     })
 
                 End While
@@ -3155,7 +3559,7 @@ Public Class FRM000010HND
         Query.Append("   [Particular] ")
         Query.Append("   ,[ItmNo] ")
         Query.Append("   ,[Qty1] ")
-        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty2] ")
         Query.Append("   ,([Qty1] - [Qty2]) [Qty3] ")
         Query.Append("   ,[UOM] ")
         Query.Append("from ")
@@ -3167,6 +3571,7 @@ Public Class FRM000010HND
         Query.Append("      ,[B].Description [Particular] ")
         Query.Append("      ,NULL [Qty1] ")
         Query.Append("      ,NULL [Qty2] ")
+        Query.Append("      ,NULL [QtyReturn] ")
         Query.Append("      ,NULL [UOM] ")
         Query.Append("   from ")
         Query.Append("      Trxn_CEDtl [A] ")
@@ -3185,6 +3590,7 @@ Public Class FRM000010HND
         Query.Append("      ,[A].Particular ")
         Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
         Query.Append("      ,isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) [Qty2] ")
+        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Cancelled', 'Declined')),0) [QtyReturn] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
         Query.Append("      Trxn_CEDtl [A] ")
@@ -3205,7 +3611,7 @@ Public Class FRM000010HND
         Query.Append("   [Particular] ")
         Query.Append("   ,[ItmNo] ")
         Query.Append("   ,[Qty1] ")
-        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty2] ")
         Query.Append("   ,([Qty1] - [Qty2]) [Qty3] ")
         Query.Append("   ,[UOM] ")
         Query.Append("from ")
@@ -3217,6 +3623,7 @@ Public Class FRM000010HND
         Query.Append("      ,[B].Description [Particular] ")
         Query.Append("      ,NULL [Qty1] ")
         Query.Append("      ,NULL [Qty2] ")
+        Query.Append("      ,NULL [QtyReturn] ")
         Query.Append("      ,NULL [UOM] ")
         Query.Append("   from ")
         Query.Append("      Trxn_CEDtl [A] ")
@@ -3225,7 +3632,7 @@ Public Class FRM000010HND
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
         Query.Append("      and isnull([A].QtyReq,0) > 0 ")
-        Query.Append("      and isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) > 0 ")
+        Query.Append("      and isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon_CCI [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) > 0 ")
         Query.Append("   union ")
         Query.Append("   select ")
         Query.Append("      [A].SeqNo ")
@@ -3235,6 +3642,7 @@ Public Class FRM000010HND
         Query.Append("      ,[A].Particular ")
         Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
         Query.Append("      ,isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon_CCI [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) [Qty2] ")
+        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Cancelled', 'Declined')),0) [QtyReturn] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
         Query.Append("      Trxn_CEDtl [A] ")
@@ -3255,7 +3663,7 @@ Public Class FRM000010HND
         Query.Append("   [Particular] ")
         Query.Append("   ,[ItmNo] ")
         Query.Append("   ,[Qty1] ")
-        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty2] ")
         Query.Append("   ,([Qty1] - [Qty2]) [Qty3] ")
         Query.Append("   ,[UOM] ")
         Query.Append("from ")
@@ -3267,6 +3675,7 @@ Public Class FRM000010HND
         Query.Append("      ,[B].Description [Particular] ")
         Query.Append("      ,NULL [Qty1] ")
         Query.Append("      ,NULL [Qty2] ")
+        Query.Append("      ,NULL [QtyReturn] ")
         Query.Append("      ,NULL [UOM] ")
         Query.Append("   from ")
         Query.Append("      Trxn_CEDtl [A] ")
@@ -3275,7 +3684,7 @@ Public Class FRM000010HND
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
         Query.Append("      and isnull([A].QtyReq,0) > 0 ")
-        Query.Append("      and isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) > 0 ")
+        Query.Append("      and isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status in ('Accepted')),0) > 0 ")
         Query.Append("   union ")
         Query.Append("   select ")
         Query.Append("      [A].SeqNo ")
@@ -3285,6 +3694,7 @@ Public Class FRM000010HND
         Query.Append("      ,[A].Particular ")
         Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
         Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status in ('Accepted')),0) [Qty2] ")
+        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Cancelled', 'Declimed')),0) [QtyReturn] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
         Query.Append("      Trxn_CEDtl [A] ")
@@ -3334,6 +3744,818 @@ Public Class FRM000010HND
         'set to max
         Return JsonConvert.SerializeObject(RecordList, Formatting.None)
         'display 
+
+    End Function
+    Function Get_Approval_Path(pID)
+
+        'query
+        Dim Query As New StringBuilder
+        Query.Append("select  ")
+        Query.Append("	(case when [A].status in ('') and [A].approver = [C].approver and cast([A].DateEnd as date) < cast(getdate() as date) then 'bullet bullet-margin bullet-vertical h-58px bg-danger'  ")
+        Query.Append("	       when [A].status in ('') and [A].approver = [C].approver and cast([A].DateEnd as date) >= cast(getdate() as date) then 'bullet bullet-margin bullet-vertical h-58px bg-success'  ")
+        Query.Append("	       when [A].status in ('') then 'bullet bullet-margin bullet-vertical h-58px bg-secondary' ")
+        Query.Append("	       when [A].status not in ('') and cast([A].DateEnd as date) < cast([A].updated_date as date) then 'bullet bullet-margin bullet-vertical h-58px bg-danger' ")
+        Query.Append("	       when [A].status not in ('') and cast([A].DateEnd as date) >= cast([A].updated_date as date) then 'bullet bullet-margin bullet-vertical h-58px bg-success' end) [Bullet] ")
+        Query.Append("	,[A].seq_no [SeqNo] ")
+        Query.Append("	,[A].type [Type] ")
+        Query.Append("	,[A].approver [Icon] ")
+        Query.Append("	,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [ApprName] ")
+        Query.Append("	,isnull(dbo.ProperCase([B].JobDesc),'-') [ApprJob] ")
+        Query.Append("	,(case when [A].status = '' then '-' else [A].status end) [ApprStatus] ")
+        Query.Append("	,(case when [A].status = '' then '-' else format([A].updated_date,'MM/dd/yy') end) [ApprDate] ")
+        Query.Append("	,(case when [A].status = '' and [A].approver = [C].approver then format([A].DateStart,'MM/dd/yy') + '-' + format([A].DateEnd,'MM/dd/yy') when [A].status not in ('') then format([A].DateStart,'MM/dd/yy') + '-' + format([A].DateEnd,'MM/dd/yy') else '-' end ) [Coverage] ")
+        Query.Append("	,format([A].NoDays,'N1') [Duration] ")
+        Query.Append("	,(case when [A].Reason = '' then '-' else isnull([A].Reason,'-') end) [Reason] ")
+        Query.Append("from ")
+        Query.Append("	 oop_form_dtl_appr [A] ")
+        Query.Append("   left join employee [B] on [A].approver = [B].emp_no ")
+        Query.Append("   left join oop_form_hdr [C] on [A].f_code = [C].f_code ")
+        Query.Append("where ")
+        Query.Append("   [A].f_code = @pID ")
+        Query.Append("order by ")
+        Query.Append("  [A].seq_no ")
+        'query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+        Dim rowIndex As Integer = 0
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pID", pID)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Icon As String
+                    If File.Exists(HttpContext.Current.Server.MapPath("~/Assets/media/avatars/" & DR("Icon") & ".png")) = True Then
+                        Icon = "Assets/media/avatars/" & DR("Icon") & ".png"
+                    ElseIf File.Exists(HttpContext.Current.Server.MapPath("~/Assets/media/avatars/" & DR("Icon") & ".jpg")) = True Then
+                        Icon = "Assets/media/avatars/" & DR("Icon") & ".jpg"
+                    Else
+                        Icon = "Assets/media/avatars/blank.png"
+                    End If
+
+                    Dim Bullet As New StringBuilder
+                    Bullet.Append("<div class='h-100'><span class='" & DR("Bullet") & "'></span></div>")
+
+                    Dim Action As New StringBuilder()
+                    Action.Append("<div class='action-toggle-wrapper' style='position: relative; display: inline-block;'>")
+                    Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this);return false;'><i class='las la-bars fs-3'></i></button>")
+                    Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Remove User' onclick=""fn0401Delete('" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Update reason for delay' onclick=""fn0402UpdateR4D('" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-add' title='Move user up' onclick=""fn0401Up('" & DR("SeqNo") & "');return false;""><i class='las la-angle-up'></i></button>")
+                    Action.Append("      <button class='btn btn-sm btn-icon btn-add' title='Move user down' onclick=""fn0401Down('" & DR("SeqNo") & "');return false;""><i class='las la-angle-down'></i></button>")
+                    Action.Append("   </div>")
+                    Action.Append("</div>")
+
+
+                    Dim User As New StringBuilder
+                    User.Append("<div class='d-flex align-items-center w-100'>")
+                    User.Append("   <div class='d-flex flex-column min-w-30px mw-30px me-3' >")
+                    User.Append("       <div class='symbol symbol-30px overflow-hidden' >")
+                    User.Append("           <img alt='' class='w-100' src='" & Icon & "' />")
+                    User.Append("        </div> ")
+                    User.Append("   </div> ")
+                    User.Append("   <div class='d-flex flex-column' >")
+                    User.Append("      <span class='fw-bold text-dark'>" & DR("ApprName") & "</span>")
+                    User.Append("      <span class='text-muted' >" & DR("ApprJob") & "</span>")
+                    User.Append("   </div>")
+                    User.Append("</div>")
+
+                    Dim Status As New StringBuilder
+                    Status.Append("<div class='d-flex align-items-center'>")
+                    Status.Append("     <div class='d-flex flex-column'>")
+                    Status.Append("         <span class='fw-bold text-dark' >" & DR("ApprStatus") & "</span>")
+                    Status.Append("         <span class='text-muted' >" & DR("ApprDate") & "</span>")
+                    Status.Append("     </div>")
+                    Status.Append("</div>")
+
+                    Dim TAT As New StringBuilder
+                    TAT.Append("<div class='d-flex align-items-center'>")
+                    TAT.Append("     <div class='d-flex flex-column'>")
+                    TAT.Append("         <span class='fw-bold text-dark' >" & DR("Coverage") & "</span>")
+                    TAT.Append("         <span class='text-muted' >" & DR("Duration") & "</span>")
+                    TAT.Append("     </div>")
+                    TAT.Append("</div>")
+
+                    RecordList.Add(New With {
+                        .Bullet = Bullet.ToString,
+                        .Action = Action.ToString,
+                        .Type = "<span title='" & DR("Type") & "'>" & DR("Type") & "</span>",
+                        .User = User.ToString,
+                        .Status = Status.ToString,
+                        .TAT = TAT.ToString,
+                        .RFD = "<span title='" & DR("Reason") & "'>" & DR("Reason") & "</span>"
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+
+        Dim serializer As JavaScriptSerializer = New JavaScriptSerializer()
+        serializer.MaxJsonLength = 2146233079
+
+        'display 
+        Return (serializer.Serialize(RecordList))
+        'display
+
+    End Function
+    Function Update_Record_Approver(pFormCode, pID, pStatus, pAssignTo, pRemarks, pMention)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Upd_FRM_Status"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pStatus", pStatus)
+        SqlCmd.Parameters.AddWithValue("@pAssignTo", pAssignTo)
+        SqlCmd.Parameters.AddWithValue("@pRemarks", pRemarks)
+        SqlCmd.Parameters.AddWithValue("@pMention", pMention)
+        SqlCmd.Parameters.AddWithValue("@pUpdatedBy", CIIS_EmpCode)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Delete_Record_Approver(pFormCode, pID, pSeqNo)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Del_FRM_Approver"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pSeqNo", pSeqNo)
+        SqlCmd.Parameters.AddWithValue("@pDeletedBy", CIIS_EmpCode)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Move_Up_Record_Approver(pFormCode, pID, pSeqNo)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Upd_FRM_MoveApprover"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pSeqNo", pSeqNo)
+        SqlCmd.Parameters.AddWithValue("@pMove", "Up")
+        SqlCmd.Parameters.AddWithValue("@pUpdatedBy", CIIS_EmpCode)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Move_Down_Record_Approver(pFormCode, pID, pSeqNo)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Upd_FRM_MoveApprover"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pSeqNo", pSeqNo)
+        SqlCmd.Parameters.AddWithValue("@pMove", "Down")
+        SqlCmd.Parameters.AddWithValue("@pUpdatedBy", CIIS_EmpCode)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Add_Approver(pFormCode, pID, pAddForm, pApproverType, pApprover, pNoDays, pTemplate)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        If pAddForm = "Manual" Then
+
+            'create connection
+            Dim SqlConn As New SqlClient.SqlConnection
+            Dim SqlCmd As New SqlCommand
+            SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+            SqlCmd.CommandTimeout = 1500
+            SqlCmd.Connection = SqlConn
+            SqlCmd.CommandType = CommandType.StoredProcedure
+            SqlCmd.CommandText = "New_FRM_Approver"
+            SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+            SqlCmd.Parameters.AddWithValue("@pID", pID)
+            SqlCmd.Parameters.AddWithValue("@pType", pApproverType)
+            SqlCmd.Parameters.AddWithValue("@pApprover", pApprover)
+            SqlCmd.Parameters.AddWithValue("@pNoDays", pNoDays)
+            SqlCmd.Parameters.AddWithValue("@pCreatedBy", CIIS_EmpCode)
+            'create connection
+
+            'execute procedure
+            SqlConn.Open()
+            SqlCmd.ExecuteNonQuery()
+            SqlConn.Close()
+            'execute procedure
+
+            'add value
+            RecordList.Add(New With {
+                .oReturn = "Success"
+            })
+            'add value
+
+        End If
+
+        If pAddForm = "Template" Then
+
+            'create connection
+            Dim SqlConn As New SqlClient.SqlConnection
+            Dim SqlCmd As New SqlCommand
+            SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+            SqlCmd.CommandTimeout = 1500
+            SqlCmd.Connection = SqlConn
+            SqlCmd.CommandType = CommandType.StoredProcedure
+            SqlCmd.CommandText = "New_FRM_ApproverTemplate"
+            SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+            SqlCmd.Parameters.AddWithValue("@pID", pID)
+            SqlCmd.Parameters.AddWithValue("@pTemplate", pTemplate)
+            SqlCmd.Parameters.AddWithValue("@pCreatedBy", CIIS_EmpCode)
+            'create connection
+
+            'execute procedure
+            SqlConn.Open()
+            SqlCmd.ExecuteNonQuery()
+            SqlConn.Close()
+            'execute procedure
+
+            'add value
+            RecordList.Add(New With {
+                .oReturn = "Success"
+            })
+            'add value
+
+        End If
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Delete_Approver(pFormCode, pID, pSeqNo)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Del_FRM_Approver"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pSeqNo", pSeqNo)
+        SqlCmd.Parameters.AddWithValue("@pDeletedBy", CIIS_EmpCode)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Update_Reason(pFormCode, pID, pSeqNo, pReason)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Upd_FRM_ReasonForDelay"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pSeqNo", pSeqNo)
+        SqlCmd.Parameters.AddWithValue("@pReason", pReason)
+        SqlCmd.Parameters.AddWithValue("@pUpdatedBy", CIIS_EmpCode)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Get_Subscriber(pID)
+
+        'query
+        Dim Query As New StringBuilder
+        Query.Append("select  ")
+        Query.Append("	 [A].monitored_by [Code] ")
+        Query.Append("	 ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
+        Query.Append("	 ,isnull(dbo.ProperCase([B].JobDesc),'-') [JobDesc] ")
+        Query.Append("from ")
+        Query.Append("	 oop_form_dtl_monitor [A] ")
+        Query.Append("   left join employee [B] on [A].monitored_by = [B].emp_no ")
+        Query.Append("where ")
+        Query.Append("   [A].f_code = @pID ")
+        Query.Append("order by ")
+        Query.Append("   [A].seq_no ")
+        'query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+        Dim rowIndex As Integer = 0
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pID", pID)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Icon As String = ""
+                    Dim iconName As String = If(IsDBNull(DR("Code")), "", DR("Code").ToString().Trim())
+
+                    Dim avatarPath As String = HttpContext.Current.Server.MapPath("~/Assets/media/avatars/")
+
+                    If Not String.IsNullOrEmpty(iconName) Then
+                        Dim pngPath As String = Path.Combine(avatarPath, iconName & ".png")
+                        Dim jpgPath As String = Path.Combine(avatarPath, iconName & ".jpg")
+
+                        If File.Exists(pngPath) Then
+                            Icon = "Assets/media/avatars/" & iconName & ".png"
+                        ElseIf File.Exists(jpgPath) Then
+                            Icon = "Assets/media/avatars/" & iconName & ".jpg"
+                        Else
+                            Icon = "Assets/media/avatars/blank.png"
+                        End If
+                    Else
+                        Icon = "Assets/media/avatars/blank.png"
+                    End If
+
+                    Dim Bullet As New StringBuilder
+                    Bullet.Append("<div class='h-100'><span class='bullet bullet-margin bullet-vertical h-58px bg-secondary'></span></div>")
+
+                    Dim Action As New StringBuilder()
+                    Action.Append("<div class='d-flex'>")
+                    Action.Append("     <button id='lbtn04Delete' class='btn btn-sm btn-icon btn-active-success mr-5' title='Remove User' onclick=""fn0501Delete('" & DR("Code") & "');return false;""><i class='las la-trash fs-3'></i></button>")
+                    Action.Append("</div>")
+
+
+                    Dim User As New StringBuilder
+                    User.Append("<div class='d-flex align-items-center w-100'>")
+                    User.Append("   <div class='d-flex flex-column min-w-30px mw-30px me-3' >")
+                    User.Append("       <div class='symbol symbol-30px overflow-hidden' >")
+                    User.Append("           <img alt='' class='w-100' src='" & Icon & "' />")
+                    User.Append("        </div> ")
+                    User.Append("   </div> ")
+                    User.Append("   <div class='d-flex flex-column' >")
+                    User.Append("      <span class='fw-bold text-dark'>" & DR("Name") & "</span>")
+                    User.Append("      <span class='text-muted' >" & DR("JobDesc") & "</span>")
+                    User.Append("   </div>")
+                    User.Append("</div>")
+
+                    RecordList.Add(New With {
+                        .Bullet = Bullet.ToString,
+                        .Action = Action.ToString,
+                        .User = User.ToString
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+
+        Dim serializer As JavaScriptSerializer = New JavaScriptSerializer()
+        serializer.MaxJsonLength = 2146233079
+
+        'display 
+        Return (serializer.Serialize(RecordList))
+        'display
+
+    End Function
+    Function Add_Subscriber(pFormCode, pID, pMonitorBy)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "New_FRM_Monitor"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pMonitorBy", pMonitorBy)
+        SqlCmd.Parameters.AddWithValue("@pCreatedBy", CIIS_EmpCode)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Delete_Subscriber(pFormCode, pID, pMonitorBy)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'create connection
+        Dim SqlConn As New SqlClient.SqlConnection
+        Dim SqlCmd As New SqlCommand
+        SqlConn.ConnectionString = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        SqlCmd.CommandTimeout = 1500
+        SqlCmd.Connection = SqlConn
+        SqlCmd.CommandType = CommandType.StoredProcedure
+        SqlCmd.CommandText = "Del_FRM_Monitor"
+        SqlCmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+        SqlCmd.Parameters.AddWithValue("@pID", pID)
+        SqlCmd.Parameters.AddWithValue("@pMonitoredBy", pMonitorBy)
+        SqlCmd.Parameters.AddWithValue("@pDeletedBy", CIIS_EmpCode)
+        'create connection
+
+        'execute procedure
+        SqlConn.Open()
+        SqlCmd.ExecuteNonQuery()
+        SqlConn.Close()
+        'execute procedure
+
+        'add value
+        RecordList.Add(New With {
+            .oReturn = "Success"
+        })
+        'add value
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display 
+
+    End Function
+    Function Get_History(pFormCode, pID)
+
+        'query
+        Dim Query As New StringBuilder
+        Query.Append("select ")
+        Query.Append("	[A].CreatedDate [SeqNo01] ")
+        Query.Append("	,0 [SeqNo02] ")
+        Query.Append("	,[A].CreatedBy [Icon01] ")
+        Query.Append("	,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
+        Query.Append("	,Format([A].CreatedDate,'MM/dd/yyyy hh:mm tt') [Date] ")
+        Query.Append("	,'V2' [Version] ")
+        Query.Append("	,[A].Type [Icon02] ")
+        Query.Append("	,[A].Type ")
+        Query.Append("	,[A].Description ")
+        Query.Append("from ")
+        Query.Append("	 Mstr_History [A] ")
+        Query.Append("   left join employee [B] on [A].CreatedBy = [B].emp_no ")
+        Query.Append("where ")
+        Query.Append("   [A].TblName = @pFormCode ")
+        Query.Append("   and [A].TblCode = @pID ")
+        Query.Append("union ")
+        Query.Append("select  ")
+        Query.Append("	[A].updated_Date [SeqNo01] ")
+        Query.Append("	,[A].seq_no [SeqNo02] ")
+        Query.Append("	,[A].updated_by [Icon] ")
+        Query.Append("	,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
+        Query.Append("	,Format([A].updated_Date,'MM/dd/yyyy hh:mm tt') [Date] ")
+        Query.Append("	,'V1' [Version] ")
+        Query.Append("	,[A].field [Icon02] ")
+        Query.Append("	,[A].field [Type] ")
+        Query.Append("	,[A].change [Description] ")
+        Query.Append("from ")
+        Query.Append("	 oop_form_dtl_history [A] ")
+        Query.Append("   left join employee [B] on [A].updated_by = [B].emp_no ")
+        Query.Append("where ")
+        Query.Append("   [A].f_code = @pID ")
+        Query.Append("order by ")
+        Query.Append("  [SeqNo01] ")
+        Query.Append("  ,[SeqNo02] ")
+        'query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+        Dim rowIndex As Integer = 0
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Parameters.AddWithValue("@pFormCode", pFormCode)
+                Cmd.Parameters.AddWithValue("@pID", pID)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Icon01 As String
+                    Dim iconPath As String = HttpContext.Current.Server.MapPath("~/Assets/media/avatars/" & DR("Icon01") & ".png")
+
+                    If File.Exists(iconPath) Then
+                        Icon01 = "Assets/media/avatars/" & DR("Icon01") & ".png"
+                    Else
+                        Icon01 = "Assets/media/avatars/blank.png"
+                    End If
+
+                    Dim Class02 As String
+                    Dim Icon02 As String
+
+                    If DR("Version") = "V1" And DR("Icon02") = "New Form" Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-file-alt"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Assigned To" Then
+                        Class02 = "symbol-label bg-info"
+                        Icon02 = "fs-1 text-white las la-user"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Endorsed To" Then
+                        Class02 = "symbol-label bg-info"
+                        Icon02 = "fs-1 text-white las la-user"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Relation" Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-sitemap"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Attached File" And DR("Description").ToString.Contains("Upload") Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-paperclip"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Attached File" And DR("Description").ToString.Contains("Download") Then
+                        Class02 = "symbol-label bg-info"
+                        Icon02 = "fs-1 text-white las la-paperclip"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Attached File" And DR("Description").ToString.Contains("Delete") Then
+                        Class02 = "symbol-label bg-danger"
+                        Icon02 = "fs-1 text-white la-paperclip"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Form Monitor" And DR("Description").ToString.Contains("Start Monitored") Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-user-friends"
+                    ElseIf DR("Version") = "V1" And (DR("Icon02") = "Form Monitor" And DR("Description").ToString.Contains("End Monitored")) Then
+                        Class02 = "symbol-label bg-danger"
+                        Icon02 = "fs-1 text-white las la-user-friends"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Approver" And DR("Description").ToString.Contains("Add Approver") Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-users"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Approver" And DR("Description").ToString.Contains("Remove Approver:") Then
+                        Class02 = "symbol-label bg-danger"
+                        Icon02 = "fs-1 text-white las la-users"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Approver" And DR("Description").ToString.Contains("Move Approver") Then
+                        Class02 = "symbol-label bg-info"
+                        Icon02 = "fs-1 text-white las la-users"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Note Added" Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-comment"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Status" And DR("Description").ToString.Contains("Approved") Then
+                        Class02 = "symbol-label bg-secondary"
+                        Icon02 = "fs-1 text-dark las la-flag"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Status" And DR("Description").ToString.Contains("Clarify") Then
+                        Class02 = "symbol-label bg-secondary"
+                        Icon02 = "fs-1 text-dark las la-flag"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Status" And DR("Description").ToString.Contains("Declined") Then
+                        Class02 = "symbol-label bg-secondary"
+                        Icon02 = "fs-1 text-dark las la-flag"
+                    ElseIf DR("Version") = "V1" And DR("Icon02") = "Status" And DR("Description").ToString.Contains("Reply") Then
+                        Class02 = "symbol-label bg-secondary"
+                        Icon02 = "fs-1 text-dark las la-flag"
+                    ElseIf DR("Version") = "V1" Then
+                        Class02 = "symbol-label bg-warning"
+                        Icon02 = "fs-1 text-white las la-pencil-alt"
+                    End If
+
+                    If DR("Version") = "V2" And DR("Icon02") = "Form Created:" Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-file-alt"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Assigned to:" Then
+                        Class02 = "symbol-label bg-info"
+                        Icon02 = "fs-1 text-white las la-user"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Uploaded a file:" Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-paperclip"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Downloaded a file:" Then
+                        Class02 = "symbol-label bg-info"
+                        Icon02 = "fs-1 text-white las la-paperclip"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Removed a file:" Then
+                        Class02 = "symbol-label bg-danger"
+                        Icon02 = "fs-1 text-white la-paperclip"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Added a subscriber:" Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-user-friends"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Removed a subscriber:" Then
+                        Class02 = "symbol-label bg-danger"
+                        Icon02 = "fs-1 text-white las la-user-friends"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Added an approver:" Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-users"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Removed an approver:" Then
+                        Class02 = "symbol-label bg-danger"
+                        Icon02 = "fs-1 text-white las la-users"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Moved an approver up:" Then
+                        Class02 = "symbol-label bg-info"
+                        Icon02 = "fs-1 text-white las la-users"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Moved an approver down:" Then
+                        Class02 = "symbol-label bg-info"
+                        Icon02 = "fs-1 text-white las la-users"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Added a note:" Then
+                        Class02 = "symbol-label bg-success"
+                        Icon02 = "fs-1 text-white las la-comment"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Approved:" Then
+                        Class02 = "symbol-label bg-secondary"
+                        Icon02 = "fs-1 text-dark las la-flag"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Clarify:" Then
+                        Class02 = "symbol-label bg-secondary"
+                        Icon02 = "fs-1 text-dark las la-flag"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Declined:" Then
+                        Class02 = "symbol-label bg-secondary"
+                        Icon02 = "fs-1 text-dark las la-flag"
+                    ElseIf DR("Version") = "V2" And DR("Icon02") = "Reply:" Then
+                        Class02 = "symbol-label bg-secondary"
+                        Icon02 = "fs-1 text-dark las la-flag"
+                    ElseIf DR("Version") = "V2" Then
+                        Class02 = "symbol-label bg-warning"
+                        Icon02 = "fs-1 text-white las la-pencil-alt"
+                    End If
+
+
+                    Dim Data As New StringBuilder
+                    Data.Append("<div class='d-flex align-items-center'>")
+                    Data.Append("       <div class='symbol symbol-30px overflow-hidden me-3' >")
+                    Data.Append("           <div class='symbol-label' >")
+                    Data.Append("               <img alt='' class='w-100' src='" & Icon01 & "' />")
+                    Data.Append("           </div> ")
+                    Data.Append("        </div> ")
+                    Data.Append("   <div class='d-flex flex-column min-w-200px me-3' >")
+                    Data.Append("      <span class='fw-bold text-dark nowrap-200px'>" & DR("Name") & "</span>")
+                    Data.Append("      <span class='text-muted nowrap-200px' >" & DR("Date") & "</span>")
+                    Data.Append("   </div>")
+                    Data.Append("   <div class='symbol symbol-30px overflow-hidden me-3' >")
+                    Data.Append("       <div class='" & Class02 & "' >")
+                    Data.Append("             <i class='" & Icon02 & "'></i>")
+                    Data.Append("       </div>")
+                    Data.Append("   </div>")
+                    Data.Append("   <div class='d-flex flex-column min-w-200px me-3' >")
+                    Data.Append("      <span class='fw-bold text-dark'>" & DR("Type") & "</span>")
+                    Data.Append("      <span class='text-muted' >" & DR("Description") & "</span>")
+                    Data.Append("   </div>")
+                    Data.Append("</div>")
+
+                    RecordList.Add(New With {
+                        .Data = Data.ToString
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        Dim serializer As JavaScriptSerializer = New JavaScriptSerializer()
+        serializer.MaxJsonLength = 2146233079
+
+        'display 
+        Return (serializer.Serialize(RecordList))
+        'display
 
     End Function
 #End Region

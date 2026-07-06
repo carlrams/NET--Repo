@@ -2130,7 +2130,7 @@ Public Class HNDSCM
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
 
-            ElseIf FormCode = "SCM110000" And Type = "Awarding - Update Record (House Constrution)" Then
+            ElseIf FormCode = "SCM110000" And Type = "Awarding - Update Record (House Construction)" Then
 
                 Dim pID = context.Request("pID")
                 Dim pContractor = context.Request("pContractor")
@@ -17511,10 +17511,10 @@ Public Class HNDSCM
         Query.Append("  ,Form_HWHdr.HWCode [Code] ")
         Query.Append("  ,'House Construction' [Category] ")
         Query.Append("  ,mstr_Projects.ProjInit + ' ' + Form_HWHdr.Phase + ' B' + Form_HWHdr.Block + ' L' + Form_HWHdr.Lot [Project] ")
-        Query.Append("  ,ogm_vendor.v_code [ContractorID] ")
-        Query.Append("  ,ogm_vendor.vendor [Contractor] ")
-        Query.Append("  ,Form_HWHdr.BOQ [CECode] ")
-        Query.Append("  ,Trxn_CEHdr.Title [Title] ")
+        Query.Append("  ,isnull(ogm_vendor.v_code, '') [ContractorID] ")
+        Query.Append("  ,isnull(ogm_vendor.vendor, '') [Contractor] ")
+        Query.Append("  ,isnull(Form_HWHdr.BOQ, '') [CECode] ")
+        Query.Append("  ,isnull(Trxn_CEHdr.Title, '') [Title] ")
         Query.Append("  ,Form_HWHdr.ConCategory [ConCategory] ")
         Query.Append("  ,Form_HWHdr.ConType [Type] ")
         Query.Append("  ,Form_HWHdr.ConNo [No] ")
@@ -17543,10 +17543,10 @@ Public Class HNDSCM
         Query.Append("  ,Form_CRT.CRTCode [Code] ")
         Query.Append("  ,Form_CRT.Category ")
         Query.Append("  ,isnull(Form_CRT.Project,'-') [Project] ")
-        Query.Append("  ,ogm_vendor.v_code [ContractorID] ")
-        Query.Append("  ,ogm_vendor.vendor [Contractor] ")
-        Query.Append("  ,Form_CRT.BOQ [CECode] ")
-        Query.Append("  ,Trxn_CEHdr.Title [Title] ")
+        Query.Append("  ,isnull(ogm_vendor.v_code,'') [ContractorID] ")
+        Query.Append("  ,isnull(ogm_vendor.vendor,'') [Contractor] ")
+        Query.Append("  ,isnull(Form_CRT.BOQ,'') [CECode] ")
+        Query.Append("  ,isnull(Trxn_CEHdr.Title,'') [Title] ")
         Query.Append("  ,Form_CRT.ContractCategory [ConCategory] ")
         Query.Append("  ,Form_CRT.ContractType [Type] ")
         Query.Append("  ,Form_CRT.ContractNo [No] ")

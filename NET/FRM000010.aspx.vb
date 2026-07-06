@@ -1260,6 +1260,7 @@ Public Class FRM000010
             Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
                 Using Cmd As New SqlCommand(Query.ToString)
                     Cmd.CommandType = CommandType.Text
+                    Cmd.CommandTimeout = 1500
                     Cmd.Connection = ConStr
                     ConStr.Open()
                     Dim DR As SqlDataReader = Cmd.ExecuteReader

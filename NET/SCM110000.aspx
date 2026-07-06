@@ -1133,6 +1133,8 @@
                     row.RetentionFee = Number(row.RetentionFee || 0);
                     row.Status = row.Status || "";
                     row.CECode = row.CECode || "";
+                    row.FormNo = row.FormNo || "";
+                    row.Category = row.Category || "";
 
                     // Date
                     if (row.DateAwarded instanceof Date) {

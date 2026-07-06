@@ -1717,7 +1717,30 @@ function fn0101AddEstimate(pCode, pTitle, pDivCode, pDivName) {
     $("#mdl0101Estimate").modal("hide");
 };
 function fn0102ChargeTo(pID) {
-    console.log(pID);
+    //Ajax
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+        data: {
+            'pFormCode': 'FRM000010',
+            'pType': 'Get - Estimate Charging',
+            'pCode': pID
+        },
+        success: function (response) {
+            document.getElementById("tbx0101ChargeTo").value = response[0].ChargeName;
+            document.getElementById("hf0101ChargeCode").value = response[0].ChargeCode;
+            document.getElementById("hf0101AcctCode").value = response[0].AcctCode;
+            document.getElementById("hf0101Subsidiary").value = response[0].Subsidiary;
+
+            //Division
+            document.getElementById("tbx0101Division").value = response[0].DivName;
+            document.getElementById("hf0101DivCode").value = response[0].DivCode;
+
+            //Department
+            document.getElementById("tbx0101Department").value = response[0].DeptName;
+            document.getElementById("hf0101DeptCode").value = response[0].DeptCode;
+        }
+    });
 };
 
 //charge to
@@ -4303,7 +4326,6 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
                 'pItemNo': pItemNo
             },
             success: function (response) {
-                console.log(response);
                 grid10Api.setGridOption("rowData", response);
             },
             complete: function (response) {
@@ -4697,11 +4719,21 @@ function fn0201Delete(pFormCode, pID, pFileName) {
     //if exisit
     fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
         if (response[0].oReturn == "1") {
-            Delete_Question(pFormCode, pID, pFileName);
+            Validate(pFormCode, pID, pFileName);
         } else {
             fnAlertOnly('No active form found!', 'warning', 'btn btn-warning');
         };
     });
+    //validate
+    function Validate(pFormCode, pID, pFileName) {
+        fnFRMValidateRecord("02Files", "Delete", pID, "", "", function (response) {
+            if (response[0].Msg === "") {
+                Delete_Question(pFormCode, pID, pFileName);
+            } else {
+                fnAlertOnly(response[0].Msg, 'error', 'btn btn-danger');
+            };
+        });
+    };
 
     function Delete_Question(pFormCode, pID, pFileName) {
         Swal.fire({
@@ -4978,7 +5010,7 @@ function ddl0401Approver(pfID, pType) {
         $("#ddl0401Approver").html('<option value="">Select a user</option>');
         $('#ddl0401Approver').val('').trigger('change');
         return; // stop here, no ajax
-    }
+    };
     $.ajax({
         type: "POST",
         url: "Assets/Handler/FRM/FRM000010HND.ashx",
