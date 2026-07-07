@@ -304,15 +304,15 @@ function fn0101LoadOverview(pMode, pID) {
                     function (response) {
                         document.getElementById("tbx0101RequestedBy").value = response[0].EmpName;
                         document.getElementById("tbx0101AssignedTo").value = response[0].EmpName;
-                    });
+                });
                 //name
 
                 document.getElementById("tbx0101EndorsedTo").value = "-";
                 document.getElementById("tbx0101Status").value = "New";
                 $('#ddl0101PurchaseType').val('').trigger('change');
-                $('#ddl0101ProjectType').val('').trigger('change');
+                fn0101ProjectType('', '');
                 document.getElementById("hf0101ProjectType").value = "";
-                fn0101Purpose('', '');
+                fn0101Purpose('', '', '');
                 fn0101Vehicle('');
                 fn0101Category('');
                 document.getElementById("tbx0202Category").value = "";
@@ -452,6 +452,7 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("lbl0101Status").innerText = response[0].Status;
                 document.getElementById("lbl0101PurchaseType").innerText = response[0].PurchaseType;
                 document.getElementById("lbl0101ProjectType").innerText = response[0].ProjType;
+                document.getElementById("hf0101ProjectType").value = response[0].ProjType;
                 document.getElementById("lbl0101Purpose").innerText = response[0].Purpose;
                 document.getElementById("lbl0101Vehicle").innerText = response[0].VehicleName;
                 //document.getElementById("lbl0101Category").innerText = response[0].ProjType.includes("(Stock Request)") || response[0].ProjType.includes("Advance PO") ? response[0].Category : "";
@@ -472,6 +473,21 @@ function fn0101LoadOverview(pMode, pID) {
                 //show fields
                 fn0101ShowFields(pMode);
                 //show fields
+
+                //department
+                $.get('Assets/Handler/FRM/FRM000010HND.ashx',
+                    {
+                        pFormCode: 'FRM000010',
+                        pType: 'Get - Employee'
+                    },
+                    function (response) {
+                        if (response[0].DeptCode == "2014000003" && document.getElementById("lbl0101ProjectType").innerText.includes("Advance PO")) {
+                            document.getElementById("btn11Add").style.display = "";
+                        } else {
+                            document.getElementById("btn11Add").style.display = "none";
+                        };
+                    });
+                //department
 
                 //particular
                 fn0102LoadParticular(document.getElementById("ContentPlaceHolder1_hdnMode").value, document.getElementById("ContentPlaceHolder1_hdnID").value);
@@ -541,8 +557,9 @@ function fn0101LoadOverview(pMode, pID) {
                 document.getElementById("tbx0101EndorsedTo").value = response[0].EndorsedTo;
                 document.getElementById("tbx0101Status").value = response[0].Status;
                 $('#ddl0101PurchaseType').val(response[0].PurchaseType).trigger('change');
-                $('#ddl0101ProjectType').val(response[0].ProjType).trigger('change');
-                fn0101Purpose(response[0].Purpose, response[0].ProjType);
+                fn0101ProjectType(response[0].ProjType, response[0].PurchaseType);
+                document.getElementById("hf0101ProjectType").value = response[0].ProjType;
+                fn0101Purpose(response[0].Purpose, response[0].PurchaseType, response[0].ProjType);
                 fn0101Vehicle(response[0].VehicleCode);
                 fn0101Category(response[0].Category);
                 document.getElementById("tbx0202Category").value = response[0].Purpose.includes("REPAIR AND MAINTENANCE") ? response[0].Category : "";
@@ -814,7 +831,7 @@ function fn0101Edit() {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value == "SALES EVENTS AND ACTIVITIES - Sales Events" && (document.getElementById("tbx0101ActName").value == "" || document.getElementById("tbx0101ActLocation").value == "" || document.getElementById("tbx0101ActDate").value == "")) {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
-        } else if ((document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) && document.getElementById("tbx0101ChargeTo").value == "") {
+        } else if ((document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "CCI Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) && document.getElementById("tbx0101ChargeTo").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
         } else if (document.getElementById("tbx0101Remarks").value == "") {
             fnAlertOnly('Some field(s) are missing!', 'error', 'btn btn-danger');
@@ -1113,14 +1130,37 @@ function fn0101SaveChangeStatus() {
 
 }
 //dropdown
-function fn0101Purpose(ID, ProjectType) {
+function fn0101ProjectType(ID, pVal01) {
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+        data: {
+            'pFunction': 'Dropdown',
+            'pType': 'Get - Dropdown - List',
+            'pTblName': 'Get_ProjectType',
+            'pPlaceHolder': 'Select Project Type',
+            'pVal01': pVal01,
+            'pVal02': ''
+        },
+        success: function (response) {
+            var s = '';
+            for (var i = 0; i < response.length; i++) {
+                s += '<option value="' + response[i].ID + '">' + response[i].Name + '</option>';
+            }
+            $("#ddl0101ProjectType").html(s);
+            $('#ddl0101ProjectType').val(ID).trigger('change');
+        },
+    });
+}
+function fn0101Purpose(ID, PurchaseType, ProjectType) {
     $.ajax({
         type: "POST",
         url: "Assets/Handler/FRM/FRM000010HND.ashx",
         data: {
             'pFunction': 'Dropdown',
             'pType': 'Get - Dropdown - Filter',
-            'pFilter': ProjectType,
+            'pFilter01': PurchaseType,
+            'pFilter02': ProjectType,
             'pTblName': 'Get_Purpose',
             'pPlaceHolder': 'Select Purpose'
         },
@@ -1282,7 +1322,7 @@ function fn0101ShowFields(pMode) {
         //Particular
 
         //Purchase Type
-        if (document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value == "Return" && document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" && document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value.includes("Return")) {
+        if (document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value == "Return" && (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "CCI Project") ) {
             document.getElementById("div0201Category").style.display = "";
             document.getElementById("div0102Estimate").style.display = "";
             document.getElementById("spn0102Estimate").innerText = "Estimate";
@@ -1290,7 +1330,7 @@ function fn0101ShowFields(pMode) {
         };
 
         //Project Type
-        if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) {
+        if (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "Non OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "CCI Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value.includes("Advance PO")) {
             document.getElementById("div0102ChargeTo").style.display = "";
         };
 
@@ -1394,7 +1434,7 @@ function fn0101ShowFields(pMode) {
         //Particular
 
         //Purchase Type
-        if (document.getElementById("lbl0101PurchaseType").innerText == "Return" && document.getElementById("lbl0101ProjectType").innerText == "OSM Project" && document.getElementById("lbl0101Purpose").innerText.includes("Return")) {
+        if (document.getElementById("lbl0101PurchaseType").innerText == "Return" && (document.getElementById("lbl0101ProjectType").innerText == "OSM Project" || document.getElementById("lbl0101ProjectType").innerText == "CCI Project" )) {
             document.getElementById("div0101Category").style.display = "";
             document.getElementById("div0101Estimate").style.display = "";
             document.getElementById("spn0101Estimate").innerText = "Estimate";
@@ -1408,7 +1448,7 @@ function fn0101ShowFields(pMode) {
             document.getElementById("btn11Add").style.display = "";
             document.getElementById("table11Record").style.display = "";
         };
-        if (document.getElementById("lbl0101ProjectType").innerText == "Non OSM Project" || document.getElementById("lbl0101ProjectType").innerText == "OSM Project" || document.getElementById("lbl0101ProjectType").innerText.includes("Advance PO")) {
+        if (document.getElementById("lbl0101ProjectType").innerText == "Non OSM Project" || document.getElementById("lbl0101ProjectType").innerText == "OSM Project" || document.getElementById("lbl0101ProjectType").innerText == "CCI Project" || document.getElementById("lbl0101ProjectType").innerText.includes("Advance PO")) {
             document.getElementById("div0101ChargeTo").style.display = "";
         };
 
@@ -1499,6 +1539,7 @@ function ddl0101PurchaseType_onchange(ddl0101PurchaseType) {
     document.getElementById("ddl0101ProjectType").disabled = true;
     document.getElementById("ddl0101Purpose").disabled = true;
     if (ddl0101PurchaseType.value != "") {
+        fn0101ProjectType('', ddl0101PurchaseType.value);
         $('#ddl0101Category').val('').trigger('change');
         $('#ddl0101Purpose').val('').trigger('change');
         $('#ddl0101ProjectType').val('').trigger('change');
@@ -1506,41 +1547,42 @@ function ddl0101PurchaseType_onchange(ddl0101PurchaseType) {
     };
 
     //Return
-    if (ddl0101PurchaseType.value == "Return") {
-        $('#ddl0101ProjectType option[value="OSM Project (Advance PO)"]').prop('disabled', true);
-        $('#ddl0101ProjectType option[value="OSM Project (Stock Request)"]').prop('disabled', true);
-        $('#ddl0101ProjectType option[value="CCI Project (Advance PO)"]').prop('disabled', true);
-        $('#ddl0101ProjectType option[value="CCI Project (Stock Request)"]').prop('disabled', true);
-    } else {
-        $('#ddl0101ProjectType option[value="OSM Project (Advance PO)"]').prop('disabled', false);
-        $('#ddl0101ProjectType option[value="OSM Project (Stock Request)"]').prop('disabled', false);
-        $('#ddl0101ProjectType option[value="CCI Project (Advance PO)"]').prop('disabled', false);
-        $('#ddl0101ProjectType option[value="CCI Project (Stock Request)"]').prop('disabled', false);
-    };
+    //if (ddl0101PurchaseType.value == "Return") {
+    //    $('#ddl0101ProjectType option[value="OSM Project (Advance PO)"]').prop('disabled', true);
+    //    $('#ddl0101ProjectType option[value="OSM Project (Stock Request)"]').prop('disabled', true);
+    //    $('#ddl0101ProjectType option[value="CCI Project (Advance PO)"]').prop('disabled', true);
+    //    $('#ddl0101ProjectType option[value="CCI Project (Stock Request)"]').prop('disabled', true);
+    //} else {
+    //    $('#ddl0101ProjectType option[value="OSM Project (Advance PO)"]').prop('disabled', false);
+    //    $('#ddl0101ProjectType option[value="OSM Project (Stock Request)"]').prop('disabled', false);
+    //    $('#ddl0101ProjectType option[value="CCI Project (Advance PO)"]').prop('disabled', false);
+    //    $('#ddl0101ProjectType option[value="CCI Project (Stock Request)"]').prop('disabled', false);
+    //};
 };
 function dd0101ProjectType_onchange(ddl0101ProjectType) {
+    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
+    const ddl0101PurchaseType = document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value;
+    const pProjType = document.getElementById("hf0101ProjectType").value;
     document.getElementById("ddl0101Purpose").disabled = true;
     if (ddl0101ProjectType.value != "") {
+        if (pMode == "ADD") fn0101Purpose('', ddl0101PurchaseType ? ddl0101PurchaseType : '', ddl0101ProjectType.value);
+        if (pMode == "UPD") fn0101Purpose(pProjType ? pProjType : '', ddl0101PurchaseType ? ddl0101PurchaseType : '', ddl0101ProjectType.value);
         document.getElementById("ddl0101Purpose").disabled = false;
-        fn0101Purpose('', ddl0101ProjectType.value);
-        $('#ddl0101Category').val('').trigger('change');
+        //$('#ddl0101Category').val('').trigger('change');
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
 function ddl0101Purpose_onchange(ddl0101Purpose) {
     if (ddl0101Purpose.value != "") {
-        $('#ddl0101Category').val('').trigger('change');
+        //$('#ddl0101Category').val('').trigger('change');
         fn0101GLAccount(ddl0101Purpose.value);
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
 function ddl0101Category_onchange(ddl0101Category) {
-    const pMode = document.getElementById("ContentPlaceHolder1_hdnMode").value;
     if (ddl0101Category.value != "") {
-        if (pMode == "ADD") {
-            document.getElementById("tbx0101Estimate").value = "";
-            document.getElementById("hf0101Estimate").value = "";
-        };
+        document.getElementById("tbx0101Estimate").value = "";
+        document.getElementById("hf0101Estimate").value = "";
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     } else {
         document.getElementById("tbx0101Estimate").value = "";
@@ -1700,9 +1742,9 @@ function fn0101Estimate() {
 function fn0101AddEstimate(pCode, pTitle, pDivCode, pDivName) {
     //variable
     const ddl0101PurchaseType = document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value;
-    const ddl0101Purpose = document.getElementById("ddl0101Purpose").options[document.getElementById("ddl0101Purpose").selectedIndex].value;
+    const ddl0101ProjectType = document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value;
     //condition
-    if (ddl0101PurchaseType.includes("Return") && ddl0101Purpose.includes("Return")) fn0102ChargeTo(pCode);
+    if (ddl0101PurchaseType.includes("Return") && (ddl0101ProjectType == "OSM Project" || ddl0101ProjectType == "CCI Project" ) ) fn0102ChargeTo(pCode);
     //Estimate
     document.getElementById("tbx0101Estimate").value = pTitle;
     document.getElementById("hf0101Estimate").value = pCode;
@@ -1997,12 +2039,12 @@ function fn0102LoadParticular(pMode, pID) {
                         select: true,
                         data: response,
                         rowCallback: function (row, data, index) {
-                            if (data.Scope != '') {
+                            if (data.Scope != null && data.Scope != '') {
                                 $(row).css({
                                     'background-color': '#BFF5C0',
                                     'font-weight': 'bold'
                                 });
-                            };
+                            } 
                         },
                         columns: [
                             {
@@ -2059,6 +2101,15 @@ function fn0102LoadParticular(pMode, pID) {
                     //hide loader
                     document.getElementById("div0102LoaderParticular").style.display = "none";
                     //hide loader
+
+                    // Hide rows
+                    table12Record.rows().every(function () {
+                        const data = this.data();
+                        if ((data.Scope == null || data.Scope.trim() == '') && (data.Item == null || data.Item.trim() == '')) {
+                            $(this.node()).hide();
+                        }
+                    });
+                    // Hide rows
 
                     //action button
                     if (pMode == "ADD") {
@@ -2130,12 +2181,12 @@ function fn0102LoadParticular(pMode, pID) {
                         select: true,
                         data: response,
                         rowCallback: function (row, data, index) {
-                            if (data.Scope != '') {
+                            if (data.Scope != null && data.Scope != '') {
                                 $(row).css({
                                     'background-color': '#BFF5C0',
                                     'font-weight': 'bold'
                                 });
-                            };
+                            } 
                         },
                         columns: [
                             {
@@ -2198,6 +2249,16 @@ function fn0102LoadParticular(pMode, pID) {
                     //hide loader
                     document.getElementById("div0102LoaderParticular").style.display = "none";
                     //hide loader
+
+                    // Hide rows
+                    table11Record.rows().every(function () {
+                        const data = this.data();
+                        if ((data.Scope == null || data.Scope.trim() == '') && (data.Item == null || data.Item.trim() == '')) {
+                            $(this.node()).hide();
+                        }
+                    });
+                    // Hide rows
+
 
                 } catch (err) {
                     console.error('Error initializing DataTable:', err);
@@ -2762,12 +2823,15 @@ function fn0102Edit(pID, pSeqNo) {
                 'pSeqNo': pSeqNo
             },
             success: function (response) {
+                //Variable
+                const isTagged = response[0].ItemNo ? response[0].ItemNo : response[0].SCMNo ? response[0].SCMNo : response[0].WBSNo ? response[0].WBSNo : '';
                 //Condition
-                const isHouseConstruction = response[0].Category.includes("House Construction");
-                const fields = ["tbx0102Particular", "tbx0102Qty", "tbx0102Unit", "tbx0102Budget"];
-                fields.forEach(id => {
-                    document.getElementById(id).readOnly = isHouseConstruction;
-                });
+                if (isTagged.trim() != '') {
+                    const fields = ["tbx0102Particular", "tbx0102Qty", "tbx0102Unit", "tbx0102Budget"];
+                    fields.forEach(id => {
+                        document.getElementById(id).readOnly = true;
+                    });
+                };
 
                 //Record
                 document.getElementById("tbx0102Particular").value = response[0].Item;
@@ -3315,7 +3379,7 @@ function btn11SCM() {
                         {
                             headerName: "Remarks",
                             field: "Remarks",
-                            editable: params => params.data.WBSNo != '',
+                            editable: params => params.data.WBSNo != ''
                         }
                     ],
                     rowData: [],
@@ -3919,7 +3983,7 @@ function btn11OSM() {
                         {
                             headerName: "Remarks",
                             field: "Remarks",
-                            editable: true
+                            editable: params => params.data.ItmNo != ''
                         }
                     ],
                     rowData: [],

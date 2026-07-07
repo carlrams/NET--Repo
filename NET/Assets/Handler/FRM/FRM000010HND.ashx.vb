@@ -82,10 +82,11 @@ Public Class FRM000010HND
 
             ElseIf pFunction = "Dropdown" And pType = "Get - Dropdown - Filter" Then
 
-                Dim pFilter = context.Request("pFilter")
+                Dim pFilter01 = context.Request("pFilter01")
+                Dim pFilter02 = context.Request("pFilter02")
                 Dim pTblName = context.Request("pTblName")
                 Dim pPlaceHolder = context.Request("pPlaceHolder")
-                json = Me.Get_Dropdown_Filter(pFilter, pTblName, pPlaceHolder)
+                json = Me.Get_Dropdown_Filter(pFilter01, pFilter02, pTblName, pPlaceHolder)
 
             ElseIf pFunction = "Dropdown" And pType = "Get - Dropdown - List" Then
 
@@ -94,7 +95,6 @@ Public Class FRM000010HND
                 Dim pVal01 = context.Request("pVal01")
                 Dim pVal02 = context.Request("pVal02")
                 json = Me.Get_Dropdown_List(pTblName, pPlaceHolder, pVal01, pVal02)
-
 
             End If
 
@@ -889,7 +889,7 @@ Public Class FRM000010HND
         'display
 
     End Function
-    Function Get_Dropdown_Filter(pFilter, pTblName, pPlaceHolder)
+    Function Get_Dropdown_Filter(pFilter01, pFilter02, pTblName, pPlaceHolder)
 
         'query
         Dim Query As New StringBuilder
@@ -909,7 +909,8 @@ Public Class FRM000010HND
             Query.Append("   Mstr_PurposeType [A] ")
             Query.Append("where ")
             Query.Append("   ISNULL([A].AcctCode, '') <> '' ")
-            Query.Append("   and [A].ProjectType = @pFilter ")
+            Query.Append("   and [A].PurchaseType = @pFilter01 ")
+            Query.Append("   and [A].ProjectType = @pFilter02 ")
             Query.Append("order by ")
             Query.Append("   [Order1] ")
             Query.Append("   ,[Order2] ")
@@ -924,7 +925,8 @@ Public Class FRM000010HND
         Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
             Using Cmd As New SqlCommand(Query.ToString)
                 Cmd.CommandType = CommandType.Text
-                Cmd.Parameters.AddWithValue("@pFilter", pFilter)
+                Cmd.Parameters.AddWithValue("@pFilter01", pFilter01)
+                Cmd.Parameters.AddWithValue("@pFilter02", pFilter02)
                 Cmd.Connection = ConStr
                 ConStr.Open()
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
@@ -1161,6 +1163,25 @@ Public Class FRM000010HND
             Query.Append("   and [A].lock = 1 ")
             Query.Append("order by ")
             Query.Append("   [Order] ")
+        ElseIf pTblName = "Get_ProjectType" Then
+            Query.Append("select ")
+            Query.Append("   '' [ID] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
+            Query.Append("   ,0 [Order1] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
+            Query.Append("union ")
+            Query.Append("select distinct ")
+            Query.Append("   [A].ProjectType [ID] ")
+            Query.Append("   ,[A].ProjectType [Name] ")
+            Query.Append("   ,2 [Order1] ")
+            Query.Append("   ,[A].ProjectType [Order2] ")
+            Query.Append("from ")
+            Query.Append("   Mstr_PurposeType [A] ")
+            Query.Append("where ")
+            Query.Append("   [A].PurchaseType = '" & pVal01 & "' ")
+            Query.Append("order by ")
+            Query.Append("   [Order1] ")
+            Query.Append("   ,[Order2] ")
         End If
 
         'query
@@ -1473,9 +1494,10 @@ Public Class FRM000010HND
         'query
         Dim Query As New StringBuilder
         Query.Append("select ")
-        Query.Append("	(case when isnull(dbo.ProperCase([E].first_name) + ' ' +  ")
-        Query.Append("	dbo.ProperCase([E].last_name),'') = '' then '-' else  ")
-        Query.Append("	isnull(dbo.ProperCase([E].first_name) + ' ' + dbo.ProperCase([E].last_name),'') end) [Name]  ")
+        Query.Append("	(case when isnull(dbo.ProperCase([E].first_name) + ' ' + ")
+        Query.Append("	dbo.ProperCase([E].last_name),'') = '' then '-' else ")
+        Query.Append("	isnull(dbo.ProperCase([E].first_name) + ' ' + dbo.ProperCase([E].last_name),'') end) [Name] ")
+        Query.Append("	,[E].dept_code ")
         Query.Append("from  ")
         Query.Append("	employee [E] ")
         Query.Append("where ")
@@ -1497,7 +1519,8 @@ Public Class FRM000010HND
                 While DR.Read()
 
                     RecordList.Add(New With {
-                    .EmpName = If(IsDBNull(DR("Name")), "", DR("Name"))
+                    .EmpName = If(IsDBNull(DR("Name")), "", DR("Name")),
+                    .DeptCode = DR("dept_code")
                     })
 
                 End While
@@ -3180,6 +3203,9 @@ Public Class FRM000010HND
         Query.Append("   ,[A].tot_cost [CPTotal] ")
         Query.Append("   ,[A].remarks [Remarks] ")
         Query.Append("   ,@Category [Category] ")
+        Query.Append("   ,[A].ItemNo ")
+        Query.Append("   ,[A].SCMNo ")
+        Query.Append("   ,[A].WBSNo ")
         Query.Append("from ")
         Query.Append("   ogm_pr_dtl [A] ")
         Query.Append("   left join oop_form_hdr [B] on [A].pr_code = [B].tbl_code ")
@@ -3217,7 +3243,10 @@ Public Class FRM000010HND
                         .Cost = DR("CPCost"),
                         .Total = DR("CPTotal"),
                         .Remarks = DR("Remarks"),
-                        .Category = DR("Category")
+                        .Category = DR("Category"),
+                        .ItemNo = DR("ItemNo"),
+                        .SCMNo = DR("SCMNo"),
+                        .WBSNo = DR("WBSNo")
                     })
 
                 End While

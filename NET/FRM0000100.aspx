@@ -232,12 +232,6 @@
                                     <input id="hf0101ProjectType" type="hidden" value="" />
 							        <select id="ddl0101ProjectType" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-38px" onchange="dd0101ProjectType_onchange(this);">
                                         <option value="">Select Project Type</option>
-                                        <option value="Non OSM Project">Non OSM Project</option>
-                                        <option value="OSM Project">OSM Project</option>
-                                        <option value="OSM Project (Advance PO)">OSM Project (Advance PO)</option>
-                                        <option value="OSM Project (Stock Request)">OSM Project (Stock Request)</option>
-                                        <option value="CCI Project (Advance PO)">CCI Project (Advance PO)</option>
-                                        <option value="CCI Project (Stock Request)">CCI Project (Stock Request)</option>
                                     </select>
 								</div>
 
