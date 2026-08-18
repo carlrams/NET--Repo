@@ -1472,7 +1472,6 @@
                     'seriesName': seriesName
                 },
                 success: function (response) {
-                    console.log(response)
                     DisplayChart(response)
                 },
             });

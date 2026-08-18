@@ -38,9 +38,9 @@ Public Class SCM000011
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.20"
+    Dim DataSource As String = "10.10.30.10"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciisv2"
+    Dim UserID As String = "ciis"
     Dim Password As String = "Cii5s"
     'connection
 
@@ -1156,7 +1156,7 @@ Public Class SCM000011
         Query.Append("where ")
         Query.Append("  [A].tbl_from = 'Form_CRT' ")
         Query.Append("  and [A].status not in ('Accepted', 'Cancelled', 'Declined') ")
-        Query.Append("  and [A].approver = @pEmpCode ")
+        'Query.Append("  and [A].approver = @pEmpCode ")
         Query.Append("  and [B].ContractStatus not in ('Awarded', 'Cancelled', 'Declined') ")
         Query.Append("  and ISNULL([B].Subdivision, '') not in ('Rawland') ")
         Query.Append("  and ISNULL([B].Subdivision, '') <> '' ")
@@ -1284,7 +1284,7 @@ Public Class SCM000011
         Query.Append("where ")
         Query.Append("  [A].tbl_from = 'Form_CRT' ")
         Query.Append("  and [A].status not in ('Accepted', 'Cancelled', 'Declined') ")
-        Query.Append("  and [A].approver = @pEmpCode ")
+        'Query.Append("  and [A].approver = @pEmpCode ")
         Query.Append("  and [D].DivCode = @pDivCode ")
         Query.Append("  and [B].ContractStatus not in ('Awarded', 'Cancelled', 'Declined') ")
         Query.Append("  and ISNULL([B].Subdivision, '') not in ('Rawland') ")

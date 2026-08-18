@@ -29,6 +29,7 @@ Public Class Global_asax
         routes.MapPageRoute("Account - HRMS and Payroll - Leave Balance", "ACC020200", "~/ACC020200.aspx")
         routes.MapPageRoute("Account - HRMS and Payroll - Payslip", "ACC020300", "~/ACC020300.aspx")
         routes.MapPageRoute("Account - Monitoring - Liquidation", "ACC030100", "~/ACC030100.aspx")
+        routes.MapPageRoute("Account - Monitoring - Cost Control", "ACC030200", "~/ACC030200.aspx")
         routes.MapPageRoute("Fixed Asset Type", "AMD010000", "~/AMD010000.aspx")
         routes.MapPageRoute("Fixed Asset - HDR", "AMD020000", "~/AMD020000.aspx")
         routes.MapPageRoute("Fixed Asset - DTL", "AMD020100-{Mode}-{ID}", "~/AMD020100.aspx")

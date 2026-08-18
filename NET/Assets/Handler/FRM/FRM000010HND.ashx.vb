@@ -40,7 +40,6 @@ Imports Microsoft.VisualBasic.ApplicationServices
 Imports Newtonsoft.Json
 Imports OfficeOpenXml.ConditionalFormatting.Contracts
 
-
 Public Class FRM000010HND
     Implements System.Web.IHttpHandler
 
@@ -51,9 +50,9 @@ Public Class FRM000010HND
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.10"
+    Dim DataSource As String = "10.10.30.20"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
     Dim calmardblive As String = "calmardblive"
     'connection
@@ -79,14 +78,6 @@ Public Class FRM000010HND
                 Dim pTblName = context.Request("pTblName")
                 Dim pPlaceHolder = context.Request("pPlaceHolder")
                 json = Me.Get_Dropdown(pTblName, pPlaceHolder)
-
-            ElseIf pFunction = "Dropdown" And pType = "Get - Dropdown - Filter" Then
-
-                Dim pFilter01 = context.Request("pFilter01")
-                Dim pFilter02 = context.Request("pFilter02")
-                Dim pTblName = context.Request("pTblName")
-                Dim pPlaceHolder = context.Request("pPlaceHolder")
-                json = Me.Get_Dropdown_Filter(pFilter01, pFilter02, pTblName, pPlaceHolder)
 
             ElseIf pFunction = "Dropdown" And pType = "Get - Dropdown - List" Then
 
@@ -889,66 +880,6 @@ Public Class FRM000010HND
         'display
 
     End Function
-    Function Get_Dropdown_Filter(pFilter01, pFilter02, pTblName, pPlaceHolder)
-
-        'query
-        Dim Query As New StringBuilder
-        If pTblName = "Get_Purpose" Then
-            Query.Append("select ")
-            Query.Append("   '' [ID] ")
-            Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
-            Query.Append("   ,0 [Order1] ")
-            Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
-            Query.Append("union ")
-            Query.Append("select distinct ")
-            Query.Append("   [A].Type + ' - ' + [A].Purpose [ID] ")
-            Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Name] ")
-            Query.Append("   ,2 [Order1] ")
-            Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Order2] ")
-            Query.Append("from ")
-            Query.Append("   Mstr_PurposeType [A] ")
-            Query.Append("where ")
-            Query.Append("   ISNULL([A].AcctCode, '') <> '' ")
-            Query.Append("   and [A].PurchaseType = @pFilter01 ")
-            Query.Append("   and [A].ProjectType = @pFilter02 ")
-            Query.Append("order by ")
-            Query.Append("   [Order1] ")
-            Query.Append("   ,[Order2] ")
-        End If
-        'query
-
-        'variable
-        Dim RecordList As New List(Of Object)()
-        'variable
-
-        'read record
-        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
-            Using Cmd As New SqlCommand(Query.ToString)
-                Cmd.CommandType = CommandType.Text
-                Cmd.Parameters.AddWithValue("@pFilter01", pFilter01)
-                Cmd.Parameters.AddWithValue("@pFilter02", pFilter02)
-                Cmd.Connection = ConStr
-                ConStr.Open()
-                Dim DR As SqlDataReader = Cmd.ExecuteReader
-                While DR.Read()
-
-                    RecordList.Add(New With {
-                        .ID = DR("ID"),
-                        .Name = DR("Name")
-                    })
-
-                End While
-                DR.Close()
-                ConStr.Close()
-            End Using
-        End Using
-        'read record
-
-        'display 
-        Return (New JavaScriptSerializer().Serialize(RecordList))
-        'display
-
-    End Function
     Function Get_Dropdown_List(pTblName, pPlaceHolder, pVal01, pVal02)
 
         'query
@@ -1182,6 +1113,27 @@ Public Class FRM000010HND
             Query.Append("order by ")
             Query.Append("   [Order1] ")
             Query.Append("   ,[Order2] ")
+        ElseIf pTblName = "Get_Purpose" Then
+            Query.Append("select ")
+            Query.Append("   '' [ID] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
+            Query.Append("   ,0 [Order1] ")
+            Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
+            Query.Append("union ")
+            Query.Append("select distinct ")
+            Query.Append("   [A].Type + ' - ' + [A].Purpose [ID] ")
+            Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Name] ")
+            Query.Append("   ,2 [Order1] ")
+            Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Order2] ")
+            Query.Append("from ")
+            Query.Append("   Mstr_PurposeType [A] ")
+            Query.Append("where ")
+            Query.Append("   ISNULL([A].AcctCode, '') <> '' ")
+            Query.Append("   and [A].PurchaseType = '" & pVal01 & "' ")
+            Query.Append("   and [A].ProjectType = '" & pVal02 & "' ")
+            Query.Append("order by ")
+            Query.Append("   [Order1] ")
+            Query.Append("   ,[Order2] ")
         End If
 
         'query
@@ -1247,7 +1199,7 @@ Public Class FRM000010HND
         Query.Append("  ,[B].Block [BlockCode] ")
         Query.Append("  ,[I].lot [LotName] ")
         Query.Append("  ,[B].Lot [LotCode] ")
-        Query.Append("  ,[M].CarModel + ' - ' + [M].PlateNo [VehicleName] ")
+        Query.Append("  ,[M].PlateNo + ' - ' + [M].CarModel [VehicleName] ")
         Query.Append("  ,[B].PlateNo [VehiclePlate] ")
         Query.Append("  ,[M].CarCode [VehicleCode] ")
         Query.Append("  ,[B].Type ")
@@ -1265,7 +1217,7 @@ Public Class FRM000010HND
         Query.Append("  ,[B].department [DeptCode] ")
         Query.Append("  ,ISNULL((CASE WHEN [B].Misc = 'MISCELLANEOUS' THEN (select description from sub_misc where account = [B].AcctCode and code = [B].ChargeCode) ")
         Query.Append("                WHEN [B].Misc = 'MODEL HOUSE' THEN (select description from sub_house where code = [B].ChargeCode) ")
-        Query.Append("                WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode and ProjectType = [B].justification), '') ")
+        Query.Append("                WHEN [B].Misc = 'NO SUBSIDIARY' THEN ISNULL((select Description from Mstr_PurposeType where Type + ' - ' + Purpose = [B].Purpose and AcctCode = [B].AcctCode and PurchaseType = [B].PurchaseType and ProjectType = [B].justification), '') ")
         Query.Append("                WHEN [B].Misc = 'SUBDIVISION' THEN (select description from sub_subdivision where code = [B].ChargeCode) ")
         Query.Append("                WHEN [B].Misc = 'PHASE' THEN (select description from sub_phase where code = [B].ChargeCode) ")
         Query.Append("                WHEN [B].Misc = 'VENDOR' THEN (select description from sub_vendor where code = [B].ChargeCode) ")
@@ -2520,7 +2472,9 @@ Public Class FRM000010HND
                     Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this);return false;'><i class='las la-bars fs-3'></i></button>")
                     Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
                     Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn0102Delete('" & pID & "', '" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
+                    'If DR("ProjType") = "Non OSM Project" Then
                     Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn0102Edit('" & pID & "', '" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
+                    'End If
                     If DR("Category").ToString.Contains("House Construction") And DR("ProjType").ToString.Contains("(Stock Request)") Then
                         Action.Append("      <button class='btn btn-sm btn-icon btn-view' title='Tag' onclick=""fn0102Tag('" & pID & "', '" & DR("ItemNo") & "', '" & DR("SeqNo") & "');return false;""><i class='las la-tag fs-3'></i></button>")
                     End If
@@ -2890,7 +2844,9 @@ Public Class FRM000010HND
                     Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this);return false;'><i class='las la-bars fs-3'></i></button>")
                     Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
                     Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn0102Delete('" & pID & "', '" & DR("SeqNo") & "');return false;""><i class='las la-trash fs-3'></i></button>")
+                    'If DR("ProjType") = "Non OSM Project" Then
                     Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn0102Edit('" & pID & "', '" & DR("SeqNo") & "');return false;""><i class='las la-pencil-alt fs-3'></i></button>")
+                    'End If
                     Action.Append("   </div>")
                     Action.Append("</div>")
 
@@ -3125,6 +3081,7 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
+        Query.Append("      and isnull([A].Release,0) > 0 ")
         Query.Append("   union ")
         Query.Append("   select ")
         Query.Append("      [A].SeqNo ")
@@ -3132,7 +3089,8 @@ Public Class FRM000010HND
         Query.Append("      ,[C].WNo [ItemNo] ")
         Query.Append("      ,'' [No] ")
         Query.Append("      ,[A].Particular ")
-        Query.Append("      ,isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) [Qty1] ")
+        'Query.Append("      ,isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) [Qty1] ")
+        Query.Append("      ,isnull([A].Release,0) [Qty1] ")
         Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Accepted','Declined','Cancelled')),0) [Qty2] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
@@ -3142,7 +3100,8 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        Query.Append("      and isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) > 0 ) [A] ")
+        'Query.Append("      and isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) > 0 ) [A] ")
+        Query.Append("      and isnull([A].Release,0) > 0 ) [A] ")
         Query.Append("order by ")
         Query.Append("   [ItemNo] ")
         Query.Append("   ,[SeqNo] ")
@@ -3288,13 +3247,15 @@ Public Class FRM000010HND
         Query.Append("  ,isnull([a].[Code], '') [Code] ")
         Query.Append("  ,@Particular [Particular] ")
         Query.Append("  ,[a].Title ")
+        Query.Append("  ,[a].CECode ")
         Query.Append("from ")
         Query.Append("(select ")
         Query.Append("  [a].ItemNo ")
         Query.Append("  ,[f].abbr + ' ' + [e].description + ' B' + [d].block + ' L' + [c].lot [Project] ")
         Query.Append("  ,[c].LotCode ")
         Query.Append("  ,[g].abbr [Unit] ")
-        Query.Append("  ,([a].Qty + [a].QtyRev) - [a].QtyReq [Qty1] ")
+        'Query.Append("  ,([a].Qty + [a].QtyRev) - [a].QtyReq [Qty1] ")
+        Query.Append("  ,[a].Release [Qty1] ")
         Query.Append("  ,ISNULL((select sum([h].qty) from Trxn_PRDtl_HouseCon [h] left join oop_form_hdr [i] on [h].PRCode = [i].tbl_code where [h].WBSNo = @pItemNo and [h].ItemNo = [a].ItemNo and [i].tbl_from = 'ogm_pr_hdr' and [i].status not in ('Accepted','Declined','Cancelled')),0) [Qty2]  ")
         Query.Append("  ,ISNULL((select sum([h].qty) from Trxn_PRDtl_HouseCon [h] left join oop_form_hdr [i] on [h].PRCode = [i].tbl_code where [h].WBSNo = @pItemNo and [h].ItemNo = [a].ItemNo and [i].tbl_from = 'ogm_pr_hdr' and [i].f_code = @pID and [i].status not in ('Accepted','Declined','Cancelled')),0) [Qty4]  ")
         Query.Append("  ,[a].AcctCode ")
@@ -3303,6 +3264,7 @@ Public Class FRM000010HND
         Query.Append("  ,[a].Subsidiary ")
         Query.Append("  ,[a].Code ")
         Query.Append("  ,[b].Title ")
+        Query.Append("  ,[a].CECode ")
         Query.Append("from ")
         Query.Append("  Trxn_CEDtl [a] ")
         Query.Append("  left join Trxn_CEHdr [b] on [a].CECode = [b].CECode ")
@@ -3315,10 +3277,11 @@ Public Class FRM000010HND
         Query.Append("  [A].WBSNo = @pItemNo ")
         Query.Append("  and [b].Post = 1 ")
         Query.Append("  and [b].Rvrs = 0 ")
-        Query.Append("  and ISNULL([a].IsOSM, 0) = 1 ")
+        'Query.Append("  and ISNULL([a].IsOSM, 0) = 1 ")
         Query.Append("  AND (@BatchNo = '' OR [b].Batch = @BatchNo) ")
         Query.Append("  and [B].SubdCode = @SubdCode ")
-        Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
+        'Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
+        Query.Append("  and [a].Release > 0 ")
         Query.Append("  and [a].Particular = @Particular) [a] ")
         Query.Append("end ")
         Query.Append("else if @Category in ('House Construction - CCI') ")
@@ -3339,13 +3302,15 @@ Public Class FRM000010HND
         Query.Append("  ,isnull([a].[Code], '') [Code] ")
         Query.Append("  ,@Particular [Particular] ")
         Query.Append("  ,[a].Title ")
+        Query.Append("  ,[a].CECode ")
         Query.Append("from ")
         Query.Append("(select ")
         Query.Append("  [a].ItemNo ")
         Query.Append("  ,[f].abbr + ' ' + [e].description + ' B' + [d].block + ' L' + [c].lot [Project] ")
         Query.Append("  ,[c].LotCode ")
         Query.Append("  ,[g].abbr [Unit] ")
-        Query.Append("  ,([a].Qty + [a].QtyRev) - [a].QtyReq [Qty1] ")
+        'Query.Append("  ,([a].Qty + [a].QtyRev) - [a].QtyReq [Qty1] ")
+        Query.Append("  ,[a].Release [Qty1] ")
         Query.Append("  ,ISNULL((select sum([h].qty) from Trxn_PRDtl_HouseCon_CCI [h] left join oop_form_hdr [i] on [h].PRCode = [i].tbl_code where [h].WBSNo = @pItemNo and [h].ItemNo = [a].ItemNo and [i].tbl_from = 'ogm_pr_hdr' and [i].status not in ('Accepted','Declined','Cancelled')),0) [Qty2]  ")
         Query.Append("  ,ISNULL((select sum([h].qty) from Trxn_PRDtl_HouseCon_CCI [h] left join oop_form_hdr [i] on [h].PRCode = [i].tbl_code where [h].WBSNo = @pItemNo and [h].ItemNo = [a].ItemNo and [i].tbl_from = 'ogm_pr_hdr' and [i].f_code = @pID and [i].status not in ('Accepted','Declined','Cancelled')),0) [Qty4] ")
         Query.Append("  ,[a].AcctCode ")
@@ -3354,6 +3319,7 @@ Public Class FRM000010HND
         Query.Append("  ,[a].Subsidiary ")
         Query.Append("  ,[a].Code ")
         Query.Append("  ,[b].Title ")
+        Query.Append("  ,[a].CECode ")
         Query.Append("from ")
         Query.Append("  Trxn_CEDtl [a] ")
         Query.Append("  left join Trxn_CEHdr [b] on [a].CECode = [b].CECode ")
@@ -3366,10 +3332,11 @@ Public Class FRM000010HND
         Query.Append("  [A].WBSNo = @pItemNo ")
         Query.Append("  and [b].Post = 1 ")
         Query.Append("  and [b].Rvrs = 0 ")
-        Query.Append("  and ISNULL([a].IsOSM, 0) = 1 ")
+        'Query.Append("  and ISNULL([a].IsOSM, 0) = 1 ")
         Query.Append("  AND (@BatchNo = '' OR [b].Batch = @BatchNo) ")
         Query.Append("  and [B].SubdCode = @SubdCode ")
-        Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
+        'Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
+        Query.Append("  and [a].Release > 0 ")
         Query.Append("  and [a].Particular = @Particular) [a] ")
         Query.Append("end ")
         'get query
@@ -3391,6 +3358,7 @@ Public Class FRM000010HND
 
                     RecordList.Add(New With {
                         .Title = DR("Title"),
+                        .CECode = DR("CECode"),
                         .ItemNo = DR("ItemNo"),
                         .Project = DR("Project"),
                         .LotCode = DR("LotCode"),
@@ -3608,7 +3576,7 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        Query.Append("      and isnull([A].QtyReq,0) > 0 ")
+        Query.Append("      and isnull([A].QtyUsed,0) > 0 ")
         Query.Append("      and isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) > 0 ")
         Query.Append("   union ")
         Query.Append("   select ")
@@ -3618,7 +3586,7 @@ Public Class FRM000010HND
         Query.Append("      ,'' [No] ")
         Query.Append("      ,[A].Particular ")
         Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
-        Query.Append("      ,isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) [Qty2] ")
+        Query.Append("      ,[A].QtyUsed [Qty2] ")
         Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Cancelled', 'Declined')),0) [QtyReturn] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
@@ -3628,7 +3596,7 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        Query.Append("      and isnull([A].QtyReq,0) > 0 ")
+        Query.Append("      and isnull([A].QtyUsed,0) > 0 ")
         Query.Append("      and isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) > 0 ) [A] ")
         Query.Append("order by ")
         Query.Append("   [ItemNo] ")
@@ -3660,7 +3628,7 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        Query.Append("      and isnull([A].QtyReq,0) > 0 ")
+        Query.Append("      and isnull([A].QtyUsed,0) > 0 ")
         Query.Append("      and isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon_CCI [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) > 0 ")
         Query.Append("   union ")
         Query.Append("   select ")
@@ -3670,7 +3638,8 @@ Public Class FRM000010HND
         Query.Append("      ,'' [No] ")
         Query.Append("      ,[A].Particular ")
         Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
-        Query.Append("      ,isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon_CCI [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) [Qty2] ")
+        'Query.Append("      ,isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon_CCI [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) [Qty2] ")
+        Query.Append("      ,[A].QtyUsed [Qty2] ")
         Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Cancelled', 'Declined')),0) [QtyReturn] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
@@ -3680,7 +3649,7 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        Query.Append("      and isnull([A].QtyReq,0) > 0 ")
+        Query.Append("      and isnull([A].QtyUsed,0) > 0 ")
         Query.Append("      and isnull((select sum([C].qty) from Trxn_PRDtl_HouseCon_CCI [C] left join ogm_pr_hdr [D] on [C].PRCode = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].WBSNo = [A].WBSNo and [C].ItemNo = [A].ItemNo and [C].CECode = [A].CECode and [E].status in ('Accepted')),0) > 0 ) [A] ")
         Query.Append("order by ")
         Query.Append("   [ItemNo] ")
@@ -3712,7 +3681,7 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        Query.Append("      and isnull([A].QtyReq,0) > 0 ")
+        Query.Append("      and isnull([A].QtyUsed,0) > 0 ")
         Query.Append("      and isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status in ('Accepted')),0) > 0 ")
         Query.Append("   union ")
         Query.Append("   select ")
@@ -3722,7 +3691,8 @@ Public Class FRM000010HND
         Query.Append("      ,'' [No] ")
         Query.Append("      ,[A].Particular ")
         Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
-        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status in ('Accepted')),0) [Qty2] ")
+        'Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status in ('Accepted')),0) [Qty2] ")
+        Query.Append("      ,[A].QtyUsed [Qty2] ")
         Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Cancelled', 'Declimed')),0) [QtyReturn] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
@@ -3732,7 +3702,7 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        Query.Append("      and isnull([A].QtyReq,0) > 0 ")
+        Query.Append("      and isnull([A].QtyUsed,0) > 0 ")
         Query.Append("      and isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status in ('Accepted')),0) > 0 ) [A] ")
         Query.Append("order by ")
         Query.Append("   [ItemNo] ")
