@@ -50,9 +50,9 @@ Public Class FRM000010HND
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.20"
+    Dim DataSource As String = "10.10.30.10"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciisv2"
+    Dim UserID As String = "ciis"
     Dim Password As String = "Cii5s"
     Dim calmardblive As String = "calmardblive"
     'connection
@@ -904,7 +904,7 @@ Public Class FRM000010HND
             Query.Append("   [Order1] ")
             Query.Append("   ,[Order2] ")
         ElseIf pTblName = "Change_Status" Then
-            Query.Append("if (select top 1 created_by from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '') in ('Endorsed By','Approved By','Implementer') and (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') not in ('For Cancellation')")
+            Query.Append("if (select top 1 created_by from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '' order by seq_no asc) in ('Endorsed By','Approved By','Implementer') and (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') not in ('For Cancellation')")
             Query.Append("begin ")
             Query.Append("   select ")
             Query.Append("      '' [ID] ")
@@ -922,7 +922,7 @@ Public Class FRM000010HND
             Query.Append("      'Cancelled' [ID] ")
             Query.Append("      ,'Cancel' [Name] ")
             Query.Append("end ")
-            Query.Append("else if (select top 1 created_by from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '') in ('Clarification') ")
+            Query.Append("else if (select top 1 created_by from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & pVal01 & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '' order by seq_no asc) in ('Clarification') ")
             Query.Append("begin ")
             Query.Append("   select ")
             Query.Append("      '' [ID] ")
@@ -942,7 +942,7 @@ Public Class FRM000010HND
             Query.Append("      'Cancelled' [ID] ")
             Query.Append("      ,'Cancel' [Name] ")
             Query.Append("end ")
-            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '') in ('Endorsed By','Approved By','Implementer') and (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') not in ('For Cancellation') ")
+            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '' order by seq_no desc) in ('Endorsed By','Approved By','Implementer') and (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') not in ('For Cancellation') ")
             Query.Append("begin ")
             Query.Append("   select ")
             Query.Append("      '' [ID] ")
@@ -960,7 +960,7 @@ Public Class FRM000010HND
             Query.Append("      'Declined' [ID] ")
             Query.Append("      ,'Decline' [Name] ")
             Query.Append("end ")
-            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '') in ('Clarification') ")
+            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '' order by seq_no desc) in ('Clarification') ")
             Query.Append("begin ")
             Query.Append("   select ")
             Query.Append("      '' [ID] ")
@@ -3081,7 +3081,7 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        Query.Append("      and isnull([A].Release,0) > 0 ")
+        'Query.Append("      and isnull([A].Release,0) > 0 ")
         Query.Append("   union ")
         Query.Append("   select ")
         Query.Append("      [A].SeqNo ")
@@ -3089,8 +3089,8 @@ Public Class FRM000010HND
         Query.Append("      ,[C].WNo [ItemNo] ")
         Query.Append("      ,'' [No] ")
         Query.Append("      ,[A].Particular ")
-        'Query.Append("      ,isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) [Qty1] ")
-        Query.Append("      ,isnull([A].Release,0) [Qty1] ")
+        Query.Append("      ,isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) [Qty1] ")
+        'Query.Append("      ,isnull([A].Release,0) [Qty1] ")
         Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Accepted','Declined','Cancelled')),0) [Qty2] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
@@ -3100,8 +3100,8 @@ Public Class FRM000010HND
         Query.Append("   where ")
         Query.Append("      [A].CECode = @CECode ")
         Query.Append("      and [A].TblFrom = 'ogm_item' ")
-        'Query.Append("      and isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) > 0 ) [A] ")
-        Query.Append("      and isnull([A].Release,0) > 0 ) [A] ")
+        Query.Append("      and isnull(([A].Qty + [A].QtyRev) - [A].QtyReq,0) > 0 ) [A] ")
+        'Query.Append("      and isnull([A].Release,0) > 0 ) [A] ")
         Query.Append("order by ")
         Query.Append("   [ItemNo] ")
         Query.Append("   ,[SeqNo] ")
@@ -3254,8 +3254,8 @@ Public Class FRM000010HND
         Query.Append("  ,[f].abbr + ' ' + [e].description + ' B' + [d].block + ' L' + [c].lot [Project] ")
         Query.Append("  ,[c].LotCode ")
         Query.Append("  ,[g].abbr [Unit] ")
-        'Query.Append("  ,([a].Qty + [a].QtyRev) - [a].QtyReq [Qty1] ")
-        Query.Append("  ,[a].Release [Qty1] ")
+        Query.Append("  ,([a].Qty + [a].QtyRev) - [a].QtyReq [Qty1] ")
+        'Query.Append("  ,[a].Release [Qty1] ")
         Query.Append("  ,ISNULL((select sum([h].qty) from Trxn_PRDtl_HouseCon [h] left join oop_form_hdr [i] on [h].PRCode = [i].tbl_code where [h].WBSNo = @pItemNo and [h].ItemNo = [a].ItemNo and [i].tbl_from = 'ogm_pr_hdr' and [i].status not in ('Accepted','Declined','Cancelled')),0) [Qty2]  ")
         Query.Append("  ,ISNULL((select sum([h].qty) from Trxn_PRDtl_HouseCon [h] left join oop_form_hdr [i] on [h].PRCode = [i].tbl_code where [h].WBSNo = @pItemNo and [h].ItemNo = [a].ItemNo and [i].tbl_from = 'ogm_pr_hdr' and [i].f_code = @pID and [i].status not in ('Accepted','Declined','Cancelled')),0) [Qty4]  ")
         Query.Append("  ,[a].AcctCode ")
@@ -3280,8 +3280,8 @@ Public Class FRM000010HND
         'Query.Append("  and ISNULL([a].IsOSM, 0) = 1 ")
         Query.Append("  AND (@BatchNo = '' OR [b].Batch = @BatchNo) ")
         Query.Append("  and [B].SubdCode = @SubdCode ")
-        'Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
-        Query.Append("  and [a].Release > 0 ")
+        Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
+        'Query.Append("  and [a].Release > 0 ")
         Query.Append("  and [a].Particular = @Particular) [a] ")
         Query.Append("end ")
         Query.Append("else if @Category in ('House Construction - CCI') ")
@@ -3309,8 +3309,8 @@ Public Class FRM000010HND
         Query.Append("  ,[f].abbr + ' ' + [e].description + ' B' + [d].block + ' L' + [c].lot [Project] ")
         Query.Append("  ,[c].LotCode ")
         Query.Append("  ,[g].abbr [Unit] ")
-        'Query.Append("  ,([a].Qty + [a].QtyRev) - [a].QtyReq [Qty1] ")
-        Query.Append("  ,[a].Release [Qty1] ")
+        Query.Append("  ,([a].Qty + [a].QtyRev) - [a].QtyReq [Qty1] ")
+        'Query.Append("  ,[a].Release [Qty1] ")
         Query.Append("  ,ISNULL((select sum([h].qty) from Trxn_PRDtl_HouseCon_CCI [h] left join oop_form_hdr [i] on [h].PRCode = [i].tbl_code where [h].WBSNo = @pItemNo and [h].ItemNo = [a].ItemNo and [i].tbl_from = 'ogm_pr_hdr' and [i].status not in ('Accepted','Declined','Cancelled')),0) [Qty2]  ")
         Query.Append("  ,ISNULL((select sum([h].qty) from Trxn_PRDtl_HouseCon_CCI [h] left join oop_form_hdr [i] on [h].PRCode = [i].tbl_code where [h].WBSNo = @pItemNo and [h].ItemNo = [a].ItemNo and [i].tbl_from = 'ogm_pr_hdr' and [i].f_code = @pID and [i].status not in ('Accepted','Declined','Cancelled')),0) [Qty4] ")
         Query.Append("  ,[a].AcctCode ")
@@ -3335,8 +3335,8 @@ Public Class FRM000010HND
         'Query.Append("  and ISNULL([a].IsOSM, 0) = 1 ")
         Query.Append("  AND (@BatchNo = '' OR [b].Batch = @BatchNo) ")
         Query.Append("  and [B].SubdCode = @SubdCode ")
-        'Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
-        Query.Append("  and [a].Release > 0 ")
+        Query.Append("  and ([a].Qty + [a].QtyRev) - [a].QtyReq > 0 ")
+        'Query.Append("  and [a].Release > 0 ")
         Query.Append("  and [a].Particular = @Particular) [a] ")
         Query.Append("end ")
         'get query

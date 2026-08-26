@@ -3810,7 +3810,19 @@
                                             return data;
                                         }
                                     },
-                                    { data: 'ItemName' },
+                                    {
+                                        data: 'ItemName',
+                                        render: function (data, type, row, meta) {
+                                            if (type === "display") {
+                                                let rowId = `${row.rowId}`;
+                                                let textbox = `
+                                                      <span title='${row.ItemName}'>${row.ItemName}</span>
+                                                  `;
+                                                return textbox;
+                                            }
+                                            return data;
+                                        }
+                                    },
                                     { data: 'Qty' },
                                     { data: 'QtyBal' },
                                     {
