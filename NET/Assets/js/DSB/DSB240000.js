@@ -2745,7 +2745,7 @@ function fn04Table() {
             if (params.node.rowPinned) {
                 return { fontWeight: 'bold', background: '#f8f9fa' };
             }
-        }
+        },
     };
     grid04Api = agGrid.createGrid(gridDiv, gridOptions);
 

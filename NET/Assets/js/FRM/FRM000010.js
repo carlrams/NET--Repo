@@ -3640,6 +3640,31 @@ function btn11OSM() {
                     },
                     success: function (response) {
                         grid06Api.setGridOption("rowData", response);
+                        let currentSection = '';
+                        let sectionStartIndex = -1;
+
+                        response.forEach((row, idx) => {
+                            if (row.WBSNo === '') {
+                                currentSection = row.Particular;
+                                sectionStartIndex = idx;
+                                row.Section = row.Particular;
+                            } else {
+                                row.Section = currentSection;
+                            }
+                        });
+
+                        response.forEach((row, idx) => {
+                            if (row.WBSNo === '') {
+                                const childrenText = response
+                                    .filter(r => r.Section === row.Section && r.WBSNo !== '')
+                                    .map(r => r.Particular)
+                                    .join(' ');
+                                row.SearchText = `${row.Particular} ${childrenText}`;
+                            } else {
+                                row.SearchText = `${row.Particular} ${row.Unit || ''} ${row.Remarks || ''} ${row.Section}`;
+                            }
+                        });
+
                     },
                     complete: function (response) {
                         grid06Api.setGridOption("loading", false);
@@ -3685,6 +3710,7 @@ function btn11OSM() {
                             resizable: false,
                             lockPosition: true,
                             width: 75,
+                            getQuickFilterText: params => params.data.SearchText || '',
                             cellRenderer: params => {
                                 if (params.data.WBSNo == '') {
                                     return '';
@@ -3810,6 +3836,32 @@ function btn11OSM() {
                     },
                     success: function (response) {
                         grid07Api.setGridOption("rowData", response);
+
+                        let currentSection = '';
+                        let sectionStartIndex = -1;
+
+                        response.forEach((row, idx) => {
+                            if (row.ItmNo === '') {
+                                currentSection = row.Particular;
+                                sectionStartIndex = idx;
+                                row.Section = row.Particular;
+                            } else {
+                                row.Section = currentSection;
+                            }
+                        });
+
+                        response.forEach((row, idx) => {
+                            if (row.ItmNo === '') {
+                                const childrenText = response
+                                    .filter(r => r.Section === row.Section && r.ItmNo !== '')
+                                    .map(r => r.Particular)
+                                    .join(' ');
+                                row.SearchText = `${row.Particular} ${childrenText}`;
+                            } else {
+                                row.SearchText = `${row.Particular} ${row.Unit || ''} ${row.Remarks || ''} ${row.Section}`;
+                            }
+                        });
+
                     },
                     complete: function (response) {
                         grid07Api.setGridOption("loading", false);
@@ -3877,6 +3929,7 @@ function btn11OSM() {
                             tooltipField: "Particular",
                             flex: 1,
                             minWidth: 350,
+                            getQuickFilterText: params => params.data.SearchText || '',
                             cellStyle: params => {
                                 if (params.data.ItmNo == '') {
                                     return { fontWeight: 'bold' }

@@ -50,9 +50,9 @@ Public Class FRM000010HND
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.10"
+    Dim DataSource As String = "10.10.30.20"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
+    Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
     Dim calmardblive As String = "calmardblive"
     'connection
@@ -942,7 +942,7 @@ Public Class FRM000010HND
             Query.Append("      'Cancelled' [ID] ")
             Query.Append("      ,'Cancel' [Name] ")
             Query.Append("end ")
-            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '' order by seq_no desc) in ('Endorsed By','Approved By','Implementer') and (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') not in ('For Cancellation') ")
+            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '' order by seq_no asc) in ('Endorsed By','Approved By','Implementer') and (select top 1 status from oop_form_hdr where f_code = '" & pVal01 & "') not in ('For Cancellation') ")
             Query.Append("begin ")
             Query.Append("   select ")
             Query.Append("      '' [ID] ")
@@ -960,7 +960,7 @@ Public Class FRM000010HND
             Query.Append("      'Declined' [ID] ")
             Query.Append("      ,'Decline' [Name] ")
             Query.Append("end ")
-            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '' order by seq_no desc) in ('Clarification') ")
+            Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & pVal01 & "' and status = '' order by seq_no asc) in ('Clarification') ")
             Query.Append("begin ")
             Query.Append("   select ")
             Query.Append("      '' [ID] ")
@@ -3237,7 +3237,7 @@ Public Class FRM000010HND
         Query.Append("  ,[a].[Unit] ")
         Query.Append("  ,[a].[Qty1] ")
         Query.Append("  ,[a].[Qty2] ")
-        Query.Append("  ,[a].[Qty1] - [a].[Qty2] [Qty3] ")
+        Query.Append("  ,([a].[Qty1] - [a].[Qty2]) [Qty3] ")
         Query.Append("  ,[a].[Qty4] ")
         Query.Append("  ,[a].[LotCode] ")
         Query.Append("  ,isnull([a].[AcctCode], '') [AcctCode] ")
