@@ -52,7 +52,7 @@ Public Class PMD020100
 
     Private Shared DataSource1 As String = "IISV2"
     Private Shared catalog1 As String = "cldc_live_acc"
-    Private Shared UserID1 As String = "ciis"
+    Private Shared UserID1 As String = "ciisv2"
     Private Shared Password1 As String = "Cii5s"
 
 

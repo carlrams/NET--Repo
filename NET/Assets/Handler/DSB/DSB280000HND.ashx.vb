@@ -35,9 +35,9 @@ Public Class DSB280000HND
     Dim UserID As String = "ciisv2"
     Dim Password As String = "Cii5s"
 
-    Dim DataSource1 As String = "10.10.30.10"
+    Dim DataSource1 As String = "10.10.30.20"
     Dim catalog1 As String = "cldc_live_acc"
-    Dim UserID1 As String = "ciis"
+    Dim UserID1 As String = "ciisv2"
     Dim Password1 As String = "Cii5s"
     'connection
 

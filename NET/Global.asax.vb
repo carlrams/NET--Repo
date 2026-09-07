@@ -302,6 +302,10 @@ Public Class Global_asax
         routes.MapPageRoute("Apps - Data Entry - Credit Terms Masterlist (DTL)", "SCM150100-{Mode}-{ID}", "~/SCM150100.aspx")
         'Credit Terms Masterlist
 
+        'Contractor Admin
+        routes.MapPageRoute("Apps - Data Entry - Contractor Announcement", "SCM170000", "~/SCM170000.aspx")
+        'Contractor Admin
+
         'Cost Estimate
         routes.MapPageRoute("Apps - Data Entry - Cost Estimate (HDR)", "FIN170000", "~/FIN170000.aspx")
         routes.MapPageRoute("Apps - Data Entry - Cost Estimate (DTL)", "FIN170100-{Mode}-{ID}", "~/FIN170100.aspx")

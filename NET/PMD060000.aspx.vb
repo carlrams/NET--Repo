@@ -26,9 +26,9 @@ Public Class PMD060000
     Dim Password As String = "Cii5s"
     Dim FormCode As String = "PMD060000"
 
-    Private Shared DataSource1 As String = "10.10.30.10"
+    Private Shared DataSource1 As String = "10.10.30.20"
     Private Shared catalog1 As String = "cldc_live_acc"
-    Private Shared UserID1 As String = "ciis"
+    Private Shared UserID1 As String = "ciisv2"
     Private Shared Password1 As String = "Cii5s"
 
     Dim AssignToDT As New DataTable

@@ -665,6 +665,7 @@
     <Content Include="Assets\js\SCM\SCM010101.js" />
     <Content Include="Assets\js\SCM\SCM010102.js" />
     <Content Include="Assets\js\SCM\SCM010200.js" />
+    <Content Include="Assets\js\SCM\SCM170000.js" />
     <Content Include="Assets\js\scripts.bundle.js" />
     <Content Include="Assets\js\widgets.bundle.js" />
     <Content Include="Assets\media\avatars\1992000001.png" />
@@ -3436,6 +3437,7 @@
     <Content Include="SCM140100.aspx" />
     <Content Include="SCM150000.aspx" />
     <Content Include="SCM150100.aspx" />
+    <Content Include="SCM170000.aspx" />
     <Content Include="SCMRPTViewer.aspx" />
     <Content Include="SCMRT0001.aspx" />
     <Content Include="SCMRT0002.aspx" />
@@ -5913,6 +5915,13 @@
     </Compile>
     <Compile Include="SCM150100.aspx.vb">
       <DependentUpon>SCM150100.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM170000.aspx.designer.vb">
+      <DependentUpon>SCM170000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM170000.aspx.vb">
+      <DependentUpon>SCM170000.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="SCMRPTViewer.aspx.designer.vb">

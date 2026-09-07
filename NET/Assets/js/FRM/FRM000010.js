@@ -137,13 +137,23 @@ function isNumberKey(e, input) {
 
 //general
 function fn01Load() {
-    fn0101LoadOverview(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
-    fn0102LoadParticular(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
-    fn0201LoadAttachment(document.getElementById('ContentPlaceHolder1_hdnMode').value, document.getElementById('ContentPlaceHolder1_hdnID').value);
-    fn0301LoadNotes(document.getElementById('ContentPlaceHolder1_hdnID').value);
-    fn0401LoadApprover(document.getElementById('ContentPlaceHolder1_hdnID').value);
-    fn0501LoadSubscriber(document.getElementById('ContentPlaceHolder1_hdnID').value);
-    fn0601LoadHistory(document.getElementById('ContentPlaceHolder1_hdnID').value);
+    let pID = document.getElementById('ContentPlaceHolder1_hdnID').value;
+    pID = pID.includes("No") ? pID.replace("No", "#") : pID;
+    fn0101LoadOverview(document.getElementById('ContentPlaceHolder1_hdnMode').value, pID);
+    fn0102LoadParticular(document.getElementById('ContentPlaceHolder1_hdnMode').value, pID);
+    fn0201LoadAttachment(document.getElementById('ContentPlaceHolder1_hdnMode').value, pID);
+    fn0301LoadNotes(pID);
+    fn0401LoadApprover(pID);
+    fn0501LoadSubscriber(pID);
+    fn0601LoadHistory(pID);
+
+    //Page title
+    if (pID === '000000000000') {
+        document.title = "Purchase Request - Add New";
+    } else {
+        document.title = "Purchase Request - " + pID;
+    }
+
 };
 function fn01DisableButtons(pValue) {
 
@@ -2457,6 +2467,30 @@ function fn11AddReturn() {
             },
             success: function (response) {
                 grid09Api.setGridOption("rowData", response);
+                let currentSection = '';
+                let sectionStartIndex = -1;
+
+                response.forEach((row, idx) => {
+                    if (row.ItmNo === '') {
+                        currentSection = row.Particular;
+                        sectionStartIndex = idx;
+                        row.Section = row.Particular;
+                    } else {
+                        row.Section = currentSection;
+                    }
+                });
+
+                response.forEach((row, idx) => {
+                    if (row.ItmNo === '') {
+                        const childrenText = response
+                            .filter(r => r.Section === row.Section && r.ItmNo !== '')
+                            .map(r => r.Particular)
+                            .join(' ');
+                        row.SearchText = `${row.Particular} ${childrenText}`;
+                    } else {
+                        row.SearchText = `${row.Particular} ${row.Unit || ''} ${row.Remarks || ''} ${row.Section}`;
+                    }
+                });
             },
             complete: function (response) {
                 grid09Api.setGridOption("loading", false);
@@ -2498,7 +2532,7 @@ function fn11AddReturn() {
             onRowSelected: params => {
                 const node = params.node;
                 if (params.node.isSelected()) {
-                    node.setDataValue('QtyReturn', node.data.Qty2);
+                    node.setDataValue('QtyReturn', node.data.Qty3);
                 } else {
                     node.setDataValue('QtyReturn', 0);
                 }
@@ -2511,6 +2545,7 @@ function fn11AddReturn() {
                     sortable: false,
                     width: 75,
                     checkboxSelection: params => params.data.ItmNo != '',
+                    getQuickFilterText: params => params.data.SearchText || '',
                     cellStyle: {
                         display: 'flex',
                         justifyContent: 'center',
@@ -2807,7 +2842,6 @@ function fn0102Delete(pID, pSeqNo) {
 };
 //update - particular
 function fn0102Edit(pID, pSeqNo) {
-    console.log(pID);
     //if exists
     fnIfExist('oop_form_hdr', 'f_code', document.getElementById('ContentPlaceHolder1_hdnID').value, function (response) {
         if (response[0].oReturn == "1") {
@@ -3597,7 +3631,29 @@ function fn0101ReBindOSMBatch() {
             'pID': document.getElementById("ContentPlaceHolder1_hdnID").value
         },
         success: function (response) {
-            grid06Api.setGridOption("rowData", response);
+            let currentSection = '';
+            response.forEach(row => {
+                if (row.WBSNo === '') {
+                    currentSection = row.Particular;
+                    row.Section = row.Particular;
+                } else {
+                    row.Section = currentSection;
+                }
+            });
+
+            response.forEach(row => {
+                if (row.WBSNo === '') {
+                    const childrenText = response
+                        .filter(r => r.Section === row.Section && r.WBSNo !== '')
+                        .map(r => r.Particular)
+                        .join(' ');
+                    row.SearchText = `${row.Particular} ${childrenText}`;
+                } else {
+                    row.SearchText = `${row.Particular} ${row.Unit || ''} ${row.Remarks || ''} ${row.Section}`;
+                }
+            });
+
+            grid06Api.applyTransaction({ update: response });
         }
     });
 };
@@ -3691,6 +3747,7 @@ function btn11OSM() {
 
                 gridOptions = {
                     theme: gridTheme,
+                    getRowId: params => params.data.WBSNo ? params.data.WBSNo : params.data.Particular,
                     suppressCellFocus: true,
                     suppressDragLeaveHidesColumns: true,
                     enableCellTextSelection: true,

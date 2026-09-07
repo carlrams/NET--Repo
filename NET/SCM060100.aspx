@@ -9664,7 +9664,7 @@
                 document.getElementById("tbx010501Find").value,
             );
         };
-        function fn010401ItemCode(pItemName, pItemCode, pUMName, pUMCode, pCost, pCanvass, pLock) {
+        function fn010401ItemCode(pItemCode, pUMName, pUMCode, pCost, pCanvass, pLock) {
             //validate
             if (pLock == 1) {
                 Item(pItemName, pItemCode, pUMName, pUMCode, pCost, pCanvass);

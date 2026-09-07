@@ -85,7 +85,8 @@ Public Class FRM000010HND
                 Dim pPlaceHolder = context.Request("pPlaceHolder")
                 Dim pVal01 = context.Request("pVal01")
                 Dim pVal02 = context.Request("pVal02")
-                json = Me.Get_Dropdown_List(pTblName, pPlaceHolder, pVal01, pVal02)
+                Dim pEmpCode = CIIS_EmpCode
+                json = Me.Get_Dropdown_List(pTblName, pPlaceHolder, pVal01, pVal02, pEmpCode)
 
             End If
 
@@ -880,7 +881,7 @@ Public Class FRM000010HND
         'display
 
     End Function
-    Function Get_Dropdown_List(pTblName, pPlaceHolder, pVal01, pVal02)
+    Function Get_Dropdown_List(pTblName, pPlaceHolder, pVal01, pVal02, pEmpCode)
 
         'query
         Dim Query As New StringBuilder
@@ -1114,32 +1115,57 @@ Public Class FRM000010HND
             Query.Append("   [Order1] ")
             Query.Append("   ,[Order2] ")
         ElseIf pTblName = "Get_Purpose" Then
-            Query.Append("select ")
-            Query.Append("   '' [ID] ")
-            Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
-            Query.Append("   ,0 [Order1] ")
-            Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
-            Query.Append("union ")
-            Query.Append("select distinct ")
-            Query.Append("   [A].Type + ' - ' + [A].Purpose [ID] ")
-            Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Name] ")
-            Query.Append("   ,2 [Order1] ")
-            Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Order2] ")
-            Query.Append("from ")
-            Query.Append("   Mstr_PurposeType [A] ")
-            Query.Append("where ")
-            Query.Append("   ISNULL([A].AcctCode, '') <> '' ")
-            Query.Append("   and [A].PurchaseType = '" & pVal01 & "' ")
-            Query.Append("   and [A].ProjectType = '" & pVal02 & "' ")
-            Query.Append("order by ")
-            Query.Append("   [Order1] ")
-            Query.Append("   ,[Order2] ")
+            If (pEmpCode = "2018000067" Or pEmpCode = "MN2019110001" Or pEmpCode = "MN2024070010") Then
+                Query.Append("select ")
+                Query.Append("   '' [ID] ")
+                Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
+                Query.Append("   ,0 [Order1] ")
+                Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
+                Query.Append("union ")
+                Query.Append("select distinct ")
+                Query.Append("   [A].Type + ' - ' + [A].Purpose [ID] ")
+                Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Name] ")
+                Query.Append("   ,2 [Order1] ")
+                Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Order2] ")
+                Query.Append("from ")
+                Query.Append("   Mstr_PurposeType [A] ")
+                Query.Append("where ")
+                Query.Append("   ISNULL([A].AcctCode, '') <> '' ")
+                Query.Append("   and [A].PurchaseType = '" & pVal01 & "' ")
+                Query.Append("   and [A].ProjectType = '" & pVal02 & "' ")
+                Query.Append("order by ")
+                Query.Append("   [Order1] ")
+                Query.Append("   ,[Order2] ")
+            Else
+                Query.Append("select ")
+                Query.Append("   '' [ID] ")
+                Query.Append("   ,'" & pPlaceHolder & "' [Name] ")
+                Query.Append("   ,0 [Order1] ")
+                Query.Append("   ,'" & pPlaceHolder & "' [Order2] ")
+                Query.Append("union ")
+                Query.Append("select distinct ")
+                Query.Append("   [A].Type + ' - ' + [A].Purpose [ID] ")
+                Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Name] ")
+                Query.Append("   ,2 [Order1] ")
+                Query.Append("   ,[A].Type + ' - ' + [A].Purpose [Order2] ")
+                Query.Append("from ")
+                Query.Append("   Mstr_PurposeType [A] ")
+                Query.Append("where ")
+                Query.Append("   ISNULL([A].AcctCode, '') <> '' ")
+                Query.Append("   and [A].Purpose not in ('Office Supplies (Stock Request)') ")
+                Query.Append("   and [A].PurchaseType = '" & pVal01 & "' ")
+                Query.Append("   and [A].ProjectType = '" & pVal02 & "' ")
+                Query.Append("   and [A].ProjectType = '" & pVal02 & "' ")
+                Query.Append("order by ")
+                Query.Append("   [Order1] ")
+                Query.Append("   ,[Order2] ")
+            End If
         End If
 
-        'query
+            'query
 
-        'variable
-        Dim RecordList As New List(Of Object)()
+            'variable
+            Dim RecordList As New List(Of Object)()
         'variable
 
         'read record
@@ -3556,8 +3582,8 @@ Public Class FRM000010HND
         Query.Append("   [Particular] ")
         Query.Append("   ,[ItmNo] ")
         Query.Append("   ,[Qty1] ")
-        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty2] ")
-        Query.Append("   ,([Qty1] - [Qty2]) [Qty3] ")
+        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty3] ")
         Query.Append("   ,[UOM] ")
         Query.Append("from ")
         Query.Append("   (select ")
@@ -3608,8 +3634,8 @@ Public Class FRM000010HND
         Query.Append("   [Particular] ")
         Query.Append("   ,[ItmNo] ")
         Query.Append("   ,[Qty1] ")
-        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty2] ")
-        Query.Append("   ,([Qty1] - [Qty2]) [Qty3] ")
+        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty3] ")
         Query.Append("   ,[UOM] ")
         Query.Append("from ")
         Query.Append("   (select ")
@@ -3661,8 +3687,8 @@ Public Class FRM000010HND
         Query.Append("   [Particular] ")
         Query.Append("   ,[ItmNo] ")
         Query.Append("   ,[Qty1] ")
-        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty2] ")
-        Query.Append("   ,([Qty1] - [Qty2]) [Qty3] ")
+        Query.Append("   ,[Qty2] ")
+        Query.Append("   ,([Qty2] - [QtyReturn]) [Qty3] ")
         Query.Append("   ,[UOM] ")
         Query.Append("from ")
         Query.Append("   (select ")
@@ -3693,7 +3719,7 @@ Public Class FRM000010HND
         Query.Append("      ,isnull(([A].Qty + [A].QtyRev),0) [Qty1] ")
         'Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status in ('Accepted')),0) [Qty2] ")
         Query.Append("      ,[A].QtyUsed [Qty2] ")
-        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [E].status not in ('Cancelled', 'Declimed')),0) [QtyReturn] ")
+        Query.Append("      ,isnull((select sum([C].qty) from ogm_pr_dtl [C] left join ogm_pr_hdr [D] on [C].pr_code = [D].pr_code left join oop_form_hdr [E] on [E].f_code = [D].form_no where [C].ItemNo = [A].ItemNo and [D].PurchaseType in ('Return') and [E].status not in ('Cancelled', 'Declined')),0) [QtyReturn] ")
         Query.Append("      ,[B].abbr [UOM] ")
         Query.Append("   FROM ")
         Query.Append("      Trxn_CEDtl [A] ")

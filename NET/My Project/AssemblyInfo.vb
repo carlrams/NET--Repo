@@ -7,10 +7,10 @@ Imports System.Runtime.InteropServices
 ' associated with an assembly.
 
 ' Review the values of the assembly attributes
-<Assembly: AssemblyTitle("CIIS")>
+<Assembly: AssemblyTitle("ciisv2")>
 <Assembly: AssemblyDescription("Calmarland Integrated Information System")>
 <Assembly: AssemblyCompany("Calmar Technologies")>
-<Assembly: AssemblyProduct("CIIS")>
+<Assembly: AssemblyProduct("ciisv2")>
 <Assembly: AssemblyCopyright("Copyright © C-Tech 2021")>
 <Assembly: AssemblyTrademark("")>
 

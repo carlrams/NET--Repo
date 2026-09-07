@@ -219,7 +219,7 @@
                                         <option value="Cash Advance">Cash Advance</option>
                                         <option value="Cash Reimbursement">Cash Reimbursement</option>
                                         <option value="Credit Purchase">Credit Purchase</option>
-                                        <option value="Department Petty Cash Fund">Department Petty Cash Fund</option>
+                                        <option value="Department Petty Cash Fund" disabled>Department Petty Cash Fund</option>
                                         <option value="Gate Pass">Gate Pass</option>
                                         <option value="Return">Return</option>
                                         <option value="Stock Request">Stock Request</option>

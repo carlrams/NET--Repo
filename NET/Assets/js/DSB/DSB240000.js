@@ -2477,7 +2477,6 @@ function fn0301Table(pID) {
     $("#mdl0301Record").modal("show");
 };
 function fn04Table() {
-    //Ajax
     $.ajax({
         type: "POST",
         url: "Assets/Handler/DSB/DSB240000HND.ashx",
@@ -2500,11 +2499,7 @@ function fn04Table() {
         AbbrMonths.push(d.toLocaleString('default', { month: 'short' }));
     }
 
-    //AG Grid
     let gridDiv = document.querySelector('#table04Record');
-    let gridOptions;
-
-    // Destroy old grid if exists
     gridDiv.innerHTML = "";
 
     const gridTheme = agGrid.themeQuartz.withParams({
@@ -2512,10 +2507,9 @@ function fn04Table() {
         headerRowBorder: false,
     });
 
-    gridOptions = {
+    const gridOptions = {
         onGridSizeChanged: function (params) {
             const isMobile = params.clientWidth < 768;
-
             if (isMobile) {
                 params.api.applyColumnState({
                     defaultState: { pinned: null }
@@ -2540,7 +2534,7 @@ function fn04Table() {
         onFirstDataRendered: updFooter,
         columnDefs: [
             {
-                headerName: "Item",
+                headerName: "Item / Warehouse",
                 field: "ItemName",
                 filter: 'agTextColumnFilter',
                 tooltipField: "ItemName",
@@ -2548,135 +2542,103 @@ function fn04Table() {
                 flex: 1,
                 minWidth: 450,
                 getQuickFilterText: params => params.data.SearchText || '',
-                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+                cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { paddingLeft: '25px', fontStyle: 'italic' }
             },
             {
                 headerName: AbbrMonths[6],
                 field: "Month7",
                 tooltipField: "Month7",
-                width: 150,
-                cellStyle: { fontStyle: 'italic' },
+                width: 130,
+                cellClass: "text-end",
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Month6) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 },
-                getQuickFilterText: () => '',
-                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+                cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { fontStyle: 'italic' }
             },
             {
                 headerName: AbbrMonths[5],
                 field: "Month6",
                 tooltipField: "Month6",
-                width: 150,
-                cellStyle: { fontStyle: 'italic' },
+                width: 130,
+                cellClass: "text-end",
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Month6) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 },
-                getQuickFilterText: () => '',
-                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+                cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { fontStyle: 'italic' }
             },
             {
                 headerName: AbbrMonths[4],
                 field: "Month5",
                 tooltipField: "Month5",
-                width: 150,
+                width: 130,
+                cellClass: "text-end",
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Month5) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 },
-                getQuickFilterText: () => '',
-                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+                cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { fontStyle: 'italic' }
             },
             {
                 headerName: AbbrMonths[3],
                 field: "Month4",
                 tooltipField: "Month4",
-                width: 150,
+                width: 130,
+                cellClass: "text-end",
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Month4) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 },
-                getQuickFilterText: () => '',
-                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+                cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { fontStyle: 'italic' }
             },
             {
                 headerName: AbbrMonths[2],
                 field: "Month3",
                 tooltipField: "Month3",
-                width: 150,
+                width: 130,
+                cellClass: "text-end",
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Month3) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 },
-                getQuickFilterText: () => '',
-                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+                cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { fontStyle: 'italic' }
             },
             {
                 headerName: AbbrMonths[1],
                 field: "Month2",
                 tooltipField: "Month2",
-                width: 150,
+                width: 130,
+                cellClass: "text-end",
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Month2) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 },
-                getQuickFilterText: () => '',
-                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+                cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { fontStyle: 'italic' }
             },
             {
                 headerName: AbbrMonths[0],
                 field: "Month1",
                 tooltipField: "Month1",
-                width: 150,
+                width: 130,
+                cellClass: "text-end",
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Month1) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 },
-                getQuickFilterText: () => '',
-                cellStyle: params => params.data.No == 1 ? '' : { fontWeight: 'bold', fontStyle: 'italic' }
+                cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { fontStyle: 'italic' }
+            },
+            {
+                headerName: "Total",
+                field: "Total",
+                tooltipField: "Total",
+                width: 140,
+                cellClass: "text-end",
+                cellStyle: { fontWeight: 'bold' },
+                valueFormatter: params => {
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
             },
             {
                 headerName: "Avg. per Month",
@@ -2686,37 +2648,23 @@ function fn04Table() {
                 cellClass: "text-end",
                 cellStyle: { fontWeight: 'bold' },
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.AvgMonth) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                },
-                getQuickFilterText: () => '',
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
             },
             {
                 headerName: "Current Stock",
                 colId: "CurrentStock",
-                field: "Month1",
-                tooltipField: "Month1",
+                field: "Total",
+                tooltipField: "Total",
                 width: 150,
                 pinned: "right",
                 cellClass: "text-end",
                 cellStyle: { fontWeight: 'bold' },
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Month1) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                },
-                getQuickFilterText: () => '',
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
             },
             {
                 headerName: "Projection",
@@ -2727,17 +2675,10 @@ function fn04Table() {
                 cellClass: "text-end",
                 cellStyle: { fontWeight: 'bold' },
                 valueFormatter: params => {
-                    let value = parseFloat(params.value);
-                    if (isNaN(value)) {
-                        value = parseFloat(params.data.Projection) || 0;
-                    }
-                    return value.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
-                },
-                getQuickFilterText: () => '',
-            },
+                    let value = parseFloat(params.value) || 0;
+                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+            }
         ],
         rowData: [],
         pagination: false,
@@ -2745,11 +2686,13 @@ function fn04Table() {
             if (params.node.rowPinned) {
                 return { fontWeight: 'bold', background: '#f8f9fa' };
             }
-        },
+        }
     };
+
     grid04Api = agGrid.createGrid(gridDiv, gridOptions);
 
     function updFooter() {
+        let month7 = 0;
         let month6 = 0;
         let month5 = 0;
         let month4 = 0;
@@ -2760,22 +2703,24 @@ function fn04Table() {
         let average = 0;
 
         grid04Api.forEachNodeAfterFilter(function (node) {
-            month6 += Number(node.data.Month6) || 0;
-            month5 += Number(node.data.Month5) || 0;
-            month4 += Number(node.data.Month4) || 0;
-            month3 += Number(node.data.Month3) || 0;
-            month2 += Number(node.data.Month2) || 0;
-            month1 += Number(node.data.Month1) || 0;
-            overall += Number(node.data.Total) || 0;
-            average += Number(node.data.AvgMonth) || 0;
+            if (node.data && node.data.No == 0) {
+                month7 += Number(node.data.Month7) || 0;
+                month6 += Number(node.data.Month6) || 0;
+                month5 += Number(node.data.Month5) || 0;
+                month4 += Number(node.data.Month4) || 0;
+                month3 += Number(node.data.Month3) || 0;
+                month2 += Number(node.data.Month2) || 0;
+                month1 += Number(node.data.Month1) || 0;
+                overall += Number(node.data.Total) || 0;
+                average += Number(node.data.AvgMonth) || 0;
+            }
         });
 
         grid04Api.setGridOption('pinnedBottomRowData', [
-            { ItemName: 'TOTAL', Month6: month6, Month5: month5, Month4: month4, Month3: month3, Month2: month2, Month1: month1, Total: overall, AvgMonth: average}
+            { ItemName: 'TOTAL', Month7: month7, Month6: month6, Month5: month5, Month4: month4, Month3: month3, Month2: month2, Month1: month1, Total: overall, AvgMonth: average }
         ]);
     }
-
-};
+}
 function fn05Table() {
     //Ajax
     $.ajax({

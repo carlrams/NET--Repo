@@ -60,7 +60,7 @@ Public Class MNU010400
             body = "Dear Ms./Mr. " & oName.Value.ToString & vbCrLf.ToString & vbCrLf.ToString
             body = body & "You may now log-in to the CLDC CIIS website using the information below:" & vbCrLf.ToString & vbCrLf.ToString
             body = body & "     Username : " & tbxUsername.Text & vbCrLf.ToString
-            body = body & "     Password : " & "ciis" & vbCrLf.ToString & vbCrLf.ToString
+            body = body & "     Password : " & "ciisv2" & vbCrLf.ToString & vbCrLf.ToString
             body = body & "Should you encounter any problems accessing your account, please contact any CIIS staff for assistance." & vbCrLf.ToString & vbCrLf.ToString
             body = body & "This is a system-generated e-mail. Please do not reply."
             mail.Body = body
