@@ -766,8 +766,7 @@
                 };
             } else if (document.getElementById("ContentPlaceHolder1_hdnMode").value == "UPD") {
                 Cancel_Upd_Question(document.getElementById('ContentPlaceHolder1_hdnID').value);
-            }
-
+            };
             function Cancel_Add_Question() {
                 Swal.fire({
                     text: 'Cancel changes?',
@@ -789,8 +788,8 @@
                             document.getElementById('ContentPlaceHolder1_hdnMode').value = "DTL";
                             document.getElementById('ContentPlaceHolder1_hdnID').value = document.getElementById('ContentPlaceHolder1_hdnPrevID').value;
                             fn01Load();
-                        }
-                    }
+                        };
+                    };
                 });
             };
             function Delete_Dtl_Question(ID) {

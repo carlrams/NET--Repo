@@ -35,11 +35,11 @@ Public Class HNDAAD
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.20"
+    Dim DataSource As String = "10.10.30.10"
     Dim catalog As String = "cldc_live_acc"
     Dim cldc_live As String = "cldc_live"
     Dim calmardblive As String = "calmardblive"
-    Dim UserID As String = "ciisv2"
+    Dim UserID As String = "ciis"
     Dim Password As String = "Cii5s"
     'connection
 

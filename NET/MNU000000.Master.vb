@@ -50,6 +50,7 @@ Public Class MNU000000
             bindNotificationNew()
             bindotificationPrevious()
             bindMode()
+
         End If
     End Sub
 
@@ -69,7 +70,7 @@ Public Class MNU000000
     Public Sub bindAccount()
 
         'hide
-        spnNewNotifier.Style("display") = "none"
+        spnNewNotifier.Style.Item("display") = "none"
         'hide
 
         'get total task
@@ -88,7 +89,7 @@ Public Class MNU000000
         'variable
 
         'read record
-        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password )
             Using Cmd As New SqlCommand(Query.ToString)
                 Cmd.CommandType = CommandType.Text
                 Cmd.Connection = ConStr
@@ -107,9 +108,9 @@ Public Class MNU000000
         'read record
 
         'display 
-        If Cnt > 0 Then spnNotifier.Style("display") = ""
-        If Cnt = 0 Then divNotificationNothing.Style("display") = ""
-        If Cnt > 0 Then divNotificationNew.Style("display") = ""
+        If Cnt > 0 Then spnNotifier.Style.Item("display") = ""
+        If Cnt = 0 Then divNotificationNothing.Style.Item("display") = ""
+        If Cnt > 0 Then divNotificationNew.Style.Item("display") = ""
         divNotificationListNew.InnerHtml = InnerHtml.ToString
         'display 
 
@@ -132,6 +133,7 @@ Public Class MNU000000
         upnlToolBar.Update()
         upnlAccount.Update()
     End Sub
+
     Function bindMode()
 
         Dim Query As New StringBuilder()
@@ -155,25 +157,35 @@ Public Class MNU000000
         End Using
 
     End Function
-
     Function bindNotificationNew()
+        spnNotifier.Style.Item("display") = "none"
+        spnFilterAll.Style.Item("display") = "none"
+        spnFilterApprovals.Style.Item("display") = "none"
+        If spnFilterMentions IsNot Nothing Then spnFilterMentions.Style.Item("display") = "none"
+        spnFilterFormUpdates.Style.Item("display") = "none"
+        spnFilterModuleUpdates.Style.Item("display") = "none"
+        divNotificationNothing.Style.Item("display") = "none"
+        divNotificationNew.Style.Item("display") = "none"
 
-        'hide
-        spnNotifier.Style("display") = "none"
-        divNotificationNothing.Style("display") = "none"
-        divNotificationNew.Style("display") = "none"
-        'hide
-
-        'get total task
         Dim Query As New StringBuilder
-        Query.Append("select")
+        Query.Append("select ")
         Query.Append("   replace([A].Link,'#','No') [Link] ")
         Query.Append("   ,[A].CreatedBy [Image] ")
-        Query.Append("   ,[A].Type + ' ' + [A].Description [Title] ")
+        Query.Append("   ,isnull([A].Type,'') + ' ' + isnull([A].Description,'') [Title] ")
         Query.Append("   ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Detail] ")
         Query.Append("   ,[A].CreatedDate [Date] ")
         Query.Append("   ,'ReadDiv' + ltrim(str([A].SeqNo)) [ReadDiv] ")
         Query.Append("   ,'ReadA' + ltrim(str([A].SeqNo)) [ReadA] ")
+        Query.Append("   ,isnull([A].Type,'') [Type] ")
+        Query.Append("   ,isnull(nullif((select top 1 [T].Category from Mstr_Notif_Type [T] ")
+        Query.Append("            where rtrim([T].NotifType) <> '' and ([A].Type like '%' + rtrim([T].NotifType) + '%' or rtrim([T].NotifType) like '%' + [A].Type + '%') ")
+        Query.Append("            order by len([T].NotifType) desc),''), ")
+        Query.Append("            (case ")
+        Query.Append("               when [A].Type like '%Approv%' or [A].Type like '%Endors%' or [A].Type like '%Declined%' then 'Approvals' ")
+        Query.Append("               when [A].Type like '%Mention%' or [A].Type like '%Menition%' then 'Mentions' ")
+        Query.Append("               when [A].Type like '%Form%' or [A].Type like '%PR%' or [A].Type like '%WO%' or [A].Type like '%Completed%' or [A].Type like '%LV%' or [A].Type like '%BTS%' then 'FormUpdates' ")
+        Query.Append("               when [A].Type like '%Module%' or [A].Type like '%System%' then 'ModuleUpdates' ")
+        Query.Append("               else 'FormUpdates' end)) [Category] ")
         Query.Append("from ")
         Query.Append("   Mstr_Notification [A] ")
         Query.Append("   left join employee [B] on [A].CreatedBy = [B].emp_no ")
@@ -182,23 +194,21 @@ Public Class MNU000000
         Query.Append("   and [A].Seen = 0 ")
         Query.Append("order by ")
         Query.Append("   [A].CreatedDate desc ")
-        'get total task
 
-        'variable
         Dim InnerHtml As New StringBuilder
         Dim Cnt As Integer = 0
-        'variable
+        Dim CntApprovals As Integer = 0
+        Dim CntMentions As Integer = 0
+        Dim CntFormUpdates As Integer = 0
+        Dim CntModuleUpdates As Integer = 0
 
-        'read record
-        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password )
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
             Using Cmd As New SqlCommand(Query.ToString)
                 Cmd.CommandType = CommandType.Text
                 Cmd.Connection = ConStr
                 ConStr.Open()
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
                 While DR.Read()
-
-                    'set value
                     Dim Link As String = DR("Link")
                     Dim Image As String = DR("Image")
                     If File.Exists(Server.MapPath("~/Assets/media/avatars/" & Image & ".png")) = True Then
@@ -212,10 +222,20 @@ Public Class MNU000000
                     Dim Detail As String = DR("Detail") & " " & IIf(Year(DR("Date")) < Year(Date.Now), Format(DR("Date"), "MMM d, yyyy"), IIf(Day(DR("Date")) < Day(Date.Now), Format(DR("Date"), "MMM d"), IIf(Day(DR("Date")) = Day(Date.Now), "Today", "On " & Format(DR("Date"), "MMM d"))))
                     Dim ReadDiv As String = DR("ReadDiv")
                     Dim ReadA As String = DR("ReadA")
-                    'set value
 
-                    'set notification ui
-                    InnerHtml.Append("<div id='" & ReadDiv & "' class='overlay overflow-hidden mb-4'> ")
+                    Dim Category As String = DR("Category").ToString().Trim().ToLower().Replace(" ", "")
+
+                    If Category = "approvals" Then
+                        CntApprovals += 1
+                    ElseIf Category = "mentions" Then
+                        CntMentions += 1
+                    ElseIf Category = "formupdates" Then
+                        CntFormUpdates += 1
+                    ElseIf Category = "moduleupdates" Then
+                        CntModuleUpdates += 1
+                    End If
+
+                    InnerHtml.Append("<div id='" & ReadDiv & "' data-notif-category='" & Category & "' class='notification-item overlay overflow-hidden mb-4'> ")
                     InnerHtml.Append("   <div class='overlay-wrapper'> ")
                     InnerHtml.Append("      <a href='" & Link & "' class='d-flex align-items-center'> ")
                     InnerHtml.Append("         <div class='d-flex flex-column-fluid'> ")
@@ -237,42 +257,52 @@ Public Class MNU000000
                     InnerHtml.Append("      </div> ")
                     InnerHtml.Append("   </div> ")
                     InnerHtml.Append("</div> ")
-                    'set notification ui
 
                     Cnt = Cnt + 1
-
                 End While
                 DR.Close()
                 ConStr.Close()
             End Using
         End Using
-        'read record
 
-        'display 
-        If Cnt > 0 Then spnNotifier.Style("display") = ""
-        If Cnt = 0 Then divNotificationNothing.Style("display") = ""
-        If Cnt > 0 Then divNotificationNew.Style("display") = ""
+        If Cnt > 0 Then
+            spnNotifier.Style.Item("display") = ""
+            spnFilterAll.Style.Item("display") = ""
+        End If
+        If CntApprovals > 0 Then spnFilterApprovals.Style.Item("display") = ""
+        If CntMentions > 0 AndAlso spnFilterMentions IsNot Nothing Then spnFilterMentions.Style.Item("display") = ""
+        If CntFormUpdates > 0 Then spnFilterFormUpdates.Style.Item("display") = ""
+        If CntModuleUpdates > 0 Then spnFilterModuleUpdates.Style.Item("display") = ""
+
+        If Cnt = 0 Then divNotificationNothing.Style.Item("display") = ""
+        If Cnt > 0 Then divNotificationNew.Style.Item("display") = ""
         divNotificationListNew.InnerHtml = InnerHtml.ToString
-        'display 
-
     End Function
-
     Function bindotificationPrevious()
 
         'hide
-        divNotificationPrevious.Style("display") = "none"
+        divNotificationPrevious.Style.Item("display") = "none"
         'hide
 
-        'get total task
         Dim Query As New StringBuilder
         Query.Append("select top 15 ")
         Query.Append("   replace([A].Link,'#','No') [Link] ")
         Query.Append("   ,[A].CreatedBy [Image] ")
-        Query.Append("   ,[A].Type + ' ' + [A].Description [Title] ")
+        Query.Append("   ,isnull([A].Type,'') + ' ' + isnull([A].Description,'') [Title] ")
         Query.Append("   ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Detail] ")
         Query.Append("   ,[A].CreatedDate [Date] ")
         Query.Append("   ,'UnreadDiv' + ltrim(str([A].SeqNo)) [UnreadDiv] ")
         Query.Append("   ,'UnreadA' + ltrim(str([A].SeqNo)) [UnreadA] ")
+        Query.Append("   ,isnull([A].Type,'') [Type] ")
+        Query.Append("   ,isnull(nullif((select top 1 [T].Category from Mstr_Notif_Type [T] ")
+        Query.Append("            where rtrim([T].NotifType) <> '' and ([A].Type like '%' + rtrim([T].NotifType) + '%' or rtrim([T].NotifType) like '%' + [A].Type + '%') ")
+        Query.Append("            order by len([T].NotifType) desc),''), ")
+        Query.Append("            (case ")
+        Query.Append("               when [A].Type like '%Approv%' or [A].Type like '%Endors%' or [A].Type like '%Declined%' then 'Approvals' ")
+        Query.Append("               when [A].Type like '%Mention%' or [A].Type like '%Menition%' then 'Mentions' ")
+        Query.Append("               when [A].Type like '%Form%' or [A].Type like '%PR%' or [A].Type like '%WO%' or [A].Type like '%Completed%' or [A].Type like '%LV%' or [A].Type like '%BTS%' then 'FormUpdates' ")
+        Query.Append("               when [A].Type like '%Module%' or [A].Type like '%System%' then 'ModuleUpdates' ")
+        Query.Append("               else 'FormUpdates' end)) [Category] ")
         Query.Append("from ")
         Query.Append("   Mstr_Notification [A] ")
         Query.Append("   left join employee [B] on [A].CreatedBy = [B].emp_no ")
@@ -281,15 +311,11 @@ Public Class MNU000000
         Query.Append("   and [A].Seen = 1 ")
         Query.Append("order by ")
         Query.Append("   [A].CreatedDate desc ")
-        'get total task
 
-        'variable
         Dim InnerHtml As New StringBuilder
         Dim Cnt As Integer = 0
-        'variable
 
-        'read record
-        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password )
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
             Using Cmd As New SqlCommand(Query.ToString)
                 Cmd.CommandType = CommandType.Text
                 Cmd.Connection = ConStr
@@ -297,7 +323,6 @@ Public Class MNU000000
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
                 While DR.Read()
 
-                    'set value
                     Dim Link As String = DR("Link")
                     Dim Image As String = DR("Image")
                     If File.Exists(Server.MapPath("~/Assets/media/avatars/" & Image & ".png")) = True Then
@@ -311,10 +336,10 @@ Public Class MNU000000
                     Dim Detail As String = DR("Detail") & " " & IIf(Year(DR("Date")) < Year(Date.Now), Format(DR("Date"), "MMM d, yyyy"), IIf(Day(DR("Date")) < Day(Date.Now), Format(DR("Date"), "MMM d"), IIf(Day(DR("Date")) = Day(Date.Now), "Today", "On " & Format(DR("Date"), "MMM d"))))
                     Dim UnreadDiv As String = DR("UnreadDiv")
                     Dim UnreadA As String = DR("UnreadA")
-                    'set value
 
-                    'set notification ui
-                    InnerHtml.Append("<div id='" & UnreadDiv & "' class='overlay overflow-hidden mb-4'> ")
+                    Dim Category As String = DR("Category").ToString().Trim().ToLower().Replace(" ", "")
+
+                    InnerHtml.Append("<div id='" & UnreadDiv & "' data-notif-category='" & Category & "' class='notification-item overlay overflow-hidden mb-4'> ")
                     InnerHtml.Append("   <div class='overlay-wrapper'> ")
                     InnerHtml.Append("      <a href='" & Link & "' class='d-flex align-items-center'> ")
                     InnerHtml.Append("         <div class='d-flex flex-column-fluid'> ")
@@ -336,7 +361,6 @@ Public Class MNU000000
                     InnerHtml.Append("      </div> ")
                     InnerHtml.Append("   </div> ")
                     InnerHtml.Append("</div> ")
-                    'set notification ui
 
                     Cnt = Cnt + 1
 
@@ -345,14 +369,12 @@ Public Class MNU000000
                 ConStr.Close()
             End Using
         End Using
-        'read record
 
-        'display 
-        If Cnt > 0 Then divNotificationPrevious.Style("display") = ""
+        If Cnt > 0 Then divNotificationPrevious.Style.Item("display") = ""
         divNotificationListPrevious.InnerHtml = InnerHtml.ToString
-        'display 
 
     End Function
+
 
     Public Sub setActiveMenu(ByVal Menu As String, ByVal SubMenu As String)
         If Menu = "DSB" Then
@@ -378,18 +400,87 @@ Public Class MNU000000
                 aDSB040000.Attributes.Add("class", "menu-link active py-3")
                 sDSB040200.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "DSB040300" Then
+                aDSB040000.Attributes.Add("class", "menu-link active py-3")
+                sDSB040300.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB040400" Then
+                aDSB040000.Attributes.Add("class", "menu-link active py-3")
+                sDSB040400.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB150000" Then
+                aDSB150000.Attributes.Add("class", "menu-link active py-3")
+                sDSB150000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB170000" Then
+                aDSB150000.Attributes.Add("class", "menu-link active py-3")
+                sDSB170000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB230000" Then
+                aDSB150000.Attributes.Add("class", "menu-link active py-3")
+                sDSB230000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB210000" Then
+                aDSB150000.Attributes.Add("class", "menu-link active py-3")
+                sDSB210000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB240000" Then
+                aDSB240000.Attributes.Add("class", "menu-link active py-3")
+                sDSB240000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB250000" Then
+                aDSB240000.Attributes.Add("class", "menu-link active py-3")
+                sDSB250000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB280000" Then
+                aDSB240000.Attributes.Add("class", "menu-link active py-3")
+                sDSB280000.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "DSB050000" Then
                 aDSB050000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "DSB060000" Then
                 aDSB060000.Attributes.Add("class", "menu-link active py-3")
             End If
-            If SubMenu = "DSB070100" Then
-                aDSB070100.Attributes.Add("class", "menu-link active py-3")
+            If SubMenu = "DSB070300" Then
+                aDSB070300.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "DSB080000" Then
                 aDSB080000.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "DSB110000" Then
+                aDSB110000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            'If SubMenu = "DSB120000" Then
+            '    aDSB120000.Attributes.Add("class", "menu-link active py-3")
+            'End If
+            If SubMenu = "DSB130000" Then
+                aDSB130000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB140000" Then
+                aDSB140000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB200000" Then
+                aDSB200000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB310000" Then
+                aDSB310000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB310000" Then
+                aDSB320000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB180000" Then
+                aDSB180000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "ACC030200" Then
+                aACC030200.Attributes.Add("class", "menu-link active py-3")
+            End If
+            'If SubMenu = "DSB150000" Then
+            '    aDSB150000.Attributes.Add("class", "menu-link active py-3")
+            'End If
+            'If SubMenu = "DSB160000" Then
+            '    aDSB160000.Attributes.Add("class", "menu-link active py-3")
+            'End If
             'If SubMenu = "001002" Then
             '    aDSB000007.Attributes.Add("class", "menu-link active py-3")
             'End If
@@ -401,6 +492,9 @@ Public Class MNU000000
             End If
             If SubMenu = "WRK010000" Then
                 aWRK010000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AAA010000" Then
+                aAAA010000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "FIN030100" Then
                 spnFIN000000.Attributes.Add("class", "menu-link active py-3")
@@ -498,11 +592,21 @@ Public Class MNU000000
                 spnPDDReport.Attributes.Add("class", "menu-link active py-3")
                 aPDDRT0017.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "PDDRT0018" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDReport.Attributes.Add("class", "menu-link active py-3")
+                aPDDRT0018.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "PDD010100" Then
                 spnPDD000000.Attributes.Add("class", "menu-link active py-3")
                 spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
                 spnPDD010000.Attributes.Add("class", "menu-link active py-3")
                 aPDD010100.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD010000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aPDD010000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "PDD010200" Then
                 spnPDD000000.Attributes.Add("class", "menu-link active py-3")
@@ -515,6 +619,52 @@ Public Class MNU000000
                 spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
                 spnPDD010000.Attributes.Add("class", "menu-link active py-3")
                 aPDD010300.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD030000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aPDD030000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD040000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aPDD040000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD050000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aPDD050000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD060000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aPDD060000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD070000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aPDD070000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD080000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aPDD080000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD090000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aPDD090000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PDD100000" Then
+                spnPDD000000.Attributes.Add("class", "menu-link active py-3")
+                spnPDDParameter.Attributes.Add("class", "menu-link active py-3")
+                aPDD100000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FAB010000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnFAB010000.Attributes.Add("class", "menu-link active py-3")
+                aFAB010000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "ENG050100" Then
                 spnENG000000.Attributes.Add("class", "menu-link active py-3")
@@ -552,11 +702,41 @@ Public Class MNU000000
                 spnENG040000.Attributes.Add("class", "menu-link active py-3")
                 aPMD010000.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "PMD020000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnENG040000.Attributes.Add("class", "menu-link active py-3")
+                aPMD020000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PMD030000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnENG040000.Attributes.Add("class", "menu-link active py-3")
+                aPMD030000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PMD040000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnENG040000.Attributes.Add("class", "menu-link active py-3")
+                aPMD040000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PMD050000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnENG040000.Attributes.Add("class", "menu-link active py-3")
+                aPMD050000.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "PMD060000" Then
                 spnENG000000.Attributes.Add("class", "menu-link active py-3")
                 spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
                 spnENG040000.Attributes.Add("class", "menu-link active py-3")
                 aPMD060000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PMD070000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnENG040000.Attributes.Add("class", "menu-link active py-3")
+                aPMD070000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "ENG020100" Then
                 spnENG000000.Attributes.Add("class", "menu-link active py-3")
@@ -618,6 +798,18 @@ Public Class MNU000000
                 spnENG010100.Attributes.Add("class", "menu-link active py-3")
                 aENG010700.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "ENG060000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnENG010100.Attributes.Add("class", "menu-link active py-3")
+                aENG060000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "ENG070000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnENG010100.Attributes.Add("class", "menu-link active py-3")
+                aENG070000.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "ENGRT0001" Then
                 spnENG000000.Attributes.Add("class", "menu-link active py-3")
                 spnENGReport.Attributes.Add("class", "menu-link active py-3")
@@ -668,45 +860,100 @@ Public Class MNU000000
                 spnENGReport.Attributes.Add("class", "menu-link active py-3")
                 aENGRT0010.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "PMD080000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGReport.Attributes.Add("class", "menu-link active py-3")
+                aPMD080000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PMD090000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGReport.Attributes.Add("class", "menu-link active py-3")
+                aPMD090000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PMD100000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGReport.Attributes.Add("class", "menu-link active py-3")
+                aPMD100000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "PMD110000" Then
+                spnENG000000.Attributes.Add("class", "menu-link active py-3")
+                spnENGReport.Attributes.Add("class", "menu-link active py-3")
+                aPMD110000.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "SLS010000" Then
                 spnSLS000000.Attributes.Add("class", "menu-link active py-3")
-                spnSLSAdmin.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aSLS010000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "SLS020000" Then
                 spnSLS000000.Attributes.Add("class", "menu-link active py-3")
-                spnSLSAdmin.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aSLS020000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "SLS030000" Then
                 spnSLS000000.Attributes.Add("class", "menu-link active py-3")
-                spnSLSAdmin.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aSLS030000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "SLS040000" Then
                 spnSLS000000.Attributes.Add("class", "menu-link active py-3")
-                spnSLSAdmin.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aSLS040000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "SLS050000" Then
                 spnSLS000000.Attributes.Add("class", "menu-link active py-3")
-                spnSLSAdmin.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aSLS050000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "SLS060000" Then
                 spnSLS000000.Attributes.Add("class", "menu-link active py-3")
-                spnSLSAdmin.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aSLS060000.Attributes.Add("class", "menu-link active py-3")
             End If
-            'If SubMenu = "SLS120000" Then
-            '    spnSLS000000.Attributes.Add("class", "menu-link active py-3")
-            '    spnSLSAdmin.Attributes.Add("class", "menu-link active py-3")
-            '    aSLS120000.Attributes.Add("class", "menu-link active py-3")
-            'End If
+            If SubMenu = "SLS140000" Then
+                spnSLS000000.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSLS140000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SLS150000" Then
+                spnSLS000000.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSLS150000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SLS160000" Then
+                spnSLS000000.Attributes.Add("class", "menu-link active py-3")
+                spnSLSParameter.Attributes.Add("class", "menu-link active py-3")
+                aSLS160000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SLS170000" Then
+                spnSLS000000.Attributes.Add("class", "menu-link active py-3")
+                spnSLSParameter.Attributes.Add("class", "menu-link active py-3")
+                aSLS170000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SLS180000" Then
+                spnSLS000000.Attributes.Add("class", "menu-link active py-3")
+                spnSLSParameter.Attributes.Add("class", "menu-link active py-3")
+                aSLS180000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SLS190000" Then
+                spnSLS000000.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSLS190000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SLS200000" Then
+                spnSLS000000.Attributes.Add("class", "menu-link active py-3")
+                spnSLSDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSLS200000.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "SLSRT0001" Then
                 spnSLS000000.Attributes.Add("class", "menu-link active py-3")
                 spnSLSReport.Attributes.Add("class", "menu-link active py-3")
                 aSLSRT0001.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SLSRT0002" Then
+                spnSLS000000.Attributes.Add("class", "menu-link active py-3")
+                spnSLSReport.Attributes.Add("class", "menu-link active py-3")
+                aSLSRT0002.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "AAD010000" Then
                 spnAAD000000.Attributes.Add("class", "menu-link active py-3")
@@ -717,6 +964,26 @@ Public Class MNU000000
                 spnAAD000000.Attributes.Add("class", "menu-link active py-3")
                 spnAADDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aAAD040000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AAD050000" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aAAD050000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AAD060000" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aAAD060000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AAD002000" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aAAD002000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AAD003000" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aAAD003000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "AAD010300" Then
                 spnAAD000000.Attributes.Add("class", "menu-link active py-3")
@@ -879,13 +1146,127 @@ Public Class MNU000000
                 spnAADReport.Attributes.Add("class", "menu-link active py-3")
                 aAADRT0032.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "AADRT0034" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADReport.Attributes.Add("class", "menu-link active py-3")
+                aAADRT0034.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AADRT0035" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADReport.Attributes.Add("class", "menu-link active py-3")
+                aAADRT0035.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AADRT0036" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADReport.Attributes.Add("class", "menu-link active py-3")
+                aAADRT0036.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AADRT0040" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADReport.Attributes.Add("class", "menu-link active py-3")
+                aAADRT0040.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AADRT0048" Then
+                spnAAD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAADReport.Attributes.Add("class", "menu-link active py-3")
+                aAADRT0048.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "FIN010000" Then
                 spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aFIN010000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "FIN020000" Then
                 spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aFIN020000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN040000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN040000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN050000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN050000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN060000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN060000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN070000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN070000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN080000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN080000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN090000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN090000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN100000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN100000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN100001" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN100001.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN100002" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN100002.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN110000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN110000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN120000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN120000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN130000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnFIN130000.Attributes.Add("class", "menu-link active py-3")
+                aFIN130000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN130001" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                spnFIN130000.Attributes.Add("class", "menu-link active py-3")
+                aFIN130001.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN140000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN140000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN150000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN150000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN160000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN160000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FIN170000" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aFIN170000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "FINRT0001" Then
                 spnFIN000000.Attributes.Add("class", "menu-link active py-3")
@@ -911,6 +1292,16 @@ Public Class MNU000000
                 spnFIN000000.Attributes.Add("class", "menu-link active py-3")
                 spnFINReport.Attributes.Add("class", "menu-link active py-3")
                 aFINRT0008.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FINRT0029" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINReport.Attributes.Add("class", "menu-link active py-3")
+                aFINRT0029.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "FINRT0030" Then
+                spnFIN000000.Attributes.Add("class", "menu-link active py-3")
+                spnFINReport.Attributes.Add("class", "menu-link active py-3")
+                aFINRT0030.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "FINRT0009" Then
                 spnFIN000000.Attributes.Add("class", "menu-link active py-3")
@@ -998,10 +1389,55 @@ Public Class MNU000000
                 spnSCM000000.Attributes.Add("class", "menu-link active py-3")
                 aSCM020000.Attributes.Add("class", "menu-link active py-3")
             End If
-            If SubMenu = "PO010000" Then
+            If SubMenu = "SCM060000" Then
                 spnSCM000000.Attributes.Add("class", "menu-link active py-3")
                 spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
-                aPO010000.Attributes.Add("class", "menu-link active py-3")
+                aSCM060000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM070000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM070000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM080000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM080000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM090000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM090000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM100000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM100000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM110000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM110000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM120000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM120000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM130000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM130000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM160000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM160000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "SCM170000" Then
+                spnSCM000000.Attributes.Add("class", "menu-link active py-3")
+                spnSCMDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aSCM170000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "SCMRT0001" Then
                 spnSCM000000.Attributes.Add("class", "menu-link active py-3")
@@ -1093,10 +1529,30 @@ Public Class MNU000000
                 spnACC030000.Attributes.Add("class", "menu-link active py-3")
                 aACC030100.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "ACC040000" Then
+                spnACC000000.Attributes.Add("class", "menu-link active py-3")
+                spnACC030000.Attributes.Add("class", "menu-link active py-3")
+                aACC040000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "ACC050000" Then
+                spnACC000000.Attributes.Add("class", "menu-link active py-3")
+                spnACC030000.Attributes.Add("class", "menu-link active py-3")
+                aACC050000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "ACC060000" Then
+                spnACC000000.Attributes.Add("class", "menu-link active py-3")
+                spnACC030000.Attributes.Add("class", "menu-link active py-3")
+                aACC060000.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "AUD010100" Then
                 spnAUD000000.Attributes.Add("class", "menu-link active py-3")
                 spnAUDDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aAUD010100.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "AUD020000" Then
+                spnAUD000000.Attributes.Add("class", "menu-link active py-3")
+                spnAUDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aAUD020000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "CSDRT0001" Then
                 spnCSD000000.Attributes.Add("class", "menu-link active py-3")
@@ -1163,6 +1619,51 @@ Public Class MNU000000
                 spnCSDReport.Attributes.Add("class", "menu-link active py-3")
                 aCSDRT0013.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "CSDRT0014" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0014.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDRT0015" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0015.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDRT0016" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0016.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDRT0017" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0017.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDRT0018" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0018.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDRT0019" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0019.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDRT0020" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0020.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDRT0021" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0021.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDRT0022" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDReport.Attributes.Add("class", "menu-link active py-3")
+                aCSDRT0022.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "CSD010100" Then
                 spnCSD000000.Attributes.Add("class", "menu-link active py-3")
                 spnCSDDataEntry.Attributes.Add("class", "menu-link active py-3")
@@ -1183,6 +1684,21 @@ Public Class MNU000000
                 spnCSDDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aCSD010400.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "CSD010500" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aCSD010500.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDDSB001" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aCSDDSB001.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "CSDDSB002" Then
+                spnCSD000000.Attributes.Add("class", "menu-link active py-3")
+                spnCSDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aCSDDSB002.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "HRA010000" Then
                 spnHRA000000.Attributes.Add("class", "menu-link active py-3")
                 spnHRAParameter.Attributes.Add("class", "menu-link active py-3")
@@ -1198,15 +1714,55 @@ Public Class MNU000000
                 spnHRAParameter.Attributes.Add("class", "menu-link active py-3")
                 aHRA030000.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "HRA110000" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAParameter.Attributes.Add("class", "menu-link active py-3")
+                aHRA110000.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "HRA040000" Then
                 spnHRA000000.Attributes.Add("class", "menu-link active py-3")
                 spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
-                aHRA030000.Attributes.Add("class", "menu-link active py-3")
+                aHRA040000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "HRA050000" Then
                 spnHRA000000.Attributes.Add("class", "menu-link active py-3")
                 spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
                 aHRA050000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRA060000" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
+                aHRA060000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRA070000" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
+                aHRA070000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRA080000" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
+                aHRA080000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRA090000" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
+                aHRA090000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRA100000" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
+                aHRA100000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRA120000" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
+                aHRA120000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRA130000" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRADataEntry.Attributes.Add("class", "menu-link active py-3")
+                aHRA130000.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "HRART0001" Then
                 spnHRA000000.Attributes.Add("class", "menu-link active py-3")
@@ -1253,6 +1809,141 @@ Public Class MNU000000
                 spnHRAReport.Attributes.Add("class", "menu-link active py-3")
                 aHRART0009.Attributes.Add("class", "menu-link active py-3")
             End If
+            If SubMenu = "HRART0010" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0010.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0011" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0011.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0012" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0012.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0013" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0013.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0014" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0014.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0015" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0015.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0016" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0016.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0017" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0017.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0018" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0018.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0019" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0019.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0020" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0020.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0021" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0021.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0022" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0022.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0023" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0023.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0024" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0024.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0025" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0025.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0026" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0026.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0027" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0027.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0028" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0028.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0029" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0029.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0030" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0030.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0031" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0031.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0032" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0032.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0033" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0033.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0034" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0034.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0035" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0035.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "HRART0036" Then
+                spnHRA000000.Attributes.Add("class", "menu-link active py-3")
+                spnHRAReport.Attributes.Add("class", "menu-link active py-3")
+                aHRART0036.Attributes.Add("class", "menu-link active py-3")
+            End If
             If SubMenu = "AMD010000" Then
                 spnAMD000000.Attributes.Add("class", "menu-link active py-3")
                 spnAMDParameter.Attributes.Add("class", "menu-link active py-3")
@@ -1267,6 +1958,26 @@ Public Class MNU000000
                 spnAMD000000.Attributes.Add("class", "menu-link active py-3")
                 spnAMDDataEntry.Attributes.Add("class", "menu-link active py-3")
                 aAMD030000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "ACQ010000" Then
+                spnACQ010000.Attributes.Add("class", "menu-link active py-3")
+                spnACQDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aAMD010000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "BTD010000" Then
+                spnBTD000000.Attributes.Add("class", "menu-link active py-3")
+                spnBTDParameter.Attributes.Add("class", "menu-link active py-3")
+                aBTD010000.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB070100" Then
+                spnBTD000000.Attributes.Add("class", "menu-link active py-3")
+                spnBTDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aDSB070100.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DSB070400" Then
+                spnBTD000000.Attributes.Add("class", "menu-link active py-3")
+                spnBTDDataEntry.Attributes.Add("class", "menu-link active py-3")
+                aDSB070400.Attributes.Add("class", "menu-link active py-3")
             End If
         End If
         If Menu = "CLD" Then
@@ -1362,6 +2073,15 @@ Public Class MNU000000
             End If
             If SubMenu = "DOC020100" Then
                 aDOC020100.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DOC040100" Then
+                aDOC040100.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DOC050100" Then
+                aDOC040100.Attributes.Add("class", "menu-link active py-3")
+            End If
+            If SubMenu = "DOC060100" Then
+                aDOC040100.Attributes.Add("class", "menu-link active py-3")
             End If
             If SubMenu = "DOC030000" Then
                 spnDOC030000.Attributes.Add("class", "menu-link active py-3")

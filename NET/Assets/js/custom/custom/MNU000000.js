@@ -199,6 +199,7 @@ function fnAlertOnly(pMessasge, pIcon, pClass) {
             popup: 'colored-toast',
         },
         showConfirmButton: false,
+        showCloseButton: true,
         timer: 5000,
         timerProgressBar: true,
     })
@@ -261,13 +262,33 @@ function fnEnterKey(evt, input) {
 };
 
 function fnFormatNumeric(input) {
-    var RawValue = input.value.replace(',', '');
+    var RawValue = input.value.replace(/,/g, '');
     var Val = parseFloat(RawValue);
     if (isNaN(Val)) {
         Val = 0;
     }
+
     var NewVal = Val.toFixed(2);
-    var Parts = NewVal.toString().split(".");
-    var Num = Parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (Parts[1] ? "." + Parts[1] : "");
-    input.value = Num;
+    var Parts = NewVal.split('.');
+    Parts[0] = Parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    input.value = Parts.join('.');
 }
+
+function fnClearTime(ID) {
+    const $flatpickr = $("#" + ID).flatpickr();
+    $flatpickr.clear();
+
+    //date
+    $('[data-kt-repeater="datepicker"]').flatpickr({
+        dateFormat: "m/d/Y"
+    });
+    //date
+
+    //date
+    $('[data-kt-repeater="timepicker"]').flatpickr({
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "h:i K"
+    });
+    //date
+};

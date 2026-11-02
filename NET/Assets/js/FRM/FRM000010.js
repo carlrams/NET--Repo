@@ -142,6 +142,7 @@ function fn01Load() {
     fn0101LoadOverview(document.getElementById('ContentPlaceHolder1_hdnMode').value, pID);
     fn0102LoadParticular(document.getElementById('ContentPlaceHolder1_hdnMode').value, pID);
     fn0201LoadAttachment(document.getElementById('ContentPlaceHolder1_hdnMode').value, pID);
+    fn0202LoadMISAttachment(document.getElementById('ContentPlaceHolder1_hdnMode').value, pID);
     fn0301LoadNotes(pID);
     fn0401LoadApprover(pID);
     fn0501LoadSubscriber(pID);
@@ -1286,14 +1287,15 @@ function fn0101Department() {
     });
 };
 //GL account
-function fn0101GLAccount(pPurpose) {
+function fn0101GLAccount(pPurpose, pProjType) {
     $.ajax({
         type: "POST",
         url: "Assets/Handler/FRM/FRM000010HND.ashx",
         data: {
             'pFormCode': 'FRM000010',
             'pType': 'Get - GL Account',
-            'pPurpose': pPurpose
+            'pPurpose': pPurpose,
+            'pProjType': pProjType
         },
         success: function (response) {
             //Account
@@ -1350,8 +1352,9 @@ function fn0101ShowFields(pMode) {
         if (document.getElementById("ddl0101PurchaseType").options[document.getElementById("ddl0101PurchaseType").selectedIndex].value == "Return" && (document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "OSM Project" || document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value == "CCI Project") ) {
             document.getElementById("div0201Category").style.display = "";
             document.getElementById("div0102Estimate").style.display = "";
-            document.getElementById("spn0102Estimate").innerText = "Estimate";
-            document.getElementById("tbx0101Estimate").placeholder = "Add estimate";
+            document.getElementById("spn0102Estimate").innerText = "Batch";
+            document.getElementById("tbx0101Estimate").placeholder = "Add batch";
+            document.getElementById("div0102Subdivision").style.display = "";
         };
 
         //Project Type
@@ -1598,8 +1601,9 @@ function dd0101ProjectType_onchange(ddl0101ProjectType) {
 };
 function ddl0101Purpose_onchange(ddl0101Purpose) {
     if (ddl0101Purpose.value != "") {
+        const ddl0101ProjectType = document.getElementById("ddl0101ProjectType").options[document.getElementById("ddl0101ProjectType").selectedIndex].value;
         document.getElementById("hf0101Purpose").value = ddl0101Purpose.value;
-        fn0101GLAccount(ddl0101Purpose.value);
+        fn0101GLAccount(ddl0101Purpose.value, ddl0101ProjectType);
         fn0101ShowFields(document.getElementById("ContentPlaceHolder1_hdnMode").value);
     };
 };
@@ -2323,7 +2327,7 @@ function fn11Add() {
         document.getElementById("tbx0102AddCPQty").value = "0.00";
         document.getElementById("tbx0102AddCost").value = "0.00";
         document.getElementById("tbx0102AddTotal").value = "0.00";
-        document.getElementById("tbx0102AddRemarks").value = "0.00";
+        document.getElementById("tbx0102AddRemarks").value = "";
 
         //Modal
         $("#mdl0102AddParticular").modal("show");
@@ -2427,8 +2431,18 @@ function fn0102Add_Ok(Btn) {
                     Btn.disabled = false;
                     // Hide loading indication
                     Btn.removeAttribute('data-kt-indicator');
-                    //Modal
-                    $('#mdl0102AddParticular').modal("hide");
+                    //Clear
+                    document.getElementById("tbx0102AddParticular").value = "";
+                    document.getElementById("tbx0102AddQty").value = "0.00";
+                    document.getElementById("tbx0102AddUnit").value = "";
+                    document.getElementById("tbx0102AddBudget").value = "0.00";
+                    $('#ddl0102AddStatus').val('').trigger('change');
+                    document.getElementById("tbx0102AddForPO").value = "0.00";
+                    document.getElementById("tbx0102AddForSR").value = "0.00";
+                    document.getElementById("tbx0102AddCPQty").value = "0.00";
+                    document.getElementById("tbx0102AddCost").value = "0.00";
+                    document.getElementById("tbx0102AddTotal").value = "0.00";
+                    document.getElementById("tbx0102AddRemarks").value = "";
                 }
             });
         };
@@ -3007,8 +3021,43 @@ function fn0102Update_Ok(Btn) {
                     Btn.disabled = false;
                     // Hide loading indication
                     Btn.removeAttribute('data-kt-indicator');
-                    //Modal
-                    $('#mdl0102Update').modal("hide");
+
+                    //Rebind
+                    $.ajax({
+                        type: "POST",
+                        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+                        data: {
+                            'pFormCode': 'FRM000010',
+                            'pType': 'Get - Particular (Update)',
+                            'pID': pID,
+                            'pSeqNo': pSeqNo
+                        },
+                        success: function (response) {
+                            //Variable
+                            const isTagged = response[0].ItemNo ? response[0].ItemNo : response[0].SCMNo ? response[0].SCMNo : response[0].WBSNo ? response[0].WBSNo : '';
+                            //Condition
+                            if (isTagged.trim() != '') {
+                                const fields = ["tbx0102Particular", "tbx0102Qty", "tbx0102Unit", "tbx0102Budget"];
+                                fields.forEach(id => {
+                                    document.getElementById(id).readOnly = true;
+                                });
+                            };
+
+                            //Record
+                            document.getElementById("tbx0102Particular").value = response[0].Item;
+                            document.getElementById("tbx0102Qty").value = formatNumber(response[0].Qty);
+                            document.getElementById("tbx0102Unit").value = response[0].Unit;
+                            document.getElementById("tbx0102Budget").value = formatNumber(response[0].BdgtAmt);
+                            $('#ddl0102Status').val(response[0].Status).trigger('change');
+                            document.getElementById("tbx0102ForPO").value = formatNumber(response[0].POQty);
+                            document.getElementById("tbx0102ForSR").value = formatNumber(response[0].SRQty);
+                            document.getElementById("tbx0102CPQty").value = formatNumber(response[0].CPQty);
+                            document.getElementById("tbx0102Cost").value = formatNumber(response[0].Cost);
+                            document.getElementById("tbx0102Total").value = formatNumber(response[0].Total);
+                            document.getElementById("tbx0102Remarks").value = response[0].Remarks;
+                            document.getElementById("ContentPlaceHolder1_hdnPRSeqNo").value = pSeqNo;
+                        }
+                    });
                 }
             });
         };
@@ -4278,6 +4327,115 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
             };
         });
     };
+    class NumberInputHeaderComponent {
+        init(params) {
+            this.params = params;
+            this.eGui = document.createElement('div');
+            this.eGui.className = 'custom-header-wrapper';
+
+            // Render Title, Sort Icon, and the Input Box
+            this.eGui.innerHTML = `
+            <div class="custom-header-top-row">
+                <span class="custom-header-title">${params.displayName}</span>
+                <span class="custom-sort-indicator"></span>
+            </div>
+            <div class="custom-header-input-container">
+                <input type="number" 
+                       class="form-control form-control-sm text-end header-qty-input" 
+                       placeholder="Distribute..." 
+                       min="0" 
+                       step="any" />
+            </div>
+        `;
+
+            this.inputElement = this.eGui.querySelector('input');
+            this.topRow = this.eGui.querySelector('.custom-header-top-row');
+            this.sortIndicator = this.eGui.querySelector('.custom-sort-indicator');
+
+            // 1. ENABLE SORTING ON CLICKING THE HEADER LABEL
+            if (params.enableSorting) {
+                this.topRow.style.cursor = 'pointer';
+
+                this.topRow.addEventListener('click', (e) => {
+                    // progressSort handles the toggle: Ascending -> Descending -> None
+                    params.progressSort(e.shiftKey);
+                });
+
+                // Listen to sort change events to update the arrow icon
+                this.onSortChangedListener = () => this.updateSortIcons();
+                params.column.addEventListener('sortChanged', this.onSortChangedListener);
+                this.updateSortIcons();
+            }
+
+            // 2. PREVENT SORTING WHEN CLICKING / TYPING IN THE INPUT BOX
+            ['click', 'mousedown', 'keydown', 'dblclick'].forEach(evt => {
+                this.inputElement.addEventListener(evt, (e) => e.stopPropagation());
+            });
+
+            // 3. INPUT DISTRIBUTION LOGIC
+            this.inputElement.addEventListener('input', () => {
+                this.distributeValue();
+            });
+        }
+
+        // Update the arrow icon according to AG Grid's current sort state
+        updateSortIcons() {
+            if (!this.params.column) return;
+
+            if (this.params.column.isSortAscending()) {
+                this.sortIndicator.innerHTML = '&#9650;'; // Up arrow (▲)
+                this.sortIndicator.style.opacity = '1';
+            } else if (this.params.column.isSortDescending()) {
+                this.sortIndicator.innerHTML = '&#9660;'; // Down arrow (▼)
+                this.sortIndicator.style.opacity = '1';
+            } else {
+                this.sortIndicator.innerHTML = '';        // No arrow
+                this.sortIndicator.style.opacity = '0';
+            }
+        }
+
+        distributeValue() {
+            const totalVal = parseFloat(this.inputElement.value);
+            const selectedNodes = this.params.api.getSelectedNodes();
+            const colId = this.params.column.getColId();
+
+            if (isNaN(totalVal) || totalVal <= 0 || selectedNodes.length === 0) {
+                return;
+            }
+
+            const count = selectedNodes.length;
+            const baseShare = Math.floor((totalVal / count) * 100) / 100;
+            let allocatedSum = 0;
+
+            selectedNodes.forEach((node, index) => {
+                const isLast = (index === count - 1);
+                let finalValue = isLast
+                    ? parseFloat((totalVal - allocatedSum).toFixed(2))
+                    : baseShare;
+
+                if (colId === 'QtyReq') {
+                    const maxAvailable = parseFloat(node.data.Qty3) || 0;
+                    finalValue = Math.min(finalValue, maxAvailable);
+                } else if (colId === 'Qty4') {
+                    const maxApproval = parseFloat(node.data.Qty2) || 0;
+                    finalValue = Math.min(finalValue, maxApproval);
+                }
+
+                allocatedSum += finalValue;
+                node.setDataValue(colId, finalValue);
+            });
+        }
+
+        getGui() {
+            return this.eGui;
+        }
+
+        destroy() {
+            if (this.onSortChangedListener && this.params.column) {
+                this.params.column.removeEventListener('sortChanged', this.onSortChangedListener);
+            }
+        }
+    }
     function View_Tag(pID, pItemNo) {
         //Ajax
         $.ajax({
@@ -4310,9 +4468,12 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
         });
 
         gridOptions = {
+            headerHeight: 65, // <-- Increased to fit title + input
+            components: {
+                numberInputHeader: NumberInputHeaderComponent // <-- Register custom header
+            },
             onGridSizeChanged: function (params) {
                 const isMobile = params.clientWidth < 768;
-
                 if (isMobile) {
                     params.api.applyColumnState({
                         defaultState: { pinned: null }
@@ -4338,26 +4499,14 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
             loading: true,
             onRowSelected: params => {
                 const node = params.node;
-                if (params.node.isSelected()) {
+                if (node.isSelected()) {
                     node.setDataValue('QtyReq', node.data.Qty3);
                 } else {
                     node.setDataValue('QtyReq', 0);
+                    node.setDataValue('Qty4', 0);
                 }
             },
             columnDefs: [
-                //{
-                //    headerName: "Action",
-                //    field: "isChecked",
-                //    resizable: false,
-                //    sortable: false,
-                //    width: 75,
-                //    checkboxSelection: true,
-                //    cellStyle: {
-                //        display: 'flex',
-                //        justifyContent: 'center',
-                //        alignItems: 'center'
-                //    }
-                //},
                 {
                     headerName: "Est. Title",
                     field: "Title",
@@ -4380,9 +4529,7 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
                     tooltipField: "Unit",
                     width: 100,
                     cellRenderer: params => {
-                        if (params.data.WBSNo == '') {
-                            return '';
-                        };
+                        if (params.data.WBSNo == '') return '';
                         return params.value;
                     }
                 },
@@ -4394,14 +4541,8 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
                     cellClass: "text-end",
                     cellStyle: { fontWeight: 'bold' },
                     valueFormatter: params => {
-                        let value = parseFloat(params.value);
-                        if (isNaN(value)) {
-                            value = parseFloat(params.data.Qty1) || 0;
-                        }
-                        return value.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
+                        let value = parseFloat(params.value) || 0;
+                        return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     },
                 },
                 {
@@ -4412,14 +4553,8 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
                     cellClass: "text-end",
                     cellStyle: { fontWeight: 'bold' },
                     valueFormatter: params => {
-                        let value = parseFloat(params.value);
-                        if (isNaN(value)) {
-                            value = parseFloat(params.data.Qty2) || 0;
-                        }
-                        return value.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
+                        let value = parseFloat(params.value) || 0;
+                        return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     },
                 },
                 {
@@ -4430,81 +4565,52 @@ function fn0102Tag(pID, pItemNo, pSeqNo) {
                     cellClass: "text-end",
                     cellStyle: { fontWeight: 'bold' },
                     valueFormatter: params => {
-                        let value = parseFloat(params.value);
-                        if (isNaN(value)) {
-                            value = parseFloat(params.data.Qty3) || 0;
-                        }
-                        return value.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
+                        let value = parseFloat(params.value) || 0;
+                        return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     },
                 },
                 {
                     headerName: "Qty - Tagged",
                     field: "Qty4",
-                    tooltipField: "Qty4",
-                    width: 150,
+                    headerComponent: 'numberInputHeader', // <-- Attached here
+                    sortable: true,
+                    width: 160,
                     pinned: "right",
                     cellClass: "text-end text-danger",
                     editable: true,
                     cellEditor: 'agNumberCellEditor',
-                    cellEditorParams: {
-                        min: 0,
-                    },
                     cellStyle: { fontWeight: 'bold' },
                     valueParser: params => {
                         let newValue = parseFloat(params.newValue);
                         const maxValue = parseFloat(params.data.Qty2) || 0;
-                        if (isNaN(newValue) || newValue < 0) {
-                            return 0;
-                        }
-                        if (newValue > maxValue) {
-                            return maxValue;
-                        }
-                        return newValue;
+                        if (isNaN(newValue) || newValue < 0) return 0;
+                        return newValue > maxValue ? maxValue : newValue;
                     },
                     valueFormatter: params => {
-                        let value = parseFloat(params.value);
-                        if (isNaN(value)) {
-                            value = parseFloat(params.data.Qty2) || 0;
-                        }
-                        return value.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
+                        let value = parseFloat(params.value) || 0;
+                        return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     },
                 },
                 {
                     headerName: "Qty - Request",
                     field: "QtyReq",
-                    width: 150,
+                    headerComponent: 'numberInputHeader', // <-- Attached here
+                    sortable: true,
+                    width: 160,
                     pinned: "right",
                     editable: true,
                     cellEditor: 'agNumberCellEditor',
                     cellClass: "text-end text-danger",
-                    cellEditorParams: {
-                        min: 0,
-                    },
                     cellStyle: { fontWeight: 'bold' },
                     valueParser: params => {
                         let newValue = parseFloat(params.newValue);
                         const maxValue = parseFloat(params.data.Qty3) || 0;
-                        if (isNaN(newValue) || newValue < 0) {
-                            return 0;
-                        }
-                        if (newValue > maxValue) {
-                            return maxValue;
-                        }
-                        return newValue;
+                        if (isNaN(newValue) || newValue < 0) return 0;
+                        return newValue > maxValue ? maxValue : newValue;
                     },
                     valueFormatter: params => {
-                        let value = parseFloat(params.value);
-                        if (isNaN(value)) value = 0;
-                        return value.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
+                        let value = parseFloat(params.value) || 0;
+                        return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     }
                 }
             ],
@@ -4973,6 +5079,119 @@ function fn0201Delete(pFormCode, pID, pFileName) {
     };
 };
 //attachment
+
+//mis attachment
+function fn0202LoadMISAttachment(pMode, pID) {
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/FRM/FRM000010HND.ashx",
+        data: {
+            'pFormCode': 'FRM000010',
+            'pType': 'Upload - Get Record (MIS)',
+            'pID': pID,
+        },
+        success: function (response) {
+            //display loader
+            document.getElementById("div0202LoaderMISAttachment").style.display = "";
+            //display loader
+
+            $('#table0202MISAttachment').DataTable().destroy();
+
+            //disable column type detection
+            DataTable.types().forEach(type => {
+                DataTable.type(type, 'detect', () => false);
+            });
+            //disable column type detection
+
+            //sort date by yyyy/mm/dd
+            $.fn.dataTable.moment('MM/DD/YYYY');
+            //sort date by yyyy/mm/dd
+
+            //datatable
+            var table0202MISAttachment = $("#table0202MISAttachment").DataTable({
+                processing: true,
+                bFilter: true,
+                bPaginate: false,
+                bInfo: false,
+                scrollCollapse: true,
+                paging: false,
+                lengthChange: false,
+                select: true,
+                data: response,
+                columns: [
+                    { data: 'Action' },
+                    { data: 'Type' },
+                    { data: 'Attachment' },
+                    { data: 'UploadedBy' },
+                    { data: 'UploadedDate' }],
+                columnDefs: [{ targets: 0, orderable: false }, { targets: 1, orderable: false }, { targets: 2, className: 'tbody-nowrap-auto' }, { targets: 3, className: 'tbody-nowrap-auto' }, { targets: 4, className: 'tbody-nowrap-auto' }],
+                order: [[2, 'asc']],
+            });
+            //datatable
+
+            //search
+            $('#tbx0202FindMISAttachment').on('keyup', function () {
+                table0202MISAttachment.search(this.value).draw();
+            });
+            //search
+
+            //hide loader
+            document.getElementById("div0202LoaderMISAttachment").style.display = "none";
+            //hide loader
+
+            //action button
+            if (pMode == "ADD") {
+                const button = document.querySelectorAll('.action-button');
+                for (const btn of button) {
+                    btn.classList.remove("btn-active-light");
+                    btn.disabled = true;
+                }
+            } else if (pMode == "DTL") {
+                const button = document.querySelectorAll('.action-button');
+                for (const btn of button) {
+                    btn.classList.add("btn-active-light");
+                    btn.disabled = false;
+                }
+            } else if (pMode == "UPD") {
+                const button = document.querySelectorAll('.action-button');
+                for (const btn of button) {
+                    btn.classList.remove("btn-active-light");
+                    btn.disabled = true;
+                }
+            }
+            //action button
+
+        },
+    });
+};
+
+function fn0202MISDownload(pFormCode, pID, pFileName) {
+    //if exisit
+    fnIfExist('ogm_si_hdr', 'si_code', pID, function (response) {
+        if (response[0].oReturn == "1") {
+            Download();
+        } else {
+            window.location.replace("MNU040100");
+        };
+    });
+    //download
+    function Download() {
+        $.ajax({
+            type: "POST",
+            url: "HNDGEN.ashx",
+            data: {
+                'pFormCode': pFormCode,
+                'pType': 'Upload - Download',
+                'pID': pID,
+                'pFileName': pFileName,
+            },
+            success: function (response) {
+                window.open('MNU020200?View=' + response[0].View);
+            },
+        });
+    };
+};
+//mis attachment
 
 //notes
 function fn0301LoadNotes(pID) {
@@ -5932,7 +6151,7 @@ function InitialiseSettings() {
                         FileCount = 0;
                         $('#mdl9801Upload').modal('show');
                     } else {
-                        fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+                        fn01AlertOnly(response[0].Msg, 'error', 'btn btn-danger');
                     }; 0
                 });
             }
@@ -5944,7 +6163,7 @@ function InitialiseSettings() {
                     if (response[0].Msg == "") {
                         btn9801Add();
                     } else {
-                        fn01AlertOnly(response[0].oReturn, 'error', 'btn btn-danger');
+                        fn01AlertOnly(response[0].Msg, 'error', 'btn btn-danger');
                     };
                 });
             } else {

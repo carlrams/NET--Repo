@@ -12,9 +12,9 @@ Public Class FRM000009
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.20"
+    Dim DataSource As String = "10.10.30.10"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciisv2"
+    Dim UserID As String = "ciis"
     Dim Password As String = "Cii5s"
     'connection
 
@@ -527,6 +527,7 @@ Public Class FRM000009
                 popup: 'colored-toast',
             },
             showConfirmButton: false,
+            showCloseButton: true,
             timer: 1500,
             timerProgressBar: true
         });
@@ -830,6 +831,7 @@ Public Class FRM000009
             hf01Lot.Value = ""
             hf01Branch.Value = ""
             bind01House()
+            bind01Category()
             ddl01House01.SelectedValue = ""
             tbx01Batch01.Value = ""
             tbx01Theme01.Value = ""
@@ -892,12 +894,15 @@ Public Class FRM000009
             Query.Append("   ,ISNULL([B].Type, '') [Type] ")
             Query.Append("   ,ISNULL([B].IsObserved, 0) [IsObserved] ")
             Query.Append("   ,ISNULL([B].ForInspection, 0) [ForInspection] ")
+            Query.Append("   ,ISNULL([F].CECode, '') [CECode] ")
+            Query.Append("   ,ISNULL([F].Title, '') [CETitle] ")
             Query.Append("from ")
             Query.Append("   oop_form_hdr [A] ")
             Query.Append("   left join Form_CRT [B] on [A].tbl_code = [B].CRTCode ")
             Query.Append("   left join employee [C] on [A].created_by = [C].emp_no ")
             Query.Append("   left join employee [D] on [A].approver = [D].emp_no ")
             Query.Append("   left join employee [E] on [A].EndorsedTo = [E].emp_no ")
+            Query.Append("   left join Trxn_CEHdr [F] on [B].CECode = [F].CECode ")
             Query.Append("where ")
             Query.Append("   [A].f_code = '" & ltrlID.Text & "' ")
             'get contract request
@@ -918,6 +923,7 @@ Public Class FRM000009
                         tbx01EndorsedTo.Text = DR("EndorsedTo")
                         tbx01Status.Text = DR("Status")
                         cbx01IsHDMF01.Checked = IIf(DR("IsHDMF") = 1, True, False)
+                        bind01Category()
                         ddl01Category.Text = DR("Category")
                         tbx01Project.Value = DR("Project")
                         hf01Subdivision.Value = DR("Subdivision")
@@ -934,6 +940,8 @@ Public Class FRM000009
                         If ddl01Category.SelectedValue = "Renovation" Then
                             ddl01Project.SelectedValue = DR("Project")
                         End If
+                        tbx01Estimate.Value = DR("CETitle")
+                        hf01EstimateCode.Value = DR("CECode")
                         ddl01Type.SelectedValue = DR("Type")
                         cbx010101.Checked = IIf(DR("IsObserved") = 1, True, False)
                         cbx010102.Checked = IIf(DR("ForInspection") = 1, True, False)
@@ -1011,6 +1019,8 @@ Public Class FRM000009
             Query.Append("   ,ISNULL([B].Type, '') [Type] ")
             Query.Append("   ,ISNULL([B].IsObserved, 0) [IsObserved] ")
             Query.Append("   ,ISNULL([B].ForInspection, 0) [ForInspection] ")
+            Query.Append("   ,ISNULL([G].CECode, '') [CECode] ")
+            Query.Append("   ,ISNULL([G].Title, '') [CETitle] ")
             Query.Append("from ")
             Query.Append("   oop_form_hdr [A] ")
             Query.Append("   left join Form_CRT [B] on [A].tbl_code = [B].CRTCode ")
@@ -1018,6 +1028,7 @@ Public Class FRM000009
             Query.Append("   left join employee [D] on [A].approver = [D].emp_no ")
             Query.Append("   left join employee [E] on [A].EndorsedTo = [E].emp_no ")
             Query.Append("   left join eng_house [F] on [B].House = [F].h_code ")
+            Query.Append("   left join Trxn_CEHdr [G] on [B].CECode = [G].CECode ")
             Query.Append("where ")
             Query.Append("   [A].f_code = '" & ltrlID.Text & "' ")
             'get contracts request 
@@ -1042,6 +1053,7 @@ Public Class FRM000009
                         lbl01Status.Text = DR("Status")
                         cbx01IsHDMF02.Checked = IIf(DR("IsHDMF") = 1, True, False)
                         lbl01Category.Text = DR("Category")
+                        lbl01Estimate.Text = DR("CETitle")
                         lbl01Project.Text = DR("Project")
                         lbl01House.Text = DR("House")
                         lbl01Batch.Text = DR("Batch")
@@ -1109,6 +1121,45 @@ Public Class FRM000009
         ddl01House01.DataValueField = "Value"
         ddl01House01.DataTextField = "Text"
         ddl01House01.DataBind()
+        'fill data
+
+    End Function
+
+    Function bind01Category()
+
+        'get house
+        Dim Query As New StringBuilder
+        Query.Append("select")
+        Query.Append("   '' [Value] ")
+        Query.Append("   ,'Select category'  [Text] ")
+        Query.Append("   ,0  [Order] ")
+        Query.Append("union ")
+        Query.Append("select")
+        Query.Append("   Category [Value] ")
+        Query.Append("   ,Category  [Text] ")
+        Query.Append("   ,1  [Order] ")
+        Query.Append("from ")
+        Query.Append("   Parm_CECategory ")
+        Query.Append("where ")
+        Query.Append("   ISNULL(lock, 0) = 1 ")
+        Query.Append("order by ")
+        Query.Append("   [Order] ")
+        Query.Append("   ,[Text] ")
+        'get house
+
+        'execute query
+        Dim ConStr As String = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        Dim SqlCon As New SqlConnection(ConStr)
+        Dim SDA As New SqlDataAdapter(Query.ToString, SqlCon)
+        Dim DT As New DataTable()
+        SDA.Fill(DT)
+        'execute query
+
+        'fill data
+        ddl01Category.DataSource = DT
+        ddl01Category.DataValueField = "Value"
+        ddl01Category.DataTextField = "Text"
+        ddl01Category.DataBind()
         'fill data
 
     End Function
@@ -1361,6 +1412,8 @@ Public Class FRM000009
                 Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "" Then
                 Alert("error", "Some field(s) are missing!")
+            ElseIf (tbx01Estimate.Value = "" Or hf01EstimateCode.Value = "") Then
+                Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "Renovation" And ddl01Project.SelectedValue = "" Then
                 Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "Amenities New" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "") Then
@@ -1587,6 +1640,7 @@ Public Class FRM000009
             SqlCmd.Parameters.AddWithValue("@pBatch", tbx01Batch01.Value)
             SqlCmd.Parameters.AddWithValue("@pTheme", tbx01Theme01.Value)
             SqlCmd.Parameters.AddWithValue("@pBudget", CDbl(tbx01Budget01.Value))
+            SqlCmd.Parameters.AddWithValue("@pCECode", hf01EstimateCode.Value)
             SqlCmd.Parameters.AddWithValue("@pPurpose", tbx01Purpose.Text)
             SqlCmd.Parameters.AddWithValue("@pCreatedBy", CIIS_EmpCode)
             SqlCmd.Parameters.AddWithValue("@pProject", IIf(ddl01Category.SelectedValue = "Renovation", ddl01Project.SelectedValue, ""))
@@ -1654,6 +1708,7 @@ Public Class FRM000009
             SqlCmd.Parameters.AddWithValue("@pBatch", tbx01Batch01.Value)
             SqlCmd.Parameters.AddWithValue("@pTheme", tbx01Theme01.Value)
             SqlCmd.Parameters.AddWithValue("@pBudget", CDbl(tbx01Budget01.Value))
+            SqlCmd.Parameters.AddWithValue("@pCECode", hf01EstimateCode.Value)
             SqlCmd.Parameters.AddWithValue("@pPurpose", tbx01Purpose.Text)
             SqlCmd.Parameters.AddWithValue("@pType", IIf(cbx01IsHDMF01.Checked = True, ddl01Type.SelectedValue, ""))
             SqlCmd.Parameters.AddWithValue("@pIsObserved", IIf(cbx01IsHDMF01.Checked = True, IIf(cbx010101.Checked = True, 1, 0), 0))

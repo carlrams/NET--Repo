@@ -275,6 +275,24 @@ Partial Public Class FRM000009
     Protected WithEvents ddl01Category As Global.System.Web.UI.WebControls.DropDownList
 
     '''<summary>
+    '''tbx01Estimate control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents tbx01Estimate As Global.System.Web.UI.HtmlControls.HtmlInputText
+
+    '''<summary>
+    '''hf01EstimateCode control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents hf01EstimateCode As Global.System.Web.UI.WebControls.HiddenField
+
+    '''<summary>
     '''div01Project control.
     '''</summary>
     '''<remarks>
@@ -579,6 +597,15 @@ Partial Public Class FRM000009
     '''To modify move field declaration from designer file to code-behind file.
     '''</remarks>
     Protected WithEvents lbl01Category As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''lbl01Estimate control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents lbl01Estimate As Global.System.Web.UI.WebControls.Label
 
     '''<summary>
     '''lbl01Project control.

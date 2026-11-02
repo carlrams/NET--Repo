@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Reservation Monitoring" Language="vb" AutoEventWireup="false" MasterPageFile="~/MNU000000.Master" CodeBehind="SCM170000.aspx.vb" Inherits="NET.SCM170000" MaintainScrollPositionOnPostback="true" %>
+﻿<%@ Page Title="Contract Announcement" Language="vb" AutoEventWireup="false" MasterPageFile="~/MNU000000.Master" CodeBehind="SCM170000.aspx.vb" Inherits="NET.SCM170000" MaintainScrollPositionOnPostback="true" %>
 <%@ MasterType VirtualPath="MNU000000.Master" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
 
@@ -7,7 +7,7 @@
         <div class="toolbar py-5">
             <div class="container-xxl d-flex flex-stack flex-wrap p-0">
                 <div class="page-title d-flex flex-column me-3">
-                    <h1 class="d-flex text-white fw-bolder my-1 fs-3">Sales Admin</h1>
+                    <h1 class="d-flex text-white fw-bolder my-1 fs-3">Contract Admin</h1>
                     <ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 my-1">
                         <lis class="breadcrumb-item text-white">Announcement</lis>
                     </ul>

@@ -97,6 +97,9 @@
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.3\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SqlServer, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SqlServer.2.4.3\lib\net45\Microsoft.AspNet.SignalR.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.3\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
     </Reference>
@@ -305,6 +308,7 @@
     <Content Include="AAD002017.aspx" />
     <Content Include="AAD002031.aspx" />
     <Content Include="AAD002034.aspx" />
+    <Content Include="AAD003000.aspx" />
     <Content Include="AAD010100.aspx" />
     <Content Include="AAD010200.aspx" />
     <Content Include="AAD010300.aspx" />
@@ -345,6 +349,7 @@
     <Content Include="Assets\js\AAD\AAD002017.js" />
     <Content Include="Assets\js\AAD\AAD002031.js" />
     <Content Include="Assets\js\AAD\AAD002034.js" />
+    <Content Include="Assets\js\AAD\AAD003000.js" />
     <Content Include="Assets\js\ACC\ACC030200.js" />
     <Content Include="Assets\js\bootstrap.bundle.js" />
     <Content Include="Assets\js\bootstrap.bundle.min.js" />
@@ -657,6 +662,7 @@
     <Content Include="Assets\js\FRM\FRM000049.js" />
     <Content Include="Assets\js\FRM\FRM000053.js" />
     <Content Include="Assets\js\FRM\FRM000054.js" />
+    <Content Include="Assets\js\FRM\FRM000063.js" />
     <Content Include="Assets\js\jquery-3.7.1.min.js" />
     <Content Include="Assets\js\jquery.atwho.js" />
     <Content Include="Assets\js\jquery.caret.js" />
@@ -665,8 +671,24 @@
     <Content Include="Assets\js\SCM\SCM010101.js" />
     <Content Include="Assets\js\SCM\SCM010102.js" />
     <Content Include="Assets\js\SCM\SCM010200.js" />
+    <Content Include="Assets\js\SCM\SCM060000.js" />
+    <Content Include="Assets\js\SCM\SCM060100.js" />
+    <Content Include="Assets\js\SCM\SCM080000.js" />
+    <Content Include="Assets\js\SCM\SCM080100.js" />
     <Content Include="Assets\js\SCM\SCM170000.js" />
+    <Content Include="Assets\js\SCM\SCM200000.js" />
+    <Content Include="Assets\js\SCM\SCM220000.js" />
+    <Content Include="Assets\js\SCM\SCM220100.js" />
+    <Content Include="Assets\js\SCM\SCM230000.js" />
+    <Content Include="Assets\js\SCM\SCM230100.js" />
+    <Content Include="Assets\js\SCM\SCM240000.js" />
+    <Content Include="Assets\js\SCM\SCM240100.js" />
+    <Content Include="Assets\js\SCM\SCM250000.js" />
+    <Content Include="Assets\js\SCM\SCM250100.js" />
+    <Content Include="Assets\js\SCM\SCM260000.js" />
+    <Content Include="Assets\js\SCM\SCM260100.js" />
     <Content Include="Assets\js\scripts.bundle.js" />
+    <Content Include="Assets\js\SLS\SLS200000.js" />
     <Content Include="Assets\js\widgets.bundle.js" />
     <Content Include="Assets\media\avatars\1992000001.png" />
     <Content Include="Assets\media\avatars\1994000000.jpg" />
@@ -3035,6 +3057,8 @@
     <Content Include="FRM000049.aspx" />
     <Content Include="FRM000053.aspx" />
     <Content Include="FRM000054.aspx" />
+    <Content Include="FRM000055.aspx" />
+    <Content Include="FRM000063.aspx" />
     <Content Include="FRM010000.aspx" />
     <Content Include="Global.asax" />
     <Content Include="HRA010000.aspx" />
@@ -3438,6 +3462,17 @@
     <Content Include="SCM150000.aspx" />
     <Content Include="SCM150100.aspx" />
     <Content Include="SCM170000.aspx" />
+    <Content Include="SCM200000.aspx" />
+    <Content Include="SCM220000.aspx" />
+    <Content Include="SCM220100.aspx" />
+    <Content Include="SCM230000.aspx" />
+    <Content Include="SCM230100.aspx" />
+    <Content Include="SCM240000.aspx" />
+    <Content Include="SCM240100.aspx" />
+    <Content Include="SCM250000.aspx" />
+    <Content Include="SCM250100.aspx" />
+    <Content Include="SCM260000.aspx" />
+    <Content Include="SCM260100.aspx" />
     <Content Include="SCMRPTViewer.aspx" />
     <Content Include="SCMRT0001.aspx" />
     <Content Include="SCMRT0002.aspx" />
@@ -3459,6 +3494,7 @@
     <Content Include="SLS050000.aspx" />
     <Content Include="SLS060000.aspx" />
     <Content Include="SLS070000.aspx" />
+    <Content Include="SLS200000.aspx" />
     <Content Include="SqlServerTypes\Loader.cs" />
     <Content Include="SqlServerTypes\readme.htm" />
     <Content Include="SqlServerTypes\x64\msvcr120.dll">
@@ -3524,6 +3560,23 @@
     <Content Include="Assets\Handler\FRM\FRM000010HND.ashx" />
     <Content Include="Assets\Handler\FRM\HNDFRM000016.ashx" />
     <Content Include="Assets\Handler\ACC\ACC030200HND.ashx" />
+    <Content Include="Assets\Handler\AAD\AAD003000HND.ashx" />
+    <Content Include="Assets\Handler\SLS\SLS200000HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM080000HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM080100HND.ashx" />
+    <Content Include="Assets\Handler\FRM\FRM000009HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM200000HND.ashx" />
+    <Content Include="Assets\Handler\FRM\FRM000063HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM220000HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM220100HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM230000HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM230100HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM240000HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM240100HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM250000HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM250100HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM260000HND.ashx" />
+    <Content Include="Assets\Handler\SCM\SCM260100HND.ashx" />
     <None Include="ENGRTDataSet.xsd">
       <Generator>MSDataSetGenerator</Generator>
       <LastGenOutput>ENGRTDataSet1.Designer.vb</LastGenOutput>
@@ -3639,6 +3692,13 @@
     </Compile>
     <Compile Include="AAD002034.aspx.vb">
       <DependentUpon>AAD002034.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="AAD003000.aspx.designer.vb">
+      <DependentUpon>AAD003000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AAD003000.aspx.vb">
+      <DependentUpon>AAD003000.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="AAD010100.aspx.designer.vb">
@@ -3837,6 +3897,9 @@
     <Compile Include="Assets\Handler\AAD\AAD002034HND.ashx.vb">
       <DependentUpon>AAD002034HND.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Assets\Handler\AAD\AAD003000HND.ashx.vb">
+      <DependentUpon>AAD003000HND.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Assets\Handler\ACC\ACC030200HND.ashx.vb">
       <DependentUpon>ACC030200HND.ashx</DependentUpon>
     </Compile>
@@ -3854,6 +3917,9 @@
     </Compile>
     <Compile Include="Assets\Handler\DSB\DSB290000HND.ashx.vb">
       <DependentUpon>DSB290000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\FRM\FRM000009HND.ashx.vb">
+      <DependentUpon>FRM000009HND.ashx</DependentUpon>
     </Compile>
     <Compile Include="Assets\Handler\FRM\FRM000010HND.ashx.vb">
       <DependentUpon>FRM000010HND.ashx</DependentUpon>
@@ -3882,6 +3948,9 @@
     <Compile Include="Assets\Handler\FRM\FRM000054HND.ashx.vb">
       <DependentUpon>FRM000054HND.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Assets\Handler\FRM\FRM000063HND.ashx.vb">
+      <DependentUpon>FRM000063HND.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Assets\Handler\FRM\HNDFRM000015.ashx.vb">
       <DependentUpon>HNDFRM000015.ashx</DependentUpon>
     </Compile>
@@ -3890,6 +3959,48 @@
     </Compile>
     <Compile Include="Assets\Handler\MNU\MNU001000HND.ashx.vb">
       <DependentUpon>MNU001000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM080000HND.ashx.vb">
+      <DependentUpon>SCM080000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM080100HND.ashx.vb">
+      <DependentUpon>SCM080100HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM200000HND.ashx.vb">
+      <DependentUpon>SCM200000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM220000HND.ashx.vb">
+      <DependentUpon>SCM220000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM220100HND.ashx.vb">
+      <DependentUpon>SCM220100HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM230000HND.ashx.vb">
+      <DependentUpon>SCM230000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM230100HND.ashx.vb">
+      <DependentUpon>SCM230100HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM240000HND.ashx.vb">
+      <DependentUpon>SCM240000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM240100HND.ashx.vb">
+      <DependentUpon>SCM240100HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM250000HND.ashx.vb">
+      <DependentUpon>SCM250000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM250100HND.ashx.vb">
+      <DependentUpon>SCM250100HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM260000HND.ashx.vb">
+      <DependentUpon>SCM260000HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SCM\SCM260100HND.ashx.vb">
+      <DependentUpon>SCM260100HND.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Assets\Handler\SLS\SLS200000HND.ashx.vb">
+      <DependentUpon>SLS200000HND.ashx</DependentUpon>
     </Compile>
     <Compile Include="Assets\Report\CrystalReport1.vb">
       <AutoGen>True</AutoGen>
@@ -4899,6 +5010,20 @@
     </Compile>
     <Compile Include="FRM000054.aspx.vb">
       <DependentUpon>FRM000054.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="FRM000055.aspx.designer.vb">
+      <DependentUpon>FRM000055.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FRM000055.aspx.vb">
+      <DependentUpon>FRM000055.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="FRM000063.aspx.designer.vb">
+      <DependentUpon>FRM000063.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FRM000063.aspx.vb">
+      <DependentUpon>FRM000063.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="FRM010000.aspx.designer.vb">
@@ -5924,6 +6049,83 @@
       <DependentUpon>SCM170000.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
+    <Compile Include="SCM200000.aspx.designer.vb">
+      <DependentUpon>SCM200000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM200000.aspx.vb">
+      <DependentUpon>SCM200000.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM220000.aspx.designer.vb">
+      <DependentUpon>SCM220000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM220000.aspx.vb">
+      <DependentUpon>SCM220000.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM220100.aspx.designer.vb">
+      <DependentUpon>SCM220100.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM220100.aspx.vb">
+      <DependentUpon>SCM220100.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM230000.aspx.designer.vb">
+      <DependentUpon>SCM230000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM230000.aspx.vb">
+      <DependentUpon>SCM230000.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM230100.aspx.designer.vb">
+      <DependentUpon>SCM230100.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM230100.aspx.vb">
+      <DependentUpon>SCM230100.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM240000.aspx.designer.vb">
+      <DependentUpon>SCM240000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM240000.aspx.vb">
+      <DependentUpon>SCM240000.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM240100.aspx.designer.vb">
+      <DependentUpon>SCM240100.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM240100.aspx.vb">
+      <DependentUpon>SCM240100.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM250000.aspx.designer.vb">
+      <DependentUpon>SCM250000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM250000.aspx.vb">
+      <DependentUpon>SCM250000.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM250100.aspx.designer.vb">
+      <DependentUpon>SCM250100.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM250100.aspx.vb">
+      <DependentUpon>SCM250100.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM260000.aspx.designer.vb">
+      <DependentUpon>SCM260000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM260000.aspx.vb">
+      <DependentUpon>SCM260000.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="SCM260100.aspx.designer.vb">
+      <DependentUpon>SCM260100.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SCM260100.aspx.vb">
+      <DependentUpon>SCM260100.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
     <Compile Include="SCMRPTViewer.aspx.designer.vb">
       <DependentUpon>SCMRPTViewer.aspx</DependentUpon>
     </Compile>
@@ -6080,6 +6282,13 @@
     </Compile>
     <Compile Include="SLS070000.aspx.vb">
       <DependentUpon>SLS070000.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SLS200000.aspx.designer.vb">
+      <DependentUpon>SLS200000.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SLS200000.aspx.vb">
+      <DependentUpon>SLS200000.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Startup.vb" />

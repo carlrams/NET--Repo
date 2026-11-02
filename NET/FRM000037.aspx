@@ -188,47 +188,6 @@
 									<div class="input-group input-group-sm mb-2">
 										<span class="input-group-text min-w-150px required">Category</span>
 										<asp:DropDownList ID="ddl01Category" runat="server" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-35px" onchange="ddl01Category(this);">
-											<asp:ListItem Value="">Select category</asp:ListItem>
-											<asp:ListItem Value="Amenities">Amenities</asp:ListItem>
-											<asp:ListItem Value="Amenities New">Amenities New</asp:ListItem>
-											<asp:ListItem Value="Amenities Repair">Amenities Repair</asp:ListItem>
-											<asp:ListItem Value="Shell to Basic">Shell to Basic</asp:ListItem>
-											<asp:ListItem Value="Basic to Complete">Basic to Complete</asp:ListItem>
-											<asp:ListItem Value="Shell to Classic">Shell to Classic</asp:ListItem>
-											<asp:ListItem Value="Classic to Premium">Classic to Premium</asp:ListItem>
-											<asp:ListItem Value="Shell to Complete">Shell to Complete</asp:ListItem>
-											<asp:ListItem Value="Shell to Premium">Shell to Premium</asp:ListItem>
-											<asp:ListItem Value="CLDC Office">CLDC Office</asp:ListItem>
-											<asp:ListItem Value="Clearing / Grass Cutting">Clearing / Grass Cutting</asp:ListItem>
-											<asp:ListItem Value="Container Van">Container Van</asp:ListItem>
-											<asp:ListItem Value="Renovation">Renovation</asp:ListItem>
-											<asp:ListItem Value="DOLE Application - Land Development">DOLE Application - Land Development</asp:ListItem>
-											<asp:ListItem Value="DOLE Application - Model House">DOLE Application - Model House</asp:ListItem>
-											<asp:ListItem Value="Electrical Consultant">Electrical Consultant</asp:ListItem>
-											<asp:ListItem Value="House Construction">House Construction</asp:ListItem>
-											<asp:ListItem Value="Take-Over Unit">Take-Over Unit</asp:ListItem>
-											<asp:ListItem Value="House Repair">House Repair</asp:ListItem>
-											<asp:ListItem Value="House Modification">House Modification</asp:ListItem>
-											<asp:ListItem Value="Initial Inspection">Initial Inspection</asp:ListItem>
-											<asp:ListItem Value="Interior Designer">Interior Designer</asp:ListItem>
-											<asp:ListItem Value="Land Development">Land Development</asp:ListItem>
-											<asp:ListItem Value="Land Development New">Land Development New</asp:ListItem>
-											<asp:ListItem Value="Land Development Repair">Land Development Repair</asp:ListItem>
-											<asp:ListItem Value="Land Scape Project New">Land Scape Project New</asp:ListItem>
-											<asp:ListItem Value="Land Scape Project Restoration">Land Scape Project Restoration</asp:ListItem>
-											<asp:ListItem Value="Land Scape Unit">Land Scape Unit</asp:ListItem>
-											<asp:ListItem Value="NWRB Application">NWRB Application</asp:ListItem>
-											<asp:ListItem Value="Perimeter Fence">Perimeter Fence</asp:ListItem>
-											<asp:ListItem Value="Perimeter Fence New">Perimeter Fence New</asp:ListItem>
-											<asp:ListItem Value="Security Services">Security Services</asp:ListItem>
-											<asp:ListItem Value="Service Entrance">Service Entrance</asp:ListItem>
-											<asp:ListItem Value="Structural Consultant - Amenities">Structural Consultant - Amenities</asp:ListItem>
-											<asp:ListItem Value="Structural Consultant - House Unit">Structural Consultant - House Unit</asp:ListItem>
-											<asp:ListItem Value="Temporary Facilities Construction">Temporary Facilities Construction</asp:ListItem>
-											<asp:ListItem Value="Testing and Investigation">Testing and Investigation</asp:ListItem>
-											<asp:ListItem Value="Utilities Repair">Utilities Repair</asp:ListItem>
-											<asp:ListItem Value="Waste Hauling Services">Waste Hauling Services</asp:ListItem>
-											<asp:ListItem Value="Others">Others</asp:ListItem>
 										</asp:DropDownList>
 									</div>
 									<div id="div01Renovation" runat="server" class="input-group input-group-sm mb-2" style="display: none;">
@@ -1380,6 +1339,9 @@
 				div01Renovation.style.display = "";
 				div01Project.style.display = "none";
 			}
+            else if (selectValue == "Shell to Baic") {
+                div01House.style.display = "";
+            }
 			else if (selectValue == "Shell to Complete") {
 				div01House.style.display = "";
 			}
@@ -1392,6 +1354,9 @@
 			else if (selectValue == "Shell to Basic") {
 				div01House.style.display = "";
 			}
+            else if (selectValue == "Classic to Basic") {
+                div01House.style.display = "";
+            }
 			else if (selectValue == "Structural Consultant - Amenities") {
 				div01Budget.style.display = "";
 			} else if (selectValue == "Structural Consultant - House Unit") {
@@ -1424,9 +1389,13 @@
 			} else if (selectValue == "Electrical Consultant") {
 				div01House.style.display = "";
 			} else if (selectValue == "DOLE Application - Model House") {
+                div01House.style.display = "";
+            } else if (selectValue == "Bare to Classic") {
+                div01House.style.display = "";
+			} else if (selectValue == "Basic to Classic") {
 				div01House.style.display = "";
-			} else if (selectValue == "Basic to Complete") {
-				div01House.style.display = "";
+            } else if (selectValue == "Basic to Complete") {
+                div01House.style.display = "";
 			} else if (selectValue == "Land Development New") {
                 div01Rawland.style.display = "";
             } else if (selectValue == "Land Development Repair") {
@@ -1669,13 +1638,29 @@
 				var ltrlID = '<asp:Literal ID="ltrlID" runat="server" />';
                 var ltrlMode = '<asp:Literal ID="ltrlMode" runat="server" />';
                 var ltrlSeqNo = '<asp:Literal ID="ltrlSeqNo" runat="server" />';
-                //form variable
+				//form variable
+
+                //Page Title
+                if (ltrlID === "0000000000000") {
+                    document.title = "Work Order Contract - Add New";
+                } else {
+                    document.title = "Work Order Contract - " + ltrlID;
+                }
+                //Page Title
 
                 //metion                jq.fn.atwho.debug = true;
                 var chatHub = jq.connection.chatHub;
                 jq.connection.hub.start().done(function () {
                     // mention load
                     loadFunction()
+                    //// mention save
+                    //jq('.lbtn05AddNote').click(function () {
+                    //    // Call the Send method on the hub.
+                    //    chatHub.server.send(ltrlFormCode, ltrlID, ltrlFormCode, initialMention.join(','), ltrlCreatedBy);
+                    //    // clear
+                    //    initialMention = [];
+                    //    mentionUser = [];
+                    //})
                 }).fail(function (error) {
                     console.error("SignalR connection failed: " + error)
                 });

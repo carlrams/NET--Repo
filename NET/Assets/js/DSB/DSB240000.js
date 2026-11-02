@@ -2476,6 +2476,38 @@ function fn0301Table(pID) {
     //modal
     $("#mdl0301Record").modal("show");
 };
+function getProjectionMeta(currentStock, avgMonth) {
+    const stock = parseFloat(currentStock) || 0;
+    const avg = parseFloat(avgMonth) || 0;
+
+    if (avg === 0) {
+        return {
+            pct: 0,
+            status: "N/A",
+            action: "No usage recorded",
+            bgColor: "#e9ecef",
+            textColor: "#495057"
+        };
+    }
+
+    const pct = (stock / avg) * 100;
+
+    if (pct > 70) {
+        return { pct, status: "Healthy Stock", action: "Normal inventory level", bgColor: "#28a745", textColor: "#ffffff" }; // Green
+    } else if (pct > 60) {
+        return { pct, status: "Bulk Procurement Zone", action: "Advance PR, canvassing, approval, ordering ongoing", bgColor: "#007bff", textColor: "#ffffff" }; // Blue
+    } else if (pct > 50) {
+        return { pct, status: "Bulk Order Trigger", action: "Raise PR and start sourcing", bgColor: "#0dcaf0", textColor: "#000000" }; // Light Blue
+    } else if (pct > 30) {
+        return { pct, status: "Low Stock", action: "Monitor incoming deliveries / Activate local purchases", bgColor: "#ffc107", textColor: "#212529" }; // Yellow
+    } else if (pct > 15) {
+        return { pct, status: "Critical", action: "Local replenishment required immediately", bgColor: "#fd7e14", textColor: "#ffffff" }; // Orange
+    } else if (pct > 5) {
+        return { pct, status: "Near Stock Out", action: "Immediate management intervention", bgColor: "#dc3545", textColor: "#ffffff" }; // Red
+    } else {
+        return { pct, status: "Stock Out", action: "Emergency procurement / expedite delivery", bgColor: "#8b0000", textColor: "#ffffff" }; // Dark Red
+    }
+}
 function fn04Table() {
     $.ajax({
         type: "POST",
@@ -2540,7 +2572,7 @@ function fn04Table() {
                 tooltipField: "ItemName",
                 pinned: 'left',
                 flex: 1,
-                minWidth: 450,
+                minWidth: 350,
                 getQuickFilterText: params => params.data.SearchText || '',
                 cellStyle: params => params.data.No == 0 ? { fontWeight: 'bold' } : { paddingLeft: '25px', fontStyle: 'italic' }
             },
@@ -2655,29 +2687,78 @@ function fn04Table() {
             {
                 headerName: "Current Stock",
                 colId: "CurrentStock",
-                field: "Total",
-                tooltipField: "Total",
+                field: "CurrentStock",
+                tooltipField: "CurrentStock",
                 width: 150,
                 pinned: "right",
                 cellClass: "text-end",
                 cellStyle: { fontWeight: 'bold' },
                 valueFormatter: params => {
+                    if (!params.data || params.node.rowPinned) return "";
                     let value = parseFloat(params.value) || 0;
                     return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 }
             },
             {
-                headerName: "Projection",
+                headerName: "Projection %",
                 field: "Projection",
                 tooltipField: "Projection",
                 width: 150,
                 pinned: "right",
                 cellClass: "text-end",
-                cellStyle: { fontWeight: 'bold' },
+                valueGetter: params => {
+                    if (!params.data) return 0;
+                    const stock = parseFloat(params.data.CurrentStock) || 0;
+                    const avg = parseFloat(params.data.AvgMonth) || 0;
+                    if (avg <= 0) return 0;
+                    const pct = (stock / avg) * 100;
+                    return pct >= 100 ? 100 : pct;
+                },
                 valueFormatter: params => {
-                    let value = parseFloat(params.value) || 0;
-                    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    if (params.node.rowPinned || params.value === "") return "";
+                    return (parseFloat(params.value) || 0).toFixed(2) + "%";
+                },
+                cellStyle: params => {
+                    if (params.node.rowPinned) return { fontWeight: 'bold' };
+                    const meta = getProjectionMeta(params.data.CurrentStock, params.data.AvgMonth);
+                    return {
+                        backgroundColor: meta.bgColor,
+                        color: meta.textColor,
+                        fontWeight: 'bold'
+                    };
                 }
+            },
+            {
+                headerName: "Status",
+                colId: "Status",
+                width: 180,
+                pinned: "right",
+                filter: 'agTextColumnFilter',
+                valueGetter: params => {
+                    if (!params.data || params.node.rowPinned) return "";
+                    return getProjectionMeta(params.data.CurrentStock, params.data.AvgMonth).status;
+                },
+                cellStyle: params => {
+                    if (params.node.rowPinned) return { fontWeight: 'bold' };
+                    const meta = getProjectionMeta(params.data.CurrentStock, params.data.AvgMonth);
+                    return {
+                        backgroundColor: meta.bgColor,
+                        color: meta.textColor,
+                        fontWeight: 'bold',
+                        textAlign: 'center'
+                    };
+                }
+            },
+            {
+                headerName: "Required Action",
+                colId: "RequiredAction",
+                minWidth: 180,
+                tooltipValueGetter: params => params.value,
+                valueGetter: params => {
+                    if (!params.data || params.node.rowPinned) return "";
+                    return getProjectionMeta(params.data.CurrentStock, params.data.AvgMonth).action;
+                },
+                cellStyle: { fontStyle: 'italic' }
             }
         ],
         rowData: [],
@@ -5862,10 +5943,37 @@ function fn04Export() {
     if (grid04Api) {
         grid04Api.exportDataAsCsv({
             fileName: 'Actual Issuance Usage.csv',
-            columnKeys: ['ItemName', 'Month7', 'Month6', 'Month5', 'Month4', 'Month3', 'Month2', 'Month1', 'Total', 'AvgMonth', 'Projection']
+            columnKeys: [
+                'ItemName',
+                'Month7',
+                'Month6',
+                'Month5',
+                'Month4',
+                'Month3',
+                'Month2',
+                'Month1',
+                'Total',
+                'AvgMonth',
+                'CurrentStock',
+                'Projection',
+                'Status',
+                'RequiredAction'
+            ],
+            exportedRows: 'all',
+            pinnedBottom: true,
+            processCellCallback: params => {
+                if (params.node.rowPinned) {
+                    if (['CurrentStock', 'Projection', 'Status', 'RequiredAction'].includes(params.column.getColId())) {
+                        return '';
+                    }
+                }
+                return params.valueFormatted !== null && params.valueFormatted !== undefined
+                    ? params.valueFormatted
+                    : params.value;
+            }
         });
     }
-};
+}
 function fn05Export() {
     if (grid05Api) {
         grid05Api.exportDataAsCsv({

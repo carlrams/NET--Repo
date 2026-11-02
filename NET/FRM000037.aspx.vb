@@ -13,9 +13,9 @@ Public Class FRM000037
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.20"
+    Dim DataSource As String = "10.10.30.10"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciisv2"
+    Dim UserID As String = "ciis"
     Dim Password As String = "Cii5s"
     'connection
 
@@ -143,7 +143,7 @@ Public Class FRM000037
             Dim Query As New StringBuilder
             Query.Append("select")
             Query.Append("   f_code ")
-            Query.Append("   ,ISNULL(formtitle, '-') ")
+            Query.Append("   ,formtitle ")
             Query.Append("   ,status ")
             Query.Append("from ")
             Query.Append("   oop_form_hdr ")
@@ -213,7 +213,7 @@ Public Class FRM000037
             Dim Query As New StringBuilder
             Query.Append("select")
             Query.Append("   f_code ")
-            Query.Append("   ,ISNULL(formtitle, '-') [FormTitle] ")
+            Query.Append("   ,formtitle ")
             Query.Append("   ,isnull(status,'New') ")
             Query.Append("from ")
             Query.Append("   oop_form_hdr ")
@@ -636,19 +636,26 @@ Public Class FRM000037
             div01Type.Style.Add("display", "none")
             div01Status.Style.Add("display", "none")
 
-            If ddl01Category.SelectedValue = "Shell to Premium" Then
+
+            If ddl01Category.SelectedValue = "Bare to Classic" Then
                 div01House.Style.Add("display", "")
-            ElseIf ddl01Category.SelectedValue = "Shell to Complete" Then
+            ElseIf ddl01Category.SelectedValue = "Basic to Classic" Then
+                div01House.Style.Add("display", "")
+            ElseIf ddl01Category.SelectedValue = "Basic to Complete" Then
+                div01House.Style.Add("display", "")
+            ElseIf ddl01Category.SelectedValue = "Classic to Basic" Then
+                div01House.Style.Add("display", "")
+            ElseIf ddl01Category.SelectedValue = "Classic to Premium" Then
+                div01House.Style.Add("display", "")
+            ElseIf ddl01Category.SelectedValue = "Shell to Basic" Then
+                div01House.Style.Add("display", "")
+            ElseIf ddl01Category.SelectedValue = "Shell to Classic" Then
+                div01House.Style.Add("display", "")
+            ElseIf ddl01Category.SelectedValue = "Shell to Premium" Then
                 div01House.Style.Add("display", "")
             ElseIf ddl01Category.SelectedValue = "Renovation" Then
                 div01Renovation.Style.Add("display", "")
                 div01Project.Style.Add("display", "none")
-            ElseIf ddl01Category.SelectedValue = "Classic to Premium" Then
-                div01House.Style.Add("display", "")
-            ElseIf ddl01Category.SelectedValue = "Shell to Classic" Then
-                div01House.Style.Add("display", "")
-            ElseIf ddl01Category.SelectedValue = "Shell to Basic" Then
-                div01House.Style.Add("display", "")
             ElseIf ddl01Category.SelectedValue = "Structural Consultant - Amenities" Then
                 div01Budget.Style.Add("display", "")
             ElseIf ddl01Category.SelectedValue = "Structural Consultant - House Unit" Then
@@ -721,8 +728,6 @@ Public Class FRM000037
                 div01House.Style.Add("display", "")
             ElseIf ddl01Category.SelectedValue = "DOLE Application - Model House" Then
                 div01House.Style.Add("display", "")
-            ElseIf ddl01Category.SelectedValue = "Basic to Complete" Then
-                div01House.Style.Add("display", "")
             ElseIf ddl01Category.SelectedValue = "Land Development New" Then
                 div01Rawland.Style.Add("display", "")
                 If ddl01Rawland.SelectedValue = "Rawland" Then
@@ -783,15 +788,21 @@ Public Class FRM000037
             pnl01Theme.Visible = False
             pnl01Budget.Visible = False
 
-            If lbl01Category.Text = "Shell to Premium" Then
+            If lbl01Category.Text = "Bare to Classic" Then
                 pnl01House.Style.Add("display", "")
-            ElseIf lbl01Category.Text = "Shell to Complete" Then
+            ElseIf lbl01Category.Text = "Basic to Classic" Then
+                pnl01House.Style.Add("display", "")
+            ElseIf lbl01Category.Text = "Basic to Complete" Then
+                pnl01House.Style.Add("display", "")
+            ElseIf lbl01Category.Text = "Classic to Basic" Then
                 pnl01House.Style.Add("display", "")
             ElseIf lbl01Category.Text = "Classic to Premium" Then
                 pnl01House.Style.Add("display", "")
+            ElseIf lbl01Category.Text = "Shell to Basic" Then
+                pnl01House.Style.Add("display", "")
             ElseIf lbl01Category.Text = "Shell to Classic" Then
                 pnl01House.Style.Add("display", "")
-            ElseIf lbl01Category.Text = "Shell to Basic" Then
+            ElseIf lbl01Category.Text = "Shell to Premium" Then
                 pnl01House.Style.Add("display", "")
             ElseIf lbl01Category.Text = "Structural Consultant - Amenities" Then
                 pnl01Budget.Visible = True
@@ -824,8 +835,6 @@ Public Class FRM000037
             ElseIf lbl01Category.Text = "Electrical Consultant" Then
                 pnl01House.Visible = True
             ElseIf lbl01Category.Text = "DOLE Application - Model House" Then
-                pnl01House.Visible = True
-            ElseIf lbl01Category.Text = "Basic to Complete" Then
                 pnl01House.Visible = True
             Else
                 pnl01House.Visible = False
@@ -895,6 +904,7 @@ Public Class FRM000037
             hf01Lot.Value = ""
             hf01Branch.Value = ""
             bind01House()
+            bind01Category()
             ddl01House01.SelectedValue = ""
             tbx01Batch01.Value = ""
             tbx01Theme01.Value = ""
@@ -987,6 +997,7 @@ Public Class FRM000037
                         tbx01EndorsedTo.Text = DR("EndorsedTo")
                         tbx01Status.Text = DR("Status")
                         cbx01IsHDMF01.Checked = IIf(DR("IsHDMF") = 1, True, False)
+                        bind01Category()
                         ddl01Category.Text = DR("Category")
                         tbx01Project.Value = DR("Project")
                         hf01Subdivision.Value = DR("Subdivision")
@@ -1378,6 +1389,44 @@ Public Class FRM000037
         End If
     End Sub
 
+    Function bind01Category()
+
+        'get house
+        Dim Query As New StringBuilder
+        Query.Append("select")
+        Query.Append("   '' [Value] ")
+        Query.Append("   ,'Select category'  [Text] ")
+        Query.Append("   ,0  [Order] ")
+        Query.Append("union ")
+        Query.Append("select")
+        Query.Append("   Category [Value] ")
+        Query.Append("   ,Category  [Text] ")
+        Query.Append("   ,1  [Order] ")
+        Query.Append("from ")
+        Query.Append("   Parm_CECategory ")
+        Query.Append("where ")
+        Query.Append("   ISNULL(lock, 0) = 1 ")
+        Query.Append("order by ")
+        Query.Append("   [Order] ")
+        Query.Append("   ,[Text] ")
+        'get house
+
+        'execute query
+        Dim ConStr As String = "Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password
+        Dim SqlCon As New SqlConnection(ConStr)
+        Dim SDA As New SqlDataAdapter(Query.ToString, SqlCon)
+        Dim DT As New DataTable()
+        SDA.Fill(DT)
+        'execute query
+
+        'fill data
+        ddl01Category.DataSource = DT
+        ddl01Category.DataValueField = "Value"
+        ddl01Category.DataTextField = "Text"
+        ddl01Category.DataBind()
+        'fill data
+
+    End Function
     Protected Sub lbtn01Find_Click(ByVal sender As Object, ByVal e As EventArgs) Handles lbtn01Find.Click
 
         ''validate
@@ -1629,7 +1678,23 @@ Public Class FRM000037
                 Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "Amenities Repair" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "") Then
                 Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Bare to Classic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Basic to Classic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "Basic to Complete" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Classic to Basic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Classic to Premium" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Shell to Basic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Shell to Classic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Shell to Premium" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Shell to Complete" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
                 Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "CLDC Office" And hf01Branch.Value = "" Then
                 Alert("error", "Some field(s) are missing!")
@@ -1726,7 +1791,23 @@ Public Class FRM000037
                 Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "Amenities Repair" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "") Then
                 Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Bare to Classic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Basic to Classic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "Basic to Complete" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Classic to Basic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Classic to Premium" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Shell to Basic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Shell to Classic" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Shell to Premium" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
+                Alert("error", "Some field(s) are missing!")
+            ElseIf ddl01Category.SelectedValue = "Shell to Complete" And (hf01Subdivision.Value = "" Or hf01Phase.Value = "" Or hf01Block.Value = "" Or hf01Lot.Value = "" Or ddl01House01.SelectedValue = "") Then
                 Alert("error", "Some field(s) are missing!")
             ElseIf ddl01Category.SelectedValue = "CLDC Office" And hf01Branch.Value = "" Then
                 Alert("error", "Some field(s) are missing!")
@@ -1998,7 +2079,7 @@ Public Class FRM000037
         Query.Append("      isnull((select top 1 [C].DateEnd from oop_form_dtl_appr [C] where [C].f_code = [A].f_code and [C].approver = [A].approver and [C].status = '' order by [C].seq_no),cast(getdate() as date)) [DateEnd] ")
         Query.Append("      ,dbo.Get_Link([A].tbl_from) + '-DTL-' + replace([A].f_code,'#','No') [Link] ")
         Query.Append("      ,dbo.Get_Icon([A].tbl_from) [Icon] ")
-        Query.Append("      ,ISNULL([A].FormTitle, '-') [Title] ")
+        Query.Append("      ,[A].FormTitle [Title] ")
         Query.Append("      ,[A].f_code [ID] ")
         Query.Append("      ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
         Query.Append("      ,[A].created_date [Date] ")
@@ -2013,7 +2094,7 @@ Public Class FRM000037
         Query.Append("      isnull((select top 1 [C].DateEnd from oop_form_dtl_appr [C] where [C].f_code = [A].f_code and [C].approver = [A].approver and [C].status = '' order by [C].seq_no),cast(getdate() as date)) [DateEnd] ")
         Query.Append("      ,dbo.Get_Link([A].tbl_from) + '-DTL-' + replace([A].f_code,'#','No') [Link] ")
         Query.Append("      ,dbo.Get_Icon([A].tbl_from) [Icon] ")
-        Query.Append("      ,ISNULL([A].FormTitle, '-') [Title] ")
+        Query.Append("      ,[A].FormTitle [Title] ")
         Query.Append("      ,[A].f_code [ID] ")
         Query.Append("      ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
         Query.Append("      ,[A].created_date [Date] ")
@@ -2028,7 +2109,7 @@ Public Class FRM000037
         Query.Append("      isnull((select top 1 [C].DateEnd from oop_form_dtl_appr [C] where [C].f_code = [A].f_code and [C].approver = [A].approver and [C].status = '' order by [C].seq_no),cast(getdate() as date)) [DateEnd] ")
         Query.Append("      ,dbo.Get_Link([A].tbl_from) + '-DTL-' + replace([A].f_code,'#','No') [Link] ")
         Query.Append("      ,dbo.Get_Icon([A].tbl_from) [Icon] ")
-        Query.Append("      ,ISNULL([A].FormTitle, '-') [Title] ")
+        Query.Append("      ,[A].FormTitle [Title] ")
         Query.Append("      ,[A].f_code [ID] ")
         Query.Append("      ,dbo.ProperCase([B].first_name) + ' ' + dbo.ProperCase([B].last_name) [Name] ")
         Query.Append("      ,[A].created_date [Date] ")
@@ -2118,7 +2199,7 @@ Public Class FRM000037
 
         'get Assigned To
         Dim Query As New StringBuilder
-        Query.Append("if (select top 1 created_by from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and status = '') in ('Endorsed By','Approved By','Implementer') ")
+        Query.Append("if (select top 1 created_by from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and status = '' order by seq_no) in ('Endorsed By','Approved By','Implementer') ")
         Query.Append("begin ")
         Query.Append("   select ")
         Query.Append("      '' [Code] ")
@@ -2136,7 +2217,7 @@ Public Class FRM000037
         Query.Append("      'Cancelled' [Code] ")
         Query.Append("      ,'Cancel' [Name] ")
         Query.Append("end ")
-        Query.Append("else if (select top 1 created_by from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and status = '') in ('Clarification') ")
+        Query.Append("else if (select top 1 created_by from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('" & CIIS_EmpCode & "') and (select top 1 approver from oop_form_hdr where f_code = '" & ltrlID.Text & "') in ('" & CIIS_EmpCode & "') and (select top 1 type from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and status = '' order by seq_no) in ('Clarification') ")
         Query.Append("begin ")
         Query.Append("   select ")
         Query.Append("      '' [Code] ")
@@ -2156,7 +2237,7 @@ Public Class FRM000037
         Query.Append("      'Cancelled' [Code] ")
         Query.Append("      ,'Cancel' [Name] ")
         Query.Append("end ")
-        Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and status = '') in ('Endorsed By','Approved By','Implementer') ")
+        Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and status = '' order by seq_no) in ('Endorsed By','Approved By','Implementer') ")
         Query.Append("begin ")
         Query.Append("   select ")
         Query.Append("      '' [Code] ")
@@ -2170,7 +2251,7 @@ Public Class FRM000037
         Query.Append("      'Clarify' [Code] ")
         Query.Append("      ,'Clarify' [Name] ")
         Query.Append("end ")
-        Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and status = '') in ('Clarification') ")
+        Query.Append("else if (select top 1 type from oop_form_dtl_appr where f_code = '" & ltrlID.Text & "' and status = '' order by seq_no) in ('Clarification') ")
         Query.Append("begin ")
         Query.Append("   select ")
         Query.Append("      '' [Code] ")

@@ -69,6 +69,7 @@ function fn01AlertOnly(pMessasge, pIcon) {
             popup: 'colored-toast',
         },
         showConfirmButton: false,
+        showCloseButton: true,
         timer: 5000,
         timerProgressBar: true,
     })
@@ -195,4 +196,18 @@ function fn01Delete(pFormCode, pTblName, pTblCode, callBack) {
         },
     });
 };
+function fn01NewCode(pTblName, callBack) {
+    $.ajax({
+        type: "POST",
+        url: "Assets/Handler/MNU/MNU001000HND.ashx",
+        data: {
+            'pFunction': 'Get-New-Code-01',
+            'pTblName': pTblName,
+        },
+        success: function (response) {
+            callBack(response);
+        },
+    });
+};
+
 //general

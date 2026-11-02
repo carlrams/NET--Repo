@@ -2,6 +2,37 @@
 <%@ MasterType VirtualPath="MNU000000.Master" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
 
+    <style type="text/css">
+        .custom-header-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end; /* Right aligns title and input */
+            width: 100%;
+            padding: 4px 0;
+        }
+
+        .custom-header-label {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+        }
+
+        .custom-header-input-container {
+            width: 100%;
+        }
+
+        .custom-header-input-container input.header-qty-input {
+            height: 24px;
+            font-size: 11px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            background-color: #fff;
+        }
+    </style>
+
     <div class="content flex-row-fluid" id="kt_content">
         
 		<div class="toolbar py-5">
@@ -494,6 +525,47 @@
                             </div>
                         </div>
                         <!--End:: Attatchment -->
+                            
+                        <!--begin:: MIS Attatchment -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title fs-3 fw-bolder">MIS Attachment</div>
+                            </div>
+                            <div class="border-bottom border-gray-200 px-4 py-3">
+                                <div class="d-flex justify-content-end">
+                                    <div class="position-relative me-5">
+                                        <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+                                                <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+                                            </svg>
+                                        </span>
+                                        <input id="tbx0202FindMISAttachment" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-10" placeholder="Search" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+									<div id="div0202LoaderMISAttachment" class="table-loading-message">
+										Loading...
+									</div>
+                                    <table id="table0202MISAttachment" class="table table-row-bordered border rounded g-2 w-100 align-middle">
+                                        <thead class="fw-bold">
+                                            <tr class="fw-bold fs-7 text-gray-800">
+                                                <th class="min-w-50px mw-50px border-end" style="padding-left: 15px"><span title="Action"><i class='las la-bars fs-3'></i></span></th>
+                                                <th class="min-w-50px mw-50px border-end">Type</th>
+                                                <th class="min-w-200px w-100">Name</th>
+                                                <th class="min-w-200px mw-200px">By</th>
+                                                <th class="min-w-200px mw-200px">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--End:: MIS Attatchment -->
 
                         <!--begin:: Approval Path -->
 						<div class="card">

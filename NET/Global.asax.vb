@@ -121,6 +121,7 @@ Public Class Global_asax
         routes.MapPageRoute("Sales Monitoring", "SLS050000", "~/SLS050000.aspx")
         routes.MapPageRoute("Seller Ranking", "SLS060000", "~/SLS060000.aspx")
         routes.MapPageRoute("Error", "SEP000001", "~/SEP000001.aspx")
+        routes.MapPageRoute("SLS - Seller Announcement", "SLS200000", "~/SLS200000.aspx")
         'Seller's Admin
 
         'AAD
@@ -143,6 +144,8 @@ Public Class Global_asax
         routes.MapPageRoute("AAD - Account Inquiry - Buyers Folder - Others", "AAD002017", "~/AAD002017.aspx")
         routes.MapPageRoute("AAD - Account Inquiry - Update Buyers Information", "AAD002031", "~/AAD002031.aspx")
         routes.MapPageRoute("AAD - Account Inquiry - House Turnover Schedule", "AAD002034", "~/AAD002034.aspx")
+
+        routes.MapPageRoute("AAD - Account Inquiry - Buyers Announcement", "AAD003000", "~/AAD003000.aspx")
 
         'Finance
         routes.MapPageRoute("FIN - Billing", "FIN010000", "~/FIN010000.aspx")
@@ -251,7 +254,9 @@ Public Class Global_asax
         routes.MapPageRoute("Apps - Form - Audit Document Request", "FRM000047-{Mode}-{ID}", "~/FRM000047.aspx")
         routes.MapPageRoute("Apps - Form - Supplier Performance Evaluation", "FRM000053-{Mode}-{ID}", "~/FRM000053.aspx")
         routes.MapPageRoute("Apps - Form - Price Inquiry", "FRM000054-{Mode}-{ID}", "~/FRM000054.aspx")
+        routes.MapPageRoute("Apps - Form - Contract Order Form (Duplicate)", "FRM000055-{Mode}-{ID}", "~/FRM000055.aspx")
         routes.MapPageRoute("Apps - Form - Purchase Request (Updated)", "FRM0000100-{Mode}-{ID}", "~/FRM0000100.aspx")
+        routes.MapPageRoute("Apps - Form - Site Inspection Request", "FRM000063-{Mode}-{ID}", "~/FRM000063.aspx")
         'Form Detail
 
         'Purchase Order
@@ -304,12 +309,38 @@ Public Class Global_asax
 
         'Contractor Admin
         routes.MapPageRoute("Apps - Data Entry - Contractor Announcement", "SCM170000", "~/SCM170000.aspx")
+        routes.MapPageRoute("Apps - Data Entry - Contractor Message", "SCM200000", "~/SCM200000.aspx")
         'Contractor Admin
 
         'Cost Estimate
         routes.MapPageRoute("Apps - Data Entry - Cost Estimate (HDR)", "FIN170000", "~/FIN170000.aspx")
         routes.MapPageRoute("Apps - Data Entry - Cost Estimate (DTL)", "FIN170100-{Mode}-{ID}", "~/FIN170100.aspx")
         'Cost Estimate
+
+        'SCM - Warehouse - Masterlist
+        routes.MapPageRoute("Apps - Data Entry - Warehouse Masterlist", "SCM220000", "~/SCM220000.aspx")
+        routes.MapPageRoute("Apps - Data Entry - Warehouse Masterlist - DTL", "SCM220100-{Mode}-{ID}", "~/SCM220100.aspx")
+        'SCM - Warehouse - Masterlist
+
+        'SCM - Warehouse - Unit of Measure
+        routes.MapPageRoute("Apps - Data Entry - Unit of Measure", "SCM230000", "~/SCM230000.aspx")
+        routes.MapPageRoute("Apps - Data Entry - Unit of Measure - DTL", "SCM230100-{Mode}-{ID}", "~/SCM230100.aspx")
+        'SCM - Warehouse - Unit of Measure
+
+        'SCM - Warehouse - Credit Terms
+        routes.MapPageRoute("Apps - Data Entry - Credit Terms", "SCM240000", "~/SCM240000.aspx")
+        routes.MapPageRoute("Apps - Data Entry - Credit Terms - DTL", "SCM240100-{Mode}-{ID}", "~/SCM240100.aspx")
+        'SCM - Warehouse - Credit Terms
+
+        'SCM - Warehouse - Classification
+        routes.MapPageRoute("Apps - Data Entry - Classification", "SCM250000", "~/SCM250000.aspx")
+        routes.MapPageRoute("Apps - Data Entry - Classification - DTL", "SCM250100-{Mode}-{ID}", "~/SCM250100.aspx")
+        'SCM - Warehouse - Classification
+
+        'SCM - Warehouse - Scope of work
+        routes.MapPageRoute("Apps - Data Entry - Scope of Work", "SCM260000", "~/SCM260000.aspx")
+        routes.MapPageRoute("Apps - Data Entry - Scope of Work - DTL", "SCM260100-{Mode}-{ID}", "~/SCM260100.aspx")
+        'SCM - Warehouse - Scope of work
 
         'Work Order
         routes.MapPageRoute("Apps - Work Order", "WRK010000", "~/WRK010000.aspx")

@@ -15,7 +15,7 @@ Public Class ForVerificationPDC
     'connection
     Dim DataSource As String = "iis"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciisv2"
+    Dim UserID As String = "ciis"
     Dim Password As String = "Cii5s"
     'connection
 

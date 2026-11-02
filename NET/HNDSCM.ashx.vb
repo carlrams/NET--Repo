@@ -308,6 +308,15 @@ Public Class HNDSCM
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
 
+            ElseIf FormCode = "SCM060100" And Type = "Purchase Order - Get Record" Then
+
+                Dim pPosted = context.Request("pPosted")
+                Dim pVendor = context.Request("pVendor")
+
+                Dim json As String = Me.SCM060100_Get_Record(pPosted, pVendor)
+                context.Response.ContentType = "text/json"
+                context.Response.Write(json)
+
             ElseIf FormCode = "SCM060000" And Type = "Purchase Order - Get Record : Redraw" Then
 
                 Dim pID = context.Request("pID")
@@ -390,6 +399,15 @@ Public Class HNDSCM
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
 
+            ElseIf FormCode = "SCM060100" And Type = "Purchase Order - Edit Record : Validate Particular" Then
+
+                Dim pID = context.Request("pID")
+                Dim pSeqNo = context.Request("pSeqNo")
+
+                Dim json As String = Me.SCM060100_Particular_Validate_Record(pID, pSeqNo)
+                context.Response.ContentType = "text/json"
+                context.Response.Write(json)
+
             ElseIf FormCode = "SCM060100" And Type = "Purchase Order - Edit Record" Then
 
                 Dim pID = context.Request("pID")
@@ -467,6 +485,15 @@ Public Class HNDSCM
                 Dim pSeqNo = context.Request("pSeqNo")
 
                 Dim json As String = Me.SCM060100_Get_Record_Particular_Redraw(pID, pSeqNo)
+                context.Response.ContentType = "text/json"
+                context.Response.Write(json)
+
+            ElseIf FormCode = "SCM060100" And Type = "Purchase Order - Get Record : Particular - View" Then
+
+                Dim pID = context.Request("pID")
+                Dim pSeqNo = context.Request("pSeqNo")
+
+                Dim json As String = Me.SCM060100_Get_Record_Particular_View(pID, pSeqNo)
                 context.Response.ContentType = "text/json"
                 context.Response.Write(json)
 
@@ -3121,7 +3148,7 @@ Public Class HNDSCM
         End Using
         'read record
 
-        'display 
+        'display
         'Return (New JavaScriptSerializer().Serialize(FormList))
 
         'set to max
@@ -3147,30 +3174,104 @@ Public Class HNDSCM
                 While DR.Read()
 
                     Dim Action As New StringBuilder
-                    Action.Append("<div class='action-toggle-wrapper mt-1' style='position: relative; display: inline-block;'>")
-                    Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this, event); return false;'><i class='las la-bars fs-3'></i></button>")
+                    Action.Append("<div class='action-toggle-wrapper d-flex align-items-center justify-content-center h-100 mt-1' style='position: relative;'>")
+                    Action.Append("   <button class='btn btn-xs btn-icon btn-light btn-active-light action-button p-0' style='width: 22px; height: 22px;' title='Action' onclick='fn01Toggle(this, event); return false;'><i class='las la-bars fs-5'></i></button>")
                     Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-view' title='View' onclick=""window.open('SCM060100-DTL-" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-search fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn03Delete('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-trash fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn04Edit('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-pencil-alt fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-lock' title='Lock' onclick=""fn05Lock('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-lock fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-lock' title='Unlock' onclick=""fn06Unlock('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-unlock fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-post' title='Post' onclick=""fn07Post('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-check-circle fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-cancel' title='Cancel' onclick=""fn08Rvrs('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-times-circle fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-cancel' title='Tools' onclick=""fn09Tools('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-cog fs-3'></i></button>")
+                    Action.Append("      <button type='button' class='btn btn-xs btn-icon btn-view p-0' style='width: 22px; height: 22px;' title='View' onclick=""window.location.href = 'SCM060100-DTL-" & DR("POCode") & "'; fn01DisableToggle(); return false;""><i class='las la-search fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-delete p-0' style='width: 22px; height: 22px;' title='Delete' onclick=""fn03Delete('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-trash fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-edit p-0' style='width: 22px; height: 22px;' title='Edit' onclick=""fn04Edit('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-pencil-alt fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-lock p-0' style='width: 22px; height: 22px;' title='Lock' onclick=""fn05Lock('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-lock fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-lock p-0' style='width: 22px; height: 22px;' title='Unlock' onclick=""fn06Unlock('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-unlock fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-post p-0' style='width: 22px; height: 22px;' title='Post' onclick=""fn07Post('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-check-circle fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-cancel p-0' style='width: 22px; height: 22px;' title='Cancel' onclick=""fn08Rvrs('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-times-circle fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-cancel p-0' style='width: 22px; height: 22px;' title='Tools' onclick=""fn09Tools('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-cog fs-5'></i></button>")
                     Action.Append("   </div>")
                     Action.Append("</div>")
+
+                    Dim Status As String = ""
+                    If DR("Status").ToString() = "for Posting" Or DR("Status").ToString() = "for Printing" Or DR("Status").ToString() = "for Locking" Or DR("Status").ToString() = "for Clarification" Then
+                        Status = "<span class='badge badge-info mt-1'>" & DR("Status").ToString() & "</span>"
+                    ElseIf DR("Status").ToString() = "Processed" Or DR("Status").ToString() = "Delivered" Or DR("Status").ToString() = "Prtl. Dlvrd." Then
+                        Status = "<span class='badge badge-success mt-1'>" & DR("Status").ToString() & "</span>"
+                    ElseIf DR("Status").ToString() = "for Re-Open" Then
+                        Status = "<span class='badge badge-warning mt-1'>" & DR("Status").ToString() & "</span>"
+                    ElseIf DR("Status").ToString() = "Cancelled" Then
+                        Status = "<span class='badge badge-danger mt-1'>" & DR("Status").ToString() & "</span>"
+                    End If
 
                     RecordList.Add(New With {
                         .rowId = "rowID01" & DR("POCode"),
                         .Code = DR("POCode"),
                         .Action = Action.ToString,
-                        .Lock = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center mt-3'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Lock") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
-                        .Post = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center mt-3'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Post") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
-                        .Rvrs = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center mt-3'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Rvrs") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Lock = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Lock") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Post = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Post") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Rvrs = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Rvrs") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
                         .PONo = DR("PONo"),
                         .PODate = Format(DR("PODate"), "MM/dd/yyyy"),
-                        .Status = DR("Status"),
+                        .Status = Status.ToString(),
+                        .Vendor = DR("VenName"),
+                        .DlvrMode = DR("DlvrMode"),
+                        .DlvrTo = DR("DeliverTo"),
+                        .PreparedBy = DR("UpdatedBy")
+                    })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'Creates an instance of your JavaScriptSerializer And Setting the MaxJsonLength
+        Dim serializer As JavaScriptSerializer = New JavaScriptSerializer()
+        serializer.MaxJsonLength = 2146233079
+
+        'display 
+        Return (serializer.Serialize(RecordList))
+        'display
+
+    End Function
+    Function SCM060100_Get_Record(pPosted, pVendor)
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand("Get_POHdrList")
+                Cmd.CommandType = CommandType.StoredProcedure
+                Cmd.Parameters.AddWithValue("@pPost", IIf(pPosted = True, 1, 0))
+                Cmd.Parameters.AddWithValue("@pVenCode", pVendor)
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    Dim Action As New StringBuilder
+                    Action.Append("<button type='button' class='btn btn-xs btn-icon btn-view p-0' style='width: 22px; height: 22px;' title='View' onclick=""window.location.href = 'SCM060100-DTL-" & DR("POCode") & "'; fn01DisableToggle(); return false;""><i class='las la-search fs-5'></i></button>")
+
+                    Dim Status As String = ""
+                    If DR("Status").ToString() = "for Posting" Or DR("Status").ToString() = "for Printing" Or DR("Status").ToString() = "for Locking" Or DR("Status").ToString() = "for Clarification" Then
+                        Status = "<span class='badge badge-info mt-1'>" & DR("Status").ToString() & "</span>"
+                    ElseIf DR("Status").ToString() = "Processed" Or DR("Status").ToString() = "Delivered" Or DR("Status").ToString() = "Prtl. Dlvrd." Then
+                        Status = "<span class='badge badge-success mt-1'>" & DR("Status").ToString() & "</span>"
+                    ElseIf DR("Status").ToString() = "for Re-Open" Then
+                        Status = "<span class='badge badge-warning mt-1'>" & DR("Status").ToString() & "</span>"
+                    ElseIf DR("Status").ToString() = "Cancelled" Then
+                        Status = "<span class='badge badge-danger mt-1'>" & DR("Status").ToString() & "</span>"
+                    End If
+
+                    RecordList.Add(New With {
+                        .rowId = "rowID01" & DR("POCode"),
+                        .Code = DR("POCode"),
+                        .Action = Action.ToString,
+                        .Lock = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Lock") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Post = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Post") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Rvrs = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Rvrs") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .PONo = DR("PONo"),
+                        .PODate = Format(DR("PODate"), "MM/dd/yyyy"),
+                        .Status = Status.ToString(),
                         .Vendor = DR("VenName"),
                         .DlvrMode = DR("DlvrMode"),
                         .DlvrTo = DR("DeliverTo"),
@@ -3231,17 +3332,17 @@ Public Class HNDSCM
                 While DR.Read()
 
                     Dim Action As New StringBuilder
-                    Action.Append("<div class='action-toggle-wrapper mt-1' style='position: relative; display: inline-block;'>")
-                    Action.Append("   <button class='btn btn-sm btn-icon btn-light btn-active-light action-button' title='Action' onclick='fn01Toggle(this); return false;'><i class='las la-bars fs-3'></i></button>")
+                    Action.Append("<div class='action-toggle-wrapper d-flex align-items-center justify-content-center h-100 mt-1' style='position: relative;'>")
+                    Action.Append("   <button class='btn btn-xs btn-icon btn-light btn-active-light action-button p-0' style='width: 22px; height: 22px;' title='Action' onclick='fn01Toggle(this, event); return false;'><i class='las la-bars fs-5'></i></button>")
                     Action.Append("   <div class='toggle-menu d-none btn-group action-button-toggle'>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-view' title='View' onclick=""window.open('SCM060100-DTL-" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-search fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-delete' title='Delete' onclick=""fn03Delete('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-trash fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-edit' title='Edit' onclick=""fn04Edit('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-pencil-alt fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-lock' title='Lock' onclick=""fn05Lock('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-lock fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-lock' title='Unlock' onclick=""fn06Unlock('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-unlock fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-post' title='Post' onclick=""fn07Post('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-check-circle fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-cancel' title='Cancel' onclick=""fn08Rvrs('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-times-circle fs-3'></i></button>")
-                    Action.Append("      <button class='btn btn-sm btn-icon btn-cancel' title='Tools' onclick=""fn09Tools('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-cog fs-3'></i></button>")
+                    Action.Append("      <button type='button' class='btn btn-xs btn-icon btn-view p-0' style='width: 22px; height: 22px;' title='View' onclick=""window.location.href = 'SCM060100-DTL-" & DR("POCode") & "'; fn01DisableToggle(); return false;""><i class='las la-search fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-delete p-0' style='width: 22px; height: 22px;' title='Delete' onclick=""fn03Delete('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-trash fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-edit p-0' style='width: 22px; height: 22px;' title='Edit' onclick=""fn04Edit('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-pencil-alt fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-lock p-0' style='width: 22px; height: 22px;' title='Lock' onclick=""fn05Lock('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-lock fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-lock p-0' style='width: 22px; height: 22px;' title='Unlock' onclick=""fn06Unlock('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-unlock fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-post p-0' style='width: 22px; height: 22px;' title='Post' onclick=""fn07Post('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-check-circle fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-cancel p-0' style='width: 22px; height: 22px;' title='Cancel' onclick=""fn08Rvrs('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-times-circle fs-5'></i></button>")
+                    Action.Append("      <button class='btn btn-xs btn-icon btn-cancel p-0' style='width: 22px; height: 22px;' title='Tools' onclick=""fn09Tools('" & DR("POCode") & "'); fn01DisableToggle(); return false;""><i class='las la-cog fs-5'></i></button>")
                     Action.Append("   </div>")
                     Action.Append("</div>")
 
@@ -3249,9 +3350,9 @@ Public Class HNDSCM
                         .rowId = "rowID01" & DR("POCode"),
                         .Code = DR("POCode"),
                         .Action = Action.ToString,
-                        .Lock = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center mt-3'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Lock") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
-                        .Post = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center mt-3'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Post") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
-                        .Rvrs = "<div class='form-check form-check-custom form-check-solid form-check-success w-100 flex-center mt-3'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Rvrs") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Lock = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Lock") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Post = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Post") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
+                        .Rvrs = "<div class='form-check form-check-custom form-check-solid form-check-success form-check-sm d-flex justify-content-center align-items-center h-100 p-0 mt-1'><input class='form-check-input' type='checkbox' value='' " & IIf(DR("Rvrs") = 1, " checked='checked'", "") & " onclick='return false'/></div>",
                         .PONo = DR("PONo"),
                         .PODate = Format(DR("PODate"), "MM/dd/yyyy"),
                         .Status = DR("Status"),
@@ -3655,6 +3756,7 @@ Public Class HNDSCM
         'display 
         Return (New JavaScriptSerializer().Serialize(RecordList))
         'display
+
     End Function
     Function SCM060100_Update_Record(pID, pSeqNo, pChangeItem, pChangeQty, pItemCode, pQty, pUMCode, pCost, pTotal, pCanvass, pCommodity, pStrategy, pOSMCode, pStandardType, pLeadType, pRemarks, pUpdatedBy)
 
@@ -3712,6 +3814,51 @@ Public Class HNDSCM
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
                 While DR.Read()
                     RecordList.Add(New With {.oID = DR("oID"), .oSeqNo = DR("oSeqNo")})
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display
+
+    End Function
+    Function SCM060100_Particular_Validate_Record(pID, pSeqNo)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("select ")
+        Query.Append("  POCode ")
+        Query.Append("  ,ISNULL(ItemName, '') [ItemName] ")
+        Query.Append("  ,ISNULL(ItemCode, '') [ItemCode] ")
+        Query.Append("from ")
+        Query.Append("  PODtl ")
+        Query.Append("where ")
+        Query.Append("  POCode = '" & pID & "' ")
+        Query.Append("  and SeqNo = " & pSeqNo & " ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    RecordList.Add(New With {
+                        .POCode = DR("POCode"),
+                        .ItemName = DR("ItemName"),
+                        .ItemCode = DR("ItemCode")
+                        })
                 End While
                 DR.Close()
                 ConStr.Close()
@@ -3974,10 +4121,25 @@ Public Class HNDSCM
 
         'update status
         Dim Query As New StringBuilder
+        Query.Append("DECLARE @PONo nvarchar(13) = '' ")
+        Query.Append("DECLARE @POCode nvarchar(13) = '" & pID & "' ")
+        Query.Append("if ISNULL((select po_no from ogm_po_hdr where po_code = @POCode), '') = '' ")
+        Query.Append("begin ")
+        Query.Append("  exec New_Code 'Trxn_POHdr(PONo)', 'PO#', @PONo output ")
+        Query.Append("  update ogm_po_hdr set ")
+        Query.Append("      po_no = @PONo ")
+        Query.Append("      ,po_date = GETDATE() ")
+        Query.Append("      ,status = 'for Locking' ")
+        Query.Append("  where ")
+        Query.Append("      po_code = @POCode ")
+        Query.Append("end ")
+        Query.Append("else ")
+        Query.Append("begin ")
         Query.Append("UPDATE ogm_po_hdr SET ")
         Query.Append("  status = 'for Locking' ")
         Query.Append("WHERE ")
-        Query.Append("  po_code = '" & pID & "' ")
+        Query.Append("  po_code = @POCode ")
+        Query.Append("end ")
         'update status
 
         'variable
@@ -4200,6 +4362,97 @@ Public Class HNDSCM
         'display
 
     End Function
+    Function SCM060100_Get_Record_Particular_View(pID, pSeqNo)
+
+        'get query
+        Dim Query As New StringBuilder
+        Query.Append("select ")
+        Query.Append("  POCode ")
+        Query.Append("  ,SeqNo ")
+        Query.Append("  ,ChangeQTY ")
+        Query.Append("  ,ChangeItem ")
+        Query.Append("  ,ItemCode ")
+        Query.Append("  ,ItemName ")
+        Query.Append("  ,Spec ")
+        Query.Append("  ,qty AS Qty ")
+        Query.Append("  ,UMCode ")
+        Query.Append("  ,UMName ")
+        Query.Append("  ,Cost ")
+        Query.Append("  ,Total ")
+        Query.Append("  ,Canvass ")
+        Query.Append("  ,OSMCode ")
+        Query.Append("  ,Remarks ")
+        Query.Append("  ,PRNo ")
+        Query.Append("  ,PRSeqNo ")
+        Query.Append("  ,PRItem ")
+        Query.Append("  ,PRQty ")
+        Query.Append("  ,PRUnit ")
+        Query.Append("  ,CreateBy ")
+        Query.Append("  ,CreateDate ")
+        Query.Append("  ,UpdateBy ")
+        Query.Append("  ,UpdateDate ")
+        Query.Append("  ,ICCode ")
+        Query.Append("  ,Classification ")
+        Query.Append("  ,Commodity ")
+        Query.Append("from ")
+        Query.Append("  PODtl ")
+        Query.Append("where ")
+        Query.Append("  POCode = '" & pID & "' ")
+        Query.Append("  and SeqNo = " & pSeqNo & " ")
+        Query.Append("order by ")
+        Query.Append("  SeqNo ")
+        'get query
+
+        'variable
+        Dim RecordList As New List(Of Object)()
+        'variable
+
+        'read record
+        Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
+            Using Cmd As New SqlCommand(Query.ToString)
+                Cmd.CommandType = CommandType.Text
+                Cmd.Connection = ConStr
+                ConStr.Open()
+                Dim DR As SqlDataReader = Cmd.ExecuteReader
+                While DR.Read()
+
+                    RecordList.Add(New With {
+                        .POCode = DR("POCode"),
+                        .SeqNo = DR("SeqNo"),
+                        .ChangeItem = IIf(DR("ChangeItem") = 1, True, False),
+                        .ChangeQty = IIf(DR("ChangeQTY") = 1, True, False),
+                        .ItemName = DR("ItemName"),
+                        .ItemCode = DR("ItemCode"),
+                        .Qty = DR("Qty"),
+                        .UMCode = DR("UMCode"),
+                        .UMName = DR("UMName"),
+                        .Cost = DR("Cost"),
+                        .Total = DR("Total"),
+                        .Canvass = DR("Canvass"),
+                        .OSMCode = DR("OSMCode"),
+                        .Remarks = DR("Remarks"),
+                        .PRNo = DR("PRNo"),
+                        .PRSeqNo = DR("PRSeqNo"),
+                        .PRItem = DR("PRItem"),
+                        .PRQty = DR("PRQty"),
+                        .PRUnit = DR("PRUnit"),
+                        .ICCode = DR("ICCode"),
+                        .Classification = DR("Classification"),
+                        .Commodity = DR("Commodity")
+                        })
+
+                End While
+                DR.Close()
+                ConStr.Close()
+            End Using
+        End Using
+        'read record
+
+        'display 
+        Return (New JavaScriptSerializer().Serialize(RecordList))
+        'display
+
+    End Function
     Function SCM060100_Get_Record_Item()
 
         'variable
@@ -4215,8 +4468,17 @@ Public Class HNDSCM
                 ConStr.Open()
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
                 While DR.Read()
+
+                    Dim ItemName As String = HttpUtility.HtmlAttributeEncode(DR("ItemName").ToString())
+                    Dim ItemCode As String = HttpUtility.HtmlAttributeEncode(DR("ItemCode").ToString())
+                    Dim UMName As String = HttpUtility.HtmlAttributeEncode(DR("UMName").ToString())
+                    Dim UMCode As String = HttpUtility.HtmlAttributeEncode(DR("UMCode").ToString())
+                    Dim Cost As String = HttpUtility.HtmlAttributeEncode(DR("Cost").ToString())
+                    Dim Canvass As String = HttpUtility.HtmlAttributeEncode(DR("Canvass").ToString())
+                    Dim Lock As String = HttpUtility.HtmlAttributeEncode(DR("Lock").ToString())
+
                     Dim Action As New StringBuilder
-                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select Item' onclick=""fn010201ItemCode('" & DR("ItemName") & "', '" & DR("ItemCode") & "', '" & DR("UMName") & "', '" & DR("UMCode") & "', '" & DR("Cost") & "', '" & DR("Canvass") & "', '" & DR("Lock") & "');return false;""><i class='las la-check fs-3'></i></button>")
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select Item' onclick=""fn010201ItemCode(this); return false;""><i class='las la-check fs-3'></i></button>")
 
                     RecordList.Add(New With {
                         .rowId = "rowID0103" & DR("ItemCode"),
@@ -4259,13 +4521,17 @@ Public Class HNDSCM
                 ConStr.Open()
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
                 While DR.Read()
+
                     Dim ItemName As String = HttpUtility.HtmlAttributeEncode(DR("ItemName").ToString())
                     Dim ItemCode As String = HttpUtility.HtmlAttributeEncode(DR("ItemCode").ToString())
                     Dim UMName As String = HttpUtility.HtmlAttributeEncode(DR("UMName").ToString())
                     Dim UMCode As String = HttpUtility.HtmlAttributeEncode(DR("UMCode").ToString())
+                    Dim Cost As String = HttpUtility.HtmlAttributeEncode(DR("Cost").ToString())
+                    Dim Canvass As String = HttpUtility.HtmlAttributeEncode(DR("Canvass").ToString())
+                    Dim Lock As String = HttpUtility.HtmlAttributeEncode(DR("Lock").ToString())
 
                     Dim Action As New StringBuilder
-                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select Item' data-itemname='" & ItemName & "' onclick=""fn010401ItemCode(this, '" & DR("ItemCode") & "', '" & DR("UMName") & "', '" & DR("UMCode") & "', '" & DR("Cost") & "', '" & DR("Canvass") & "', '" & DR("Lock") & "');return false;""><i class='las la-check fs-3'></i></button>")
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view' title='Select Item' data-itemname='" & ItemName & "' data-itemcode='" & ItemCode & "' data-umname='" & UMName & "' data-umcode='" & UMCode & "' data-cost='" & Cost & "' data-canvass='" & Canvass & "' data-lock='" & Lock & "' onclick=""fn010401ItemCode(this); return false;""><i class='las la-check fs-3'></i></button>")
 
                     RecordList.Add(New With {
                         .rowId = "rowID0104" & DR("ItemCode"),
@@ -7416,8 +7682,14 @@ Public Class HNDSCM
                 Dim DR As SqlDataReader = Cmd.ExecuteReader
                 While DR.Read()
 
+                    Dim ItemName As String = HttpUtility.HtmlAttributeEncode(DR("ItemName").ToString())
+                    Dim ItemCode As String = HttpUtility.HtmlAttributeEncode(DR("ItemCode").ToString())
+                    Dim UMName As String = HttpUtility.HtmlAttributeEncode(DR("UMName").ToString())
+                    Dim UMCode As String = HttpUtility.HtmlAttributeEncode(DR("UMCode").ToString())
+                    Dim Lock As String = HttpUtility.HtmlAttributeEncode(DR("Lock").ToString())
+
                     Dim Action As New StringBuilder
-                    Action.Append("<button class='btn btn-sm btn-icon btn-view mt-1' title='View Record' onclick=""fn010104ViewItem('" & DR("ItemName") & "', '" & DR("ItemCode") & "', '" & DR("UMCode") & "', '" & DR("UMName") & "', '" & DR("Lock") & "');return false;""><i class='las la-search fs-3'></i></button>")
+                    Action.Append("<button class='btn btn-sm btn-icon btn-view mt-1' title='View Record' data-itemname='" & ItemName & "' data-itemcode='" & ItemCode & "' data-umname='" & UMName & "' data-umcode='" & UMCode & "' data-lock='" & Lock & "' onclick=""fn010104ViewItem(this); return false;""><i class='las la-search fs-3'></i></button>")
 
                     RecordList.Add(New With {
                         .Action = Action.ToString,
@@ -13102,9 +13374,10 @@ Public Class HNDSCM
         Query.Append("  left join oop_form_hdr on ogm_pr_hdr.form_no = oop_form_hdr.f_code ")
         Query.Append("  left join employee on oop_form_hdr.created_by = employee.emp_no ")
         Query.Append("where ")
-        Query.Append("  oop_form_hdr.status = 'Accepted' ")
+        Query.Append("  oop_form_hdr.status not in ('Cancelled', 'Declined', 'For Cancellation') ")
         Query.Append("  and ogm_pr_dtl.Status = '' ")
         Query.Append("  and ogm_pr_dtl.ForSRBalance > 0 ")
+        Query.Append("  and ISNULL(ogm_pr_dtl.ForSR_Approved, 0) = 1 ")
         Query.Append("  and oop_form_hdr.created_by = '" & pRequestor & "' ")
         Query.Append("order by ")
         Query.Append("  [PRNo] ")
@@ -13176,9 +13449,11 @@ Public Class HNDSCM
         Query.Append("  left join oop_form_hdr on ogm_pr_hdr.form_no = oop_form_hdr.f_code ")
         Query.Append("  left join employee on oop_form_hdr.created_by = employee.emp_no ")
         Query.Append("where ")
-        Query.Append("  oop_form_hdr.status = 'Accepted' ")
+        Query.Append("  oop_form_hdr.status not in ('Cancelled', 'Declined', 'For Cancellation') ")
+        'Query.Append("  oop_form_hdr.status = 'Accepted' ")
         Query.Append("  and ogm_pr_dtl.Status = '' ")
         Query.Append("  and ogm_pr_dtl.ForSRBalance > 0 ")
+        Query.Append("  and ISNULL(ogm_pr_dtl.ForSR_Approved, 0) = 1 ")
         Query.Append("  and oop_form_hdr.created_by = '" & pRequestor & "' ")
         Query.Append("  and oop_form_hdr.form_no = '" & pPRNo & "' ")
         Query.Append("  and oop_form_dtl.seq_no = '" & pSeqNo & "' ")

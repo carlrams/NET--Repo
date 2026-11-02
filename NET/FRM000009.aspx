@@ -182,48 +182,22 @@
 										<span class="input-group-text min-w-150px required">Category</span>
 										<asp:DropDownList ID="ddl01Category" runat="server" data-kt-repeater="select2" class="form-select form-select-sm form-select-border min-h-35px" onchange="ddl01Category(this);">
 											<asp:ListItem Value="">Select category</asp:ListItem>
-											<asp:ListItem Value="Amenities">Amenities</asp:ListItem>
-											<asp:ListItem Value="Amenities New">Amenities New</asp:ListItem>
-											<asp:ListItem Value="Amenities Repair">Amenities Repair</asp:ListItem>
-											<asp:ListItem Value="Shell to Basic">Shell to Basic</asp:ListItem>
-											<asp:ListItem Value="Basic to Complete">Basic to Complete</asp:ListItem>
-											<asp:ListItem Value="Shell to Classic">Shell to Classic</asp:ListItem>
-											<asp:ListItem Value="Classic to Premium">Classic to Premium</asp:ListItem>
-											<asp:ListItem Value="Premium to Classic">Premium to Classic</asp:ListItem>
-											<asp:ListItem Value="Shell to Complete">Shell to Complete</asp:ListItem>
-											<asp:ListItem Value="Shell to Premium">Shell to Premium</asp:ListItem>
-											<asp:ListItem Value="CLDC Office">CLDC Office</asp:ListItem>
-											<asp:ListItem Value="Clearing / Grass Cutting">Clearing / Grass Cutting</asp:ListItem>
-											<asp:ListItem Value="Container Van">Container Van</asp:ListItem>
-											<asp:ListItem Value="Renovation">Renovation</asp:ListItem>
-											<asp:ListItem Value="DOLE Application - Land Development">DOLE Application - Land Development</asp:ListItem>
-											<asp:ListItem Value="DOLE Application - Model House">DOLE Application - Model House</asp:ListItem>
-											<asp:ListItem Value="Electrical Consultant">Electrical Consultant</asp:ListItem>
-											<asp:ListItem Value="House Construction">House Construction</asp:ListItem>
-											<asp:ListItem Value="Take-Over Unit">Take-Over Unit</asp:ListItem>
-											<asp:ListItem Value="House Repair">House Repair</asp:ListItem>
-											<asp:ListItem Value="House Modification">House Modification</asp:ListItem>
-											<asp:ListItem Value="Initial Inspection">Initial Inspection</asp:ListItem>
-											<asp:ListItem Value="Interior Designer">Interior Designer</asp:ListItem>
-											<asp:ListItem Value="Land Development">Land Development</asp:ListItem>
-											<asp:ListItem Value="Land Development New">Land Development New</asp:ListItem>
-											<asp:ListItem Value="Land Development Repair">Land Development Repair</asp:ListItem>
-											<asp:ListItem Value="Land Scape Project New">Land Scape Project New</asp:ListItem>
-											<asp:ListItem Value="Land Scape Project Restoration">Land Scape Project Restoration</asp:ListItem>
-											<asp:ListItem Value="Land Scape Unit">Land Scape Unit</asp:ListItem>
-											<asp:ListItem Value="NWRB Application">NWRB Application</asp:ListItem>
-											<asp:ListItem Value="Perimeter Fence">Perimeter Fence</asp:ListItem>
-											<asp:ListItem Value="Perimeter Fence New">Perimeter Fence New</asp:ListItem>
-											<asp:ListItem Value="Security Services">Security Services</asp:ListItem>
-											<asp:ListItem Value="Service Entrance">Service Entrance</asp:ListItem>
-											<asp:ListItem Value="Structural Consultant - Amenities">Structural Consultant - Amenities</asp:ListItem>
-											<asp:ListItem Value="Structural Consultant - House Unit">Structural Consultant - House Unit</asp:ListItem>
-											<asp:ListItem Value="Temporary Facilities Construction">Temporary Facilities Construction</asp:ListItem>
-											<asp:ListItem Value="Testing and Investigation">Testing and Investigation</asp:ListItem>
-											<asp:ListItem Value="Utilities Repair">Utilities Repair</asp:ListItem>
-											<asp:ListItem Value="Waste Hauling Services">Waste Hauling Services</asp:ListItem>
-											<asp:ListItem Value="Others">Others</asp:ListItem>
 										</asp:DropDownList>
+									</div>
+									<div class="input-group input-group-sm mb-2">
+										<span class="input-group-text input-group-text-top min-w-150px required">Estimate</span>
+										<div class="d-flex align-items-center position-relative w-100" style="margin-left:1px">
+											<input id="tbx01Estimate" runat="server" type="text" class="form-control form-control-sm border-0 m-0" placeholder="Select estimate" readonly />
+											<!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+											<span class="svg-icon svg-icon-2 position-absolute pointer end-5px" onclick="fn01Estimate(); return false;">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+													<rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+													<path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+												</svg>
+											</span>
+											<!--end::Svg Icon-->
+										</div>
+										<asp:HiddenField ID="hf01EstimateCode" runat="server" />
 									</div>
 									<div id="div01Project" runat="server" class="input-group input-group-sm mb-2">
 										<span class="input-group-text min-w-150px required">Project</span>
@@ -339,6 +313,10 @@
 									<div class="input-group input-group-sm mb-2">
 										<span class="input-group-text min-w-150px">Category</span>
 										<asp:Label ID="lbl01Category" runat="server" class="form-control">-</asp:Label>
+									</div>
+									<div class="input-group input-group-sm mb-2">
+										<span class="input-group-text min-w-150px">Estimate</span>
+										<asp:Label ID="lbl01Estimate" runat="server" class="form-control">-</asp:Label>
 									</div>
 									<div class="input-group input-group-sm mb-2">
 										<span class="input-group-text min-w-150px">Project</span>
@@ -845,6 +823,68 @@
 						<div style="overflow-x:auto; scrollbar-width: thin;">
 						    <!--begin::list-->
                             <table id="gv01FindProject" class="table table-no-border table-row-bordered table-hover align-middle w-100">
+                                <thead>
+                                    <tr class="d-none">
+                                        <th class="mw-5px min-w-5px">Bullet</th>
+                                        <th class="w-100">Data</th>
+                                    </tr>           
+                                </thead>           
+                                <tbody>
+
+                                </tbody>
+                            </table>
+						</div>
+						<!--end::list-->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--begin::Modal Find Project -->
+	
+		<!--begin::Modal Find Project -->
+		<div id="mdl01Estimate" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+			<div class="modal-dialog modal-fullscreen" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+				<div class="modal-content shadow-none">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							Find record - Estimate
+						</h5>
+						<!--begin::Close-->
+						<div class="btn btn-sm btn-icon btn-bg-white btn-active-white btn-active-color-success" data-bs-dismiss="modal" aria-label="Close" title="Close">
+							<!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+							<span class="svg-icon svg-icon-1">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+									<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+									<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+								</svg>
+							</span>
+							<!--end::Svg Icon-->
+						</div>
+						<!--end::Close-->
+					</div>
+					<div class="modal-body min-h-80px mh-80px overflow-hidden">
+						<!--begin::toolbar-->
+						<div class="d-flex align-items-center">
+							<!--begin::Search-->
+							<div class="position-relative">
+								<!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+								<span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+										<rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+										<path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+									</svg>
+								</span>
+								<!--end::Svg Icon-->
+                                <input id="tbx01FindEstimate" type="text" data-kt-inbox-listing-filter="search" class="form-control form-control-sm form-control-solid mw-100 min-w-150px min-w-md-200px ps-12" placeholder="Search" />
+							</div>
+							<!--end::Search-->
+						</div>
+						<!--end::toolbar-->
+					</div>
+					<div class="modal-body pt-0">
+						<div style="overflow-x:auto; scrollbar-width: thin;">
+						    <!--begin::list-->
+                            <table id="gv01Estimate" class="table table-no-border table-row-bordered table-hover align-middle w-100">
                                 <thead>
                                     <tr class="d-none">
                                         <th class="mw-5px min-w-5px">Bullet</th>
@@ -1380,7 +1420,7 @@
     <script type="text/javascript">
 
         //function related to this page only
-        function ddl01Category(selectObj) {
+		function ddl01Category(selectObj) {
             var selectIndex = selectObj.selectedIndex;
             var selectValue = selectObj.options[selectIndex].text;
 
@@ -1568,6 +1608,68 @@
             });
         };
 		//find poject
+
+		//find estimate
+		function fn01Estimate() {
+			$("#mdl01Estimate").modal("show");
+            var selectIndex = document.getElementById("ContentPlaceHolder1_ddl01Category").selectedIndex;
+			var selectValue = document.getElementById("ContentPlaceHolder1_ddl01Category").options[selectIndex].text;
+
+			if (selectValue != "") {
+                $.ajax({
+                    type: "POST",
+                    url: "Assets/Handler/FRM/FRM000009HND.ashx",
+                    data: {
+                        'pFormCode': 'FRM000009',
+                        'pType': 'Get Record - Estimate',
+                        'pCategory': selectValue
+                    },
+					success: function (response) {
+                        var gv01Estimate = document.getElementById("gv01Estimate");
+
+                        //Remove all rows.
+                        var rowCount = gv01Estimate.rows.length;
+                        for (var i = rowCount - 1; i > 0; i--) {
+                            gv01Estimate.deleteRow(i);
+                        }
+
+                        //Add the data rows.
+                        for (var i = 0; i < response.length; i++) {
+                            row = gv01Estimate.insertRow(-1);
+                            var cell = row.insertCell(-1);
+                            cell.innerHTML = response[i].Bullet;
+                            cell.setAttribute("class", "mw-5px min-w-5px");
+
+                            cell = row.insertCell(-1);
+                            cell.innerHTML = response[i].Data;
+                            cell.setAttribute("class", "w-100");
+                        }
+                    }
+                });
+			}
+		};
+        $(document).ready(function () {
+            $("#tbx01FindEstimate").on("keyup input", function () {
+                var filter = $(this).val().toLowerCase();
+                var table = document.getElementById("gv01Estimate");
+                if (!table) return;
+
+                var rows = table.getElementsByTagName("tr");
+                for (var i = 1; i < rows.length; i++) {
+                    var text = rows[i].textContent || rows[i].innerText;
+                    rows[i].style.display = text.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+                }
+            });
+        });
+		//find estimate
+
+		//get estimate
+		function fn01GetEstimate(pCode, pTitle) {
+			document.getElementById("ContentPlaceHolder1_tbx01Estimate").value = pTitle;
+			document.getElementById("ContentPlaceHolder1_hf01EstimateCode").value = pCode;
+            $("#mdl01Estimate").modal("hide");
+		};
+		//get estimate
 
         //table search
         var prm = Sys.WebForms.PageRequestManager.getInstance();

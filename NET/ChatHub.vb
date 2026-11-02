@@ -3,8 +3,10 @@ Imports System.Data.SqlClient
 Imports System.Drawing.Imaging
 Imports System.IO
 Imports System.Runtime.Remoting.Contexts
+Imports System.Threading.Tasks
 Imports System.Web.Script.Services
 Imports System.Web.Services
+Imports System.Windows.Media.Media3D
 Imports AjaxControlToolkit
 Imports AjaxControlToolkit.HtmlEditor.ToolbarButtons
 Imports CrystalDecisions.CrystalReports.Engine
@@ -20,10 +22,11 @@ Public Class ChatHub
 
     Inherits Hub
 
-    Dim DataSource As String = "10.10.30.20"
+    Dim DataSource As String = "10.10.30.10"
     Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciisv2"
-    Dim Password As String = "Cii5s"
+    Dim catalog01 As String = "cldc_contractorportal"
+    Dim UserID As String = "jfevidal"
+    Dim Password As String = "jfevidal"
 
 #Region "Send"
 
@@ -376,6 +379,217 @@ Public Class ChatHub
         Clients.All.updateCostPurchase(CostPurcoase)
         Clients.All.updateDiscountPurchase(DiscountPurchase)
     End Sub
+#End Region
+
+#Region "Message - Contractor"
+    Public Overrides Function OnConnected() As Task
+        Groups.Add(Context.ConnectionId, "Admins")
+        Return MyBase.OnConnected()
+    End Function
+
+    Public Function GetMessageContractor() As List(Of Object)
+        Dim connectionString As String = "Data Source=" & DataSource & ";Initial Catalog=" & catalog & ";User ID=" & UserID & ";Password=" & Password & ";"
+        Dim data As New List(Of Object)()
+
+        Using connection As New SqlConnection(connectionString)
+            connection.Open()
+
+            Dim Query As New StringBuilder
+            Query.Append("SELECT ")
+            Query.Append("  * ")
+            Query.Append("FROM ")
+            Query.Append("(SELECT DISTINCT ")
+            Query.Append("  [a].SenderID, ")
+            Query.Append("  [b].vendor AS [Contractor], ")
+            Query.Append("  ISNULL(( ")
+            Query.Append("      SELECT TOP 1 ")
+            Query.Append("          CASE ")
+            Query.Append("              WHEN ISNULL([c].Message, '') <> '' THEN [c].Message ")
+            Query.Append("              WHEN ISNULL([c].AttachmentName, '') <> '' THEN '📎 ' + [c].AttachmentName ")
+            Query.Append("              WHEN ISNULL([c].AttachmentPath, '') <> '' THEN '📎 Attachment' ")
+            Query.Append("              ELSE 'No messages yet' ")
+            Query.Append("          END ")
+            Query.Append("      FROM cldc_contractorportal.dbo.Mstr_Conversation [c] ")
+            Query.Append("      WHERE [c].SenderID = [a].SenderID ")
+            Query.Append("      ORDER BY [c].CreatedDate DESC ")
+            Query.Append("  ), 'No messages yet') AS [Message], ")
+            Query.Append("  ISNULL((SELECT TOP 1 [c].CreatedDate FROM cldc_contractorportal.dbo.Mstr_Conversation [c] WHERE [c].SenderID = [a].SenderID ORDER BY [c].CreatedDate DESC), '') AS [CreatedDate], ")
+            Query.Append("  ISNULL(( ")
+            Query.Append("      SELECT COUNT(1) ")
+            Query.Append("      FROM cldc_contractorportal.dbo.Mstr_Conversation [u] ")
+            Query.Append("      WHERE [u].SenderID = [a].SenderID ")
+            Query.Append("        AND [u].SenderType = 'Contractor' ")
+            Query.Append("        AND ISNULL([u].IsRead_Admin, 0) = 0 ")
+            Query.Append("  ), 0) AS [UnreadCount] ")
+            Query.Append("FROM ")
+            Query.Append("  cldc_contractorportal.dbo.Mstr_Conversation [a] ")
+            Query.Append("  LEFT JOIN cldc_live_acc.dbo.ogm_vendor [b] ON [a].SenderID = [b].v_code ")
+            Query.Append("GROUP BY ")
+            Query.Append("  [a].SenderID, ")
+            Query.Append("  [b].vendor) [A] ")
+            Query.Append("ORDER BY ")
+            Query.Append("  [CreatedDate] DESC ")
+
+            Using command As New SqlCommand(Query.ToString(), connection)
+                Using reader As SqlDataReader = command.ExecuteReader()
+                    While reader.Read()
+                        Dim SenderID As String = Convert.ToString(reader("SenderID"))
+                        Dim Contractor As String = Convert.ToString(reader("Contractor"))
+                        Dim Message As String = Convert.ToString(reader("Message"))
+                        Dim CreatedDate As String = Convert.ToString(reader("CreatedDate"))
+                        Dim UnreadCount As Integer = Convert.ToInt32(reader("UnreadCount"))
+
+                        data.Add(New With {
+                            .SenderID = SenderID,
+                            .Contractor = Contractor,
+                            .Message = Message,
+                            .CreatedDate = CreatedDate,
+                            .UnreadCount = UnreadCount
+                        })
+                    End While
+                End Using
+            End Using
+        End Using
+
+        Return data
+
+    End Function
+    Public Sub MarkAsReadAdmin(ByVal pCode As String)
+        If String.IsNullOrWhiteSpace(pCode) Then
+            Return
+        End If
+
+        Dim connectionString As String = "Data Source=" & DataSource & ";Initial Catalog=" & catalog & ";User ID=" & UserID & ";Password=" & Password & ";"
+
+        Using connection As New SqlConnection(connectionString)
+            Dim query As String = "UPDATE cldc_contractorportal.dbo.Mstr_Conversation SET IsRead_Admin = 1 WHERE SenderID = @pSenderID AND SenderType = 'Contractor' AND ISNULL(IsRead_Admin, 0) = 0"
+            Using command As New SqlCommand(query, connection)
+                command.Parameters.AddWithValue("@pSenderID", pCode.Trim())
+                connection.Open()
+                command.ExecuteNonQuery()
+            End Using
+        End Using
+    End Sub
+
+    Public Function GetMessagesByContractor(ByVal pCode As String) As List(Of Object)
+        Dim connectionString As String = "Data Source=" & DataSource & ";Initial Catalog=" & catalog & ";User ID=" & UserID & ";Password=" & Password & ";"
+        Dim data As New List(Of Object)()
+
+        Using connection As New SqlConnection(connectionString)
+            connection.Open()
+
+            Dim Query As New StringBuilder
+            Query.Append("SELECT DISTINCT ")
+            Query.Append("  [a].ID, ")
+            Query.Append("  [a].SeqNo, ")
+            Query.Append("  [a].SenderType, ")
+            Query.Append("  [a].SenderID, ")
+            Query.Append("  ISNULL([a].Message, '') AS [Message], ")
+            'Query.Append("  'C:/inetpub/contractor/' + [a].AttachmentPath, ")
+            'Query.Append("  'C:/Users/User/Desktop/.NET/Contractor Portal/NET v2.6/NET/NET/' + [a].AttachmentPath AS [AttachmentPath], ")
+            Query.Append("  [a].AttachmentPath, ")
+            Query.Append("  [a].AttachmentName, ")
+            Query.Append("  [a].IsRead_Contractor, ")
+            Query.Append("  [a].IsRead_Admin, ")
+            Query.Append("  [a].CreatedDate, ")
+            Query.Append("  [b].vendor AS [Contractor] ")
+            Query.Append("FROM ")
+            Query.Append("  cldc_contractorportal.dbo.Mstr_Conversation [a] ")
+            Query.Append("  LEFT JOIN cldc_live_Acc.dbo.ogm_vendor [b] ON [a].SenderID = [b].v_code ")
+            Query.Append("WHERE ")
+            Query.Append("  [a].SenderID = @pSenderID ")
+            Query.Append("ORDER BY ")
+            Query.Append("  [a].CreatedDate ASC ")
+
+            Using command As New SqlCommand(Query.ToString(), connection)
+                command.Parameters.AddWithValue("@pSenderID", pCode.Trim())
+
+                Using reader As SqlDataReader = command.ExecuteReader()
+                    While reader.Read()
+                        Dim ID As String = Convert.ToString(reader("ID"))
+                        Dim SeqNo As String = Convert.ToString(reader("SeqNo"))
+                        Dim SenderType As String = Convert.ToString(reader("SenderType"))
+                        Dim SenderID As String = Convert.ToString(reader("SenderID"))
+                        Dim Message As String = Convert.ToString(reader("Message"))
+                        Dim AttachmentPath As String = Convert.ToString(reader("AttachmentPath"))
+                        Dim AttachmentName As String = Convert.ToString(reader("AttachmentName"))
+                        Dim IsRead_Contractor As String = Convert.ToString(reader("IsRead_Contractor"))
+                        Dim IsRead_Admin As String = Convert.ToString(reader("IsRead_Admin"))
+                        Dim CreatedDate As String = Convert.ToString(reader("CreatedDate"))
+                        Dim Contractor As String = Convert.ToString(reader("Contractor"))
+
+                        data.Add(New With {
+                            .ID = ID,
+                            .SeqNo = SeqNo,
+                            .SenderType = SenderType,
+                            .SenderID = SenderID,
+                            .Message = Message,
+                            .AttachmentPath = AttachmentPath,
+                            .AttachmentName = AttachmentName,
+                            .IsRead_Contractor = IsRead_Contractor,
+                            .IsRead_Admin = IsRead_Admin,
+                            .CreatedDate = CreatedDate,
+                            .Contractor = Contractor
+                        })
+                    End While
+                End Using
+            End Using
+        End Using
+
+        Return data
+    End Function
+
+    Public Function SendAdminReply(ByVal pCode As String, ByVal pMessage As String, ByVal pAttachmentPath As String, ByVal pAttachmentName As String) As Object
+        If String.IsNullOrWhiteSpace(pMessage) AndAlso String.IsNullOrWhiteSpace(pAttachmentPath) Then
+            Return Nothing
+        End If
+
+        Dim connectionString As String = "Data Source=" & DataSource & ";Initial Catalog=" & catalog01 & ";User ID=" & UserID & ";Password=" & Password & ";"
+        Dim newID As String = "0"
+        Dim createdDateStr As String = String.Empty
+
+        Using connection As New SqlConnection(connectionString)
+            Using command As New SqlCommand("cp_new_message", connection)
+                command.CommandType = CommandType.StoredProcedure
+                command.Parameters.AddWithValue("@pSenderType", "Admin")
+                command.Parameters.AddWithValue("@pSenderID", pCode.Trim())
+                command.Parameters.AddWithValue("@pMessage", If(String.IsNullOrWhiteSpace(pMessage), DBNull.Value, pMessage.Trim()))
+                command.Parameters.AddWithValue("@pIsRead_Contractor", 0)
+                command.Parameters.AddWithValue("@pIsRead_Admin", 1)
+                command.Parameters.AddWithValue("@pAttachmentPath", If(String.IsNullOrWhiteSpace(pAttachmentPath), DBNull.Value, pAttachmentPath.Trim()))
+                command.Parameters.AddWithValue("@pAttachmentName", If(String.IsNullOrWhiteSpace(pAttachmentName), DBNull.Value, pAttachmentName.Trim()))
+
+                connection.Open()
+
+                Using reader As SqlDataReader = command.ExecuteReader()
+                    If reader.Read() Then
+                        newID = Convert.ToString(reader("NewID"))
+                        createdDateStr = Convert.ToDateTime(reader("CreatedDate")).ToString("yyyy-MM-dd HH:mm:ss")
+                    End If
+                End Using
+            End Using
+        End Using
+
+        Dim messageObj = New With {
+            .ID = newID,
+            .SenderType = "Admin",
+            .SenderID = pCode.Trim(),
+            .Message = If(String.IsNullOrWhiteSpace(pMessage), "", pMessage.Trim()),
+            .AttachmentPath = pAttachmentPath,
+            .AttachmentName = pAttachmentName,
+            .IsRead_Contractor = "0",
+            .IsRead_Admin = "1",
+            .CreatedDate = createdDateStr
+        }
+
+        Clients.Group(pCode.Trim().ToLower()).receiveMessage(messageObj)
+        Clients.Caller.receiveMessage(messageObj)
+        Clients.OthersInGroup("Admins").receiveMessage(messageObj)
+
+        Return messageObj
+
+    End Function
+
 #End Region
 
 End Class

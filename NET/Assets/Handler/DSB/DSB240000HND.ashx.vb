@@ -1,5 +1,6 @@
 ﻿Imports System.Data
 Imports System.Data.SqlClient
+Imports System.Data.SqlTypes
 Imports System.Drawing
 Imports System.Globalization
 Imports System.IO
@@ -2306,16 +2307,17 @@ Public Class DSB240000HND
         Query.Append("    [A].ItemName ")
         Query.Append("    ,ISNULL([A].WhseName, '') [WhseName] ")
         Query.Append("    ,ISNULL([A].WhseCode, '') [WhseCode] ")
-        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-6,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-6,GETDATE())) THEN [A].qty ELSE 0 END) [Mnth7] ")
-        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-5,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-5,GETDATE())) THEN [A].qty ELSE 0 END) [Mnth6] ")
-        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-4,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-4,GETDATE())) THEN [A].qty ELSE 0 END) [Mnth5] ")
-        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-3,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-3,GETDATE())) THEN [A].qty ELSE 0 END) [Mnth4] ")
-        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-2,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-2,GETDATE())) THEN [A].qty ELSE 0 END) [Mnth3] ")
-        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-1,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-1,GETDATE())) THEN [A].qty ELSE 0 END) [Mnth2] ")
-        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN [A].qty ELSE 0 END) [Mnth1] ")
-        Query.Append("    ,SUM(CASE WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ([A].year * 12 + [A].period)) BETWEEN 0 AND 6 THEN [A].qty ELSE 0 END) [Total] ")
-        Query.Append("  FROM ItemBalance [A] ")
-        Query.Append("  WHERE ISNULL([A].ClassName, '') != '' AND [A].qty > 0 ")
+        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-6,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-6,GETDATE())) THEN abs([A].qty) ELSE 0 END) [Mnth7] ")
+        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-5,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-5,GETDATE())) THEN abs([A].qty) ELSE 0 END) [Mnth6] ")
+        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-4,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-4,GETDATE())) THEN abs([A].qty) ELSE 0 END) [Mnth5] ")
+        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-3,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-3,GETDATE())) THEN abs([A].qty) ELSE 0 END) [Mnth4] ")
+        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-2,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-2,GETDATE())) THEN abs([A].qty) ELSE 0 END) [Mnth3] ")
+        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(DATEADD(MONTH,-1,GETDATE())) AND [A].year = YEAR(DATEADD(MONTH,-1,GETDATE())) THEN abs([A].qty) ELSE 0 END) [Mnth2] ")
+        Query.Append("    ,SUM(CASE WHEN [A].period = MONTH(GETDATE()) AND [A].year = YEAR(GETDATE()) THEN abs([A].qty) ELSE 0 END) [Mnth1] ")
+        Query.Append("    ,SUM(CASE WHEN (YEAR(GETDATE()) * 12 + MONTH(GETDATE()) - ([A].year * 12 + [A].period)) BETWEEN 0 AND 6 THEN abs([A].qty) ELSE 0 END) [Total] ")
+        Query.Append("    ,ISNULL((select SUM([b].qty) from ItemBalance [b] where [b].WhseCode = [a].WhseCode and [b].ItemCode = MAX([a].ItemCode) and [b].UMCode = MAX([a].UMCode) and [b].year = YEAR(GETDATE()) and [b].period = MONTH(GETDATE()) ), 0) [CurrentStock] ")
+        Query.Append("  FROM ItemLedger [A] ")
+        Query.Append("  WHERE [A].post = 1 AND ISNULL([A].rvrs, 0) = 0 AND [A].qty < 0 ")
         Query.Append("  GROUP BY [A].ItemName, [A].WhseName, [A].WhseCode ")
         Query.Append("), ")
         Query.Append("WarehouseSummary AS ( ")
@@ -2341,6 +2343,7 @@ Public Class DSB240000HND
         Query.Append("  ,[Mnth2] ")
         Query.Append("  ,[Mnth1] ")
         Query.Append("  ,[Total] ")
+        Query.Append("  ,[CurrentStock] ")
         Query.Append("  ,([Total] / 7.0) [AvgMnth] ")
         Query.Append("  ,(CASE WHEN [Total] = 0 THEN 0 ELSE ([Mnth1] / ([Total] / 7.0)) END) [Projection] ")
         Query.Append("  ,[No] ")
@@ -2358,10 +2361,13 @@ Public Class DSB240000HND
         Query.Append("    ,SUM(R.Mnth2) [Mnth2] ")
         Query.Append("    ,SUM(R.Mnth1) [Mnth1] ")
         Query.Append("    ,SUM(R.Total) [Total] ")
+        Query.Append("    ,SUM(R.CurrentStock) [CurrentStock] ")
         Query.Append("    ,0 [No] ")
         Query.Append("    ,R.ItemName + ' ' + ISNULL(WS.AllWarehouses, '') [SearchText] ")
         Query.Append("  FROM RawData R ")
         Query.Append("  LEFT JOIN WarehouseSummary WS ON R.ItemName = WS.ItemName ")
+        Query.Append("  WHERE ")
+        Query.Append("      ISNULL(R.ItemName,'') <> '' ")
         Query.Append("  GROUP BY R.ItemName, WS.AllWarehouses ")
         Query.Append("  UNION ALL ")
         Query.Append("  SELECT ")
@@ -2376,11 +2382,13 @@ Public Class DSB240000HND
         Query.Append("    ,R.Mnth2 ")
         Query.Append("    ,R.Mnth1 ")
         Query.Append("    ,R.Total ")
+        Query.Append("    ,R.CurrentStock ")
         Query.Append("    ,1 [No] ")
         Query.Append("    ,R.ItemName + ' ' + R.WhseName [SearchText] ")
         Query.Append("  FROM RawData R ")
         Query.Append(") T ")
         Query.Append("WHERE ISNULL([ItemName], '') != '' ")
+        Query.Append("AND [Total] <> 0 ")
         Query.Append("ORDER BY [Parent], [No], [WhseCode] ")
         'get query
 
@@ -2392,6 +2400,7 @@ Public Class DSB240000HND
         Using ConStr As New SqlConnection("Data Source=" & DataSource & "; Initial Catalog=" & catalog & "; User ID=" & UserID & "; Password=" & Password)
             Using Cmd As New SqlCommand(Query.ToString())
                 Cmd.CommandType = CommandType.Text
+                Cmd.CommandTimeout = 1500
                 Cmd.Connection = ConStr
                 ConStr.Open()
                 Dim DR As SqlDataReader = Cmd.ExecuteReader()
@@ -2409,6 +2418,7 @@ Public Class DSB240000HND
                         .Month2 = DR("Mnth2"),
                         .Month1 = DR("Mnth1"),
                         .Total = DR("Total"),
+                        .CurrentStock = DR("CurrentStock"),
                         .AvgMonth = DR("AvgMnth"),
                         .Projection = DR("Projection"),
                         .No = DR("No")
