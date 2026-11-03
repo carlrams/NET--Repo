@@ -14,9 +14,9 @@ Public Class SLM000011
 
     'connection
     Dim DataSource As String = "IISV2"
-    Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
-    Dim Password As String = "Cii5s"
+    Dim catalog As String = ""
+    Dim UserID As String = ""
+    Dim Password As String = ""
     'connection
 
     Sub ProcessRequest(ByVal context As HttpContext) Implements IHttpHandler.ProcessRequest

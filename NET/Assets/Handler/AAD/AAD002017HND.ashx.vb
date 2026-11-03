@@ -20,10 +20,10 @@ Public Class AAD002017HND
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.10"
+    Dim DataSource As String = ""
     Dim catalog As String = "calmardblive"
-    Dim UserID As String = "ciis"
-    Dim Password As String = "Cii5s"
+    Dim UserID As String = ""
+    Dim Password As String = ""
     'connection
 
     Sub ProcessRequest(ByVal context As HttpContext) Implements IHttpHandler.ProcessRequest

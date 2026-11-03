@@ -22,11 +22,11 @@ Public Class ChatHub
 
     Inherits Hub
 
-    Dim DataSource As String = "10.10.30.10"
-    Dim catalog As String = "cldc_live_acc"
+    Dim DataSource As String = ""
+    Dim catalog As String = ""
     Dim catalog01 As String = "cldc_contractorportal"
-    Dim UserID As String = "jfevidal"
-    Dim Password As String = "jfevidal"
+    Dim UserID As String = ""
+    Dim Password As String = ""
 
 #Region "Send"
 

@@ -12,11 +12,11 @@ Public Class ENGRTView
     Dim CIIS_UserInfo As HttpCookie
     Dim CIIS_EmpCode As String
 
-    Dim DataSource As String = "10.10.30.10"
+    Dim DataSource As String = ""
     Dim cldc_live_acc As String = "cldc_live_acc"
-    Dim calmardbLive As String = "calmardbLive"
-    Dim UserID As String = "ciis"
-    Dim Password As String = "Cii5s"
+    Dim calmardblive As String = ""
+    Dim UserID As String = ""
+    Dim Password As String = ""
     Dim FormCode As String = ""
 
 #Region "Form"

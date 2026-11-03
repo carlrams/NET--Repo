@@ -30,10 +30,10 @@ Public Class DSB240000HND
     'cookies
 
     'connection
-    Dim DataSource As String = "10.10.30.20"
-    Dim catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciisv2"
-    Dim Password As String = "Cii5s"
+    Dim DataSource As String = ""
+    Dim catalog As String = ""
+    Dim UserID As String = ""
+    Dim Password As String = ""
     'connection
 
     Sub ProcessRequest(ByVal context As HttpContext) Implements IHttpHandler.ProcessRequest

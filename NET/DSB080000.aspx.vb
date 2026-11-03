@@ -15,10 +15,10 @@ Public Class DSB080000
     Dim CIIS_EmpCode As String
     Dim CIIS_Deparment As String
 
-    Dim DataSource As String = "10.10.30.10"
-    Dim Catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
-    Dim Password As String = "Cii5s"
+    Dim DataSource As String = ""
+    Dim catalog As String = ""
+    Dim UserID As String = ""
+    Dim Password As String = ""
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 

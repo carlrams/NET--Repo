@@ -10,10 +10,10 @@ Public Class MNU000010
     Dim CIIS_UserInfo As HttpCookie
     Dim CIIS_EmpCode As String
 
-    Dim DataSource As String = "10.10.30.10"
-    Dim Catalog As String = "cldc_live_acc"
-    Dim UserID As String = "ciis"
-    Dim Password As String = "Cii5s"
+    Dim DataSource As String = ""
+    Dim catalog As String = ""
+    Dim UserID As String = ""
+    Dim Password As String = ""
 
 #Region "Page"
 
